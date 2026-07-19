@@ -339,6 +339,13 @@ three native pixels of outer padding, and apply nearest-neighbor integer scale
 bounds, baselines, dimensions, filenames, and hashes and pins the 118/42
 selection closure.
 
+The repository also commits a generated [GitHub specimen gallery](../SPECIMENS.md).
+It contains those 160 pangrams plus complete raw-code glyph sheets for the 40
+complementary symbols artifacts, so every generated identity can be previewed in
+a browser. `scripts/update_specimen_gallery.py --check` requires the tracked
+PNG bytes, paths, identities, hashes, and Markdown to match a fresh build; the
+committed images are presentation derivatives and do not add Unicode evidence.
+
 ## BDF, ISO 10646, and X core constraints
 
 Unicode derivative BDFs store the scalar value directly as decimal BDF

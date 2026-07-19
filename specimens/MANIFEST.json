@@ -1,0 +1,1989 @@
+{
+  "counts": {
+    "latin": 160,
+    "profiles": {
+      "latin": {
+        "runtime": 42,
+        "source": 118
+      },
+      "symbols": {
+        "runtime": 7,
+        "source": 33
+      }
+    },
+    "symbols": 40,
+    "total": 200
+  },
+  "schema_version": 1,
+  "selection": {
+    "latin": "at least one visible emitted Unicode BDF glyph in U+0041-U+005A or U+0061-U+007A",
+    "symbols": "closed complement of the Latin artifact set"
+  },
+  "source_license": {
+    "path": "LICENSE.source",
+    "sha256": "05b8de7c86c946cc747ab71a9aaa7dd56e37365278b5585ab685156eaa90fb92"
+  },
+  "source_revision": "8e978d7d1704096a63edd4386a3b8326a2e584af",
+  "specimens": [
+    {
+      "artifact_name": "13FGB",
+      "content_class": "latin",
+      "path": "latin/runtime/13fgb.png",
+      "profile": "runtime",
+      "runtime_name": "13FGB",
+      "sha256": "4e6469db22deb1d7f94ddc2f4f12451293c7dcae10505188fd2eb0d110e042c5",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "16FG",
+      "content_class": "latin",
+      "path": "latin/runtime/16fg.png",
+      "profile": "runtime",
+      "runtime_name": "16FG",
+      "sha256": "caa5711304691512302f7ba45e664bdf06f94dbb47e33034b27fb21dbfb1aff9",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "20VR",
+      "content_class": "latin",
+      "path": "latin/runtime/20vr.png",
+      "profile": "runtime",
+      "runtime_name": "20VR",
+      "sha256": "b0779ce80e3fc7f75766be537dbca0119626da3759fd80099e7bb94bfb5ee88c",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "25FR3",
+      "content_class": "latin",
+      "path": "latin/runtime/25fr3.png",
+      "profile": "runtime",
+      "runtime_name": "25FR3",
+      "sha256": "0a8f89b80cf7add31982e3725ca4b308d55ccb7ce00bf2d05ff24c0483669573",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "31VR",
+      "content_class": "latin",
+      "path": "latin/runtime/31vr.png",
+      "profile": "runtime",
+      "runtime_name": "31VR",
+      "sha256": "8a4aa8ad9b4f7dca73282b31f954809d376418f9df82f5326d015610b62a6759",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "40VR",
+      "content_class": "latin",
+      "path": "latin/runtime/40vr.png",
+      "profile": "runtime",
+      "runtime_name": "40VR",
+      "sha256": "95d1ad1a117f0335faf4b3ad2856fb095af9fb76be5ed3ee79e2db1e9cb52c38",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "40VSHD",
+      "content_class": "latin",
+      "path": "latin/runtime/40vshd.png",
+      "profile": "runtime",
+      "runtime_name": "40VSHD",
+      "sha256": "954f6752712ebb58e8a11009f77fdc03ef40385e34ca0d8b4a11f1d21733b6a7",
+      "specimen_kind": "unicode-pangram",
+      "text": "THE FIVE BOXING LISP WIZARDS JUMP QUICKLY."
+    },
+    {
+      "artifact_name": "43VXMS",
+      "content_class": "latin",
+      "path": "latin/runtime/43vxms.png",
+      "profile": "runtime",
+      "runtime_name": "43VXMS",
+      "sha256": "bcd8aa57a1e14710d020f4d7553e77cb711288ed964d8e3c44a7fe124f49f758",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "5X5",
+      "content_class": "latin",
+      "path": "latin/runtime/5x5.png",
+      "profile": "runtime",
+      "runtime_name": "5X5",
+      "sha256": "d1023fff47a1900a294926a0e2cd2fb7a5dece921f08960d733f77a17baacb88",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "BIGFNT",
+      "content_class": "latin",
+      "path": "latin/runtime/bigfnt.png",
+      "profile": "runtime",
+      "runtime_name": "BIGFNT",
+      "sha256": "0cf893a273ce8f85db4bcce7854906b7e7aa109deff72af5648fd6ef6a12b198",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "BIGVG",
+      "content_class": "latin",
+      "path": "latin/runtime/bigvg.png",
+      "profile": "runtime",
+      "runtime_name": "BIGVG",
+      "sha256": "b20838e2bf4d78e680d6e3ca34ca33727fe87d6321e5bf0720a1c139d3cb6afb",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CPT-13FG",
+      "content_class": "latin",
+      "path": "latin/runtime/cpt-13fg.png",
+      "profile": "runtime",
+      "runtime_name": "CPT-13FG",
+      "sha256": "cd0552baed9d984778087b59742d582d3f50b73518e137105070cc1a953e5000",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CPT-CM10",
+      "content_class": "latin",
+      "path": "latin/runtime/cpt-cm10.png",
+      "profile": "runtime",
+      "runtime_name": "CPT-CM10",
+      "sha256": "4a647d0788799edda26ee9b22f914f6bc8b870d5e4805b559dbd3ae769736c81",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CPT-CM12",
+      "content_class": "latin",
+      "path": "latin/runtime/cpt-cm12.png",
+      "profile": "runtime",
+      "runtime_name": "CPT-CM12",
+      "sha256": "800375d7a1d1e378767ddb7278e4c2dd76ee7a160ebf318500867c992ffac7ee",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CPT-HL10",
+      "content_class": "latin",
+      "path": "latin/runtime/cpt-hl10.png",
+      "profile": "runtime",
+      "runtime_name": "CPT-HL10",
+      "sha256": "cf2bf2bd8d539e58b9a86a7a6e99368e013848f00971e86936288576e034bf65",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CPT-HL10B",
+      "content_class": "latin",
+      "path": "latin/runtime/cpt-hl10b.png",
+      "profile": "runtime",
+      "runtime_name": "CPT-HL10B",
+      "sha256": "4ec080b5deed3da9b48c75ebcde92f84a35c11b7d038fab14ef127610c69d11b",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CPT-TR10I",
+      "content_class": "latin",
+      "path": "latin/runtime/cpt-tr10i.png",
+      "profile": "runtime",
+      "runtime_name": "CPT-TR10I",
+      "sha256": "76fcd14b758fb7a9d56d9a7bd0e004076b46daf09ddf379e24d78a8fc7dfc798",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CPTFONT",
+      "content_class": "latin",
+      "path": "latin/runtime/cptfont.png",
+      "profile": "runtime",
+      "runtime_name": "CPTFONT",
+      "sha256": "0798ce97ce5e7f283428b5ac7d0f18c83e150aa1ea11f2f1d9faeb3dbcc08f81",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "GERM35",
+      "content_class": "latin",
+      "path": "latin/runtime/germ35.png",
+      "profile": "runtime",
+      "runtime_name": "GERM35",
+      "sha256": "71a5e737cd22d53f5235835c4749f852df1cda60ff0782876f7897965830b6d0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL10",
+      "content_class": "latin",
+      "path": "latin/runtime/hl10.png",
+      "profile": "runtime",
+      "runtime_name": "HL10",
+      "sha256": "cf2bf2bd8d539e58b9a86a7a6e99368e013848f00971e86936288576e034bf65",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL10B",
+      "content_class": "latin",
+      "path": "latin/runtime/hl10b.png",
+      "profile": "runtime",
+      "runtime_name": "HL10B",
+      "sha256": "4ec080b5deed3da9b48c75ebcde92f84a35c11b7d038fab14ef127610c69d11b",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL12",
+      "content_class": "latin",
+      "path": "latin/runtime/hl12.png",
+      "profile": "runtime",
+      "runtime_name": "HL12",
+      "sha256": "0e110e0db705d1530cd23d97fe0a8e48eae356fdacf164c6d31c9bb8163376b0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL12B",
+      "content_class": "latin",
+      "path": "latin/runtime/hl12b.png",
+      "profile": "runtime",
+      "runtime_name": "HL12B",
+      "sha256": "9bc6d08a25ed4e97b81d1714383a3d50b20eaa28890f58921a17060f94cf275e",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL12BI",
+      "content_class": "latin",
+      "path": "latin/runtime/hl12bi.png",
+      "profile": "runtime",
+      "runtime_name": "HL12BI",
+      "sha256": "e85c246ce34c3f09df727a7341c6447278a2c5536e6d93910a410d4a8c39e6c8",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly"
+    },
+    {
+      "artifact_name": "HL12I",
+      "content_class": "latin",
+      "path": "latin/runtime/hl12i.png",
+      "profile": "runtime",
+      "runtime_name": "HL12I",
+      "sha256": "515913ba3d2c54baca5edae19ea95f32a3c65e899b8ad555a0cfdf083d198729",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly"
+    },
+    {
+      "artifact_name": "HL6",
+      "content_class": "latin",
+      "path": "latin/runtime/hl6.png",
+      "profile": "runtime",
+      "runtime_name": "HL6",
+      "sha256": "8e4e05ab64053b291d373e459ed2a95a1b4815a27723fcd6ba4d4738ef1c5eaf",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7",
+      "content_class": "latin",
+      "path": "latin/runtime/hl7.png",
+      "profile": "runtime",
+      "runtime_name": "HL7",
+      "sha256": "f83ff4f9ddd69afa6fc39e3a5c6ceea5b85f27417ddb265c375333b5cbde7891",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "MEDFNB",
+      "content_class": "latin",
+      "path": "latin/runtime/medfnb.png",
+      "profile": "runtime",
+      "runtime_name": "MEDFNB",
+      "sha256": "0faabb2025b66f584434a2b1c4e488af9ac5f1eb98e09eb60bbd7eaf669199a0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "MEDFNT",
+      "content_class": "latin",
+      "path": "latin/runtime/medfnt.png",
+      "profile": "runtime",
+      "runtime_name": "MEDFNT",
+      "sha256": "f35007ecb094a9be05f54890e8389d70ff924398c4e7d544e7b88658968a5f27",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "METS",
+      "content_class": "latin",
+      "path": "latin/runtime/mets.png",
+      "profile": "runtime",
+      "runtime_name": "METS",
+      "sha256": "90758487d6daabca468a4e2e9d5796a2ca2c782a0e8898f346cbd5ec976736cd",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "METSI",
+      "content_class": "latin",
+      "path": "latin/runtime/metsi.png",
+      "profile": "runtime",
+      "runtime_name": "METSI",
+      "sha256": "2dd1d3b9e329120f937841afbcd125bba5f29f364182e237118781490ea87088",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "N43XMS",
+      "content_class": "latin",
+      "path": "latin/runtime/n43xms.png",
+      "profile": "runtime",
+      "runtime_name": "43VXMS",
+      "sha256": "05602913f9890029028d5077c51f64083b81b28a8d350887d6fb91b1fb00ca97",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "PRT12B",
+      "content_class": "latin",
+      "path": "latin/runtime/prt12b.png",
+      "profile": "runtime",
+      "runtime_name": "PRT12B",
+      "sha256": "abe7e7bce543dc7186c6903c4f5f93a02893f662f5f84fce521ff54cec18a1e0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "S35GER",
+      "content_class": "latin",
+      "path": "latin/runtime/s35ger.png",
+      "profile": "runtime",
+      "runtime_name": "S35GER",
+      "sha256": "b12e540d4442697d0b7077756a15337b386a566c8ff15fa7232d612ac0189a90",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly"
+    },
+    {
+      "artifact_name": "SAIL12",
+      "content_class": "latin",
+      "path": "latin/runtime/sail12.png",
+      "profile": "runtime",
+      "runtime_name": "SAIL12",
+      "sha256": "576428c7853d9b8479f3282ee2a31d1c97607b106b361e8a55daed653f87a993",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR10I",
+      "content_class": "latin",
+      "path": "latin/runtime/tr10i.png",
+      "profile": "runtime",
+      "runtime_name": "TR10I",
+      "sha256": "76fcd14b758fb7a9d56d9a7bd0e004076b46daf09ddf379e24d78a8fc7dfc798",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR12B",
+      "content_class": "latin",
+      "path": "latin/runtime/tr12b.png",
+      "profile": "runtime",
+      "runtime_name": "TR12B",
+      "sha256": "d68b7cf1fb4a3ea3a31475f87154b893b6f272ce67ff4ea983d7c1131a4c7463",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR12B1",
+      "content_class": "latin",
+      "path": "latin/runtime/tr12b1.png",
+      "profile": "runtime",
+      "runtime_name": "TR12B1",
+      "sha256": "d68b7cf1fb4a3ea3a31475f87154b893b6f272ce67ff4ea983d7c1131a4c7463",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR8",
+      "content_class": "latin",
+      "path": "latin/runtime/tr8.png",
+      "profile": "runtime",
+      "runtime_name": "TR8",
+      "sha256": "89bf7b0594751523c7737385d2bd9c3dc3d5eabf1dd49168383a49b40a6ca317",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR8B",
+      "content_class": "latin",
+      "path": "latin/runtime/tr8b.png",
+      "profile": "runtime",
+      "runtime_name": "TR8B",
+      "sha256": "0a974748d2fdd03bb3e1d18e98cfdc5ba3fc945d3c3c49a32dcc65b0712f11a4",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR8I",
+      "content_class": "latin",
+      "path": "latin/runtime/tr8i.png",
+      "profile": "runtime",
+      "runtime_name": "TR8I",
+      "sha256": "2d8b150092b30054f4f9fee12bff353aca4790cb3c504c2fcfbdd70c21bf0397",
+      "specimen_kind": "unicode-pangram",
+      "text": "THE FIVE BOXING LISP WIZARDS JUMP QUICKLY."
+    },
+    {
+      "artifact_name": "TVFONT",
+      "content_class": "latin",
+      "path": "latin/runtime/tvfont.png",
+      "profile": "runtime",
+      "runtime_name": "TVFONT",
+      "sha256": "7bc30e0fed235752ace035670839e3896c55affc981463105a06e8dc79b9ee6d",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "13FG",
+      "content_class": "latin",
+      "logical_name": "13FG",
+      "path": "latin/source/13fg.png",
+      "profile": "source",
+      "sha256": "cd0552baed9d984778087b59742d582d3f50b73518e137105070cc1a953e5000",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "13FGB",
+      "content_class": "latin",
+      "logical_name": "13FGB",
+      "path": "latin/source/13fgb.png",
+      "profile": "source",
+      "sha256": "4e6469db22deb1d7f94ddc2f4f12451293c7dcae10505188fd2eb0d110e042c5",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "14FR3",
+      "content_class": "latin",
+      "logical_name": "14FR3",
+      "path": "latin/source/14fr3.png",
+      "profile": "source",
+      "sha256": "18ecedc51c6dd51ed6c55a3ff78803cd0340dff0fc402b5fb847181203376b27",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "16FG",
+      "content_class": "latin",
+      "logical_name": "16FG",
+      "path": "latin/source/16fg.png",
+      "profile": "source",
+      "sha256": "caa5711304691512302f7ba45e664bdf06f94dbb47e33034b27fb21dbfb1aff9",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "25FR3",
+      "content_class": "latin",
+      "logical_name": "25FR3",
+      "path": "latin/source/25fr3.png",
+      "profile": "source",
+      "sha256": "0a8f89b80cf7add31982e3725ca4b308d55ccb7ce00bf2d05ff24c0483669573",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "40VSHD",
+      "content_class": "latin",
+      "logical_name": "40VSHD",
+      "path": "latin/source/40vshd.png",
+      "profile": "source",
+      "sha256": "99dfb97494d8ada199459c016fd8bd998f8dc298a72d694df1b0107562ddd852",
+      "specimen_kind": "unicode-pangram",
+      "text": "THE FIVE BOXING LISP WIZARDS JUMP QUICKLY."
+    },
+    {
+      "artifact_name": "43VXMS",
+      "content_class": "latin",
+      "logical_name": "43VXMS",
+      "path": "latin/source/43vxms.png",
+      "profile": "source",
+      "sha256": "b0d5fdd244bcdc39d76489186d8fc5bacba89ea97c6cfd480033d8f58a456961",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "5X5",
+      "content_class": "latin",
+      "logical_name": "5X5",
+      "path": "latin/source/5x5.png",
+      "profile": "source",
+      "sha256": "3d7e051a522dc62f7fa6fd955a43e48f5d1cb23d1ed574f839f5168415e27956",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "BIGFNT",
+      "content_class": "latin",
+      "logical_name": "BIGFNT",
+      "path": "latin/source/bigfnt.png",
+      "profile": "source",
+      "sha256": "f2047dc64e9b1d3ecd3a04afab59839328dfcfd29da8fae21ef74e4539676ef5",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "BIGFNT-KST",
+      "content_class": "latin",
+      "logical_name": "BIGFNT",
+      "path": "latin/source/bigfnt-kst.png",
+      "profile": "source",
+      "sha256": "0cf893a273ce8f85db4bcce7854906b7e7aa109deff72af5648fd6ef6a12b198",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "BLKF10",
+      "content_class": "latin",
+      "logical_name": "BLKF10",
+      "path": "latin/source/blkf10.png",
+      "profile": "source",
+      "sha256": "126555cce77f4c2632bd31f08c16d577eb28cadc8d9c61db50e380305f8005f3",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "BLKF10-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "BLKF10",
+      "path": "latin/source/blkf10-al-ar1.png",
+      "profile": "source",
+      "sha256": "fdc09e604972550f5a3c24c568c540e414efa8dd49025d05e2436e48a5747be8",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CHA",
+      "content_class": "latin",
+      "logical_name": "CHA",
+      "path": "latin/source/cha.png",
+      "profile": "source",
+      "sha256": "a20c52fcf0805cbbc61314d9fd27886d37a673f2dfb13b17bf308e1525f16228",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CHA-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "CHA",
+      "path": "latin/source/cha-al-ar1.png",
+      "profile": "source",
+      "sha256": "097ead961f3b6a40376e39022b3f1c0c4c22104966837453023fda10cc8774b4",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CHAS",
+      "content_class": "latin",
+      "logical_name": "CHAS",
+      "path": "latin/source/chas.png",
+      "profile": "source",
+      "sha256": "4b626e8d365f601f285aa65c039a3ba5100cda50567db9f732e0b3b86ef56bce",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CHAS-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "CHAS",
+      "path": "latin/source/chas-al-ar1.png",
+      "profile": "source",
+      "sha256": "ded2969385d81e8000d28bce7fddac68f67d295e24d281eba8dfc03a62a83d47",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLAR",
+      "content_class": "latin",
+      "logical_name": "CLAR",
+      "path": "latin/source/clar.png",
+      "profile": "source",
+      "sha256": "5691ffafefe72f11b3399678ba713d10764f7152d8e934405970c19b2b0c5205",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLAR-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "CLAR",
+      "path": "latin/source/clar-al-ar1.png",
+      "profile": "source",
+      "sha256": "7eafa8ff535057fff469b4d87d9312b17dcb5a22f51a466a8c6ca57881aecb3c",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLAR12",
+      "content_class": "latin",
+      "logical_name": "CLAR12",
+      "path": "latin/source/clar12.png",
+      "profile": "source",
+      "sha256": "a241cfe89bf90bee4d49eb0538b39f469658306e254259dd3f2f4cec6fe67a83",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLAR12-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "CLAR12",
+      "path": "latin/source/clar12-al-ar1.png",
+      "profile": "source",
+      "sha256": "a27829da6ce2eef08ca8116a730a21e2d8cff648b6f16c065a68bd2fe79188ea",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLAR14",
+      "content_class": "latin",
+      "logical_name": "CLAR14",
+      "path": "latin/source/clar14.png",
+      "profile": "source",
+      "sha256": "5691ffafefe72f11b3399678ba713d10764f7152d8e934405970c19b2b0c5205",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLAR14-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "CLAR14",
+      "path": "latin/source/clar14-al-ar1.png",
+      "profile": "source",
+      "sha256": "7eafa8ff535057fff469b4d87d9312b17dcb5a22f51a466a8c6ca57881aecb3c",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLARB",
+      "content_class": "latin",
+      "logical_name": "CLARB",
+      "path": "latin/source/clarb.png",
+      "profile": "source",
+      "sha256": "6b40531bb8fef76f0059f7f1bb7ac522d427ad55b2cefb3b78e39386e3877d10",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLARB-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "CLARB",
+      "path": "latin/source/clarb-al-ar1.png",
+      "profile": "source",
+      "sha256": "b7ee490231a2388e880721b6360d8ff781dc3581b1da1822fdb821263eb75766",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CLRE14",
+      "content_class": "latin",
+      "logical_name": "CLRE14",
+      "path": "latin/source/clre14.png",
+      "profile": "source",
+      "sha256": "06b399459eddab81eff0e1885ffe033a30367f5ea07feb776efa466b6d047fba",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CM10",
+      "content_class": "latin",
+      "logical_name": "CM10",
+      "path": "latin/source/cm10.png",
+      "profile": "source",
+      "sha256": "58b4b33f4c9b05497f3fde9a91938b3398660022970425ffa5073e8ea0b1dd13",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CM12",
+      "content_class": "latin",
+      "logical_name": "CM12",
+      "path": "latin/source/cm12.png",
+      "profile": "source",
+      "sha256": "688c47259e6fd9a90f90a722d190f473b2b0475216e400e51444c36c5ba18f88",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "CPTFON",
+      "content_class": "latin",
+      "logical_name": "CPTFON",
+      "path": "latin/source/cptfon.png",
+      "profile": "source",
+      "sha256": "0798ce97ce5e7f283428b5ac7d0f18c83e150aa1ea11f2f1d9faeb3dbcc08f81",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "GACH10",
+      "content_class": "latin",
+      "logical_name": "GACH10",
+      "path": "latin/source/gach10.png",
+      "profile": "source",
+      "sha256": "f672dbf71fef05cc05f73d0fdf711ce13221fa5d06f4f48a836c48d3fd9c8a07",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "GACH10-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "GACH10",
+      "path": "latin/source/gach10-al-ar1.png",
+      "profile": "source",
+      "sha256": "a0bdc406403572861bfbbbcf89de9dcbe4978f76174157ee290ba48107063018",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "GACH12",
+      "content_class": "latin",
+      "logical_name": "GACH12",
+      "path": "latin/source/gach12.png",
+      "profile": "source",
+      "sha256": "e47bb4ec64b9abf91d3c817bda4a6890702463a8a83c15f09b6070e0b66d74cf",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "GACH12-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "GACH12",
+      "path": "latin/source/gach12-al-ar1.png",
+      "profile": "source",
+      "sha256": "576428c7853d9b8479f3282ee2a31d1c97607b106b361e8a55daed653f87a993",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "GACHA8",
+      "content_class": "latin",
+      "logical_name": "GACHA8",
+      "path": "latin/source/gacha8.png",
+      "profile": "source",
+      "sha256": "d8c64f3c3cda4ceb937f329998150ce44ff0b47b7c289df4bd77d2eb41a4bdae",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "GACHA8-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "GACHA8",
+      "path": "latin/source/gacha8-al-ar1.png",
+      "profile": "source",
+      "sha256": "80b62b8cf769e6842f8abbd200283c515ffbb2426e8a90d03245148c26b40547",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "GLS7X9",
+      "content_class": "latin",
+      "logical_name": "GLS7X9",
+      "path": "latin/source/gls7x9.png",
+      "profile": "source",
+      "sha256": "fe4bc222f83c6006e6f6ca102de7a43ffcdec40c53c0b558974a380c60df3429",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HAFONT",
+      "content_class": "latin",
+      "logical_name": "HAFONT",
+      "path": "latin/source/hafont.png",
+      "profile": "source",
+      "sha256": "0798ce97ce5e7f283428b5ac7d0f18c83e150aa1ea11f2f1d9faeb3dbcc08f81",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL10",
+      "content_class": "latin",
+      "logical_name": "HL10",
+      "path": "latin/source/hl10.png",
+      "profile": "source",
+      "sha256": "cf2bf2bd8d539e58b9a86a7a6e99368e013848f00971e86936288576e034bf65",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL10-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL10",
+      "path": "latin/source/hl10-al-ar1.png",
+      "profile": "source",
+      "sha256": "22ed6a18cc39bdc4360364c99f97da288fab7c061bfb161c991bb167da897963",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL10B",
+      "content_class": "latin",
+      "logical_name": "HL10B",
+      "path": "latin/source/hl10b.png",
+      "profile": "source",
+      "sha256": "4ec080b5deed3da9b48c75ebcde92f84a35c11b7d038fab14ef127610c69d11b",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL10B-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL10B",
+      "path": "latin/source/hl10b-al-ar1.png",
+      "profile": "source",
+      "sha256": "4e70854c70e367b601e30bd333b1caac398230f81ca999e619b88e1748e1fe14",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL12",
+      "content_class": "latin",
+      "logical_name": "HL12",
+      "path": "latin/source/hl12.png",
+      "profile": "source",
+      "sha256": "0e110e0db705d1530cd23d97fe0a8e48eae356fdacf164c6d31c9bb8163376b0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL12-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL12",
+      "path": "latin/source/hl12-al-ar1.png",
+      "profile": "source",
+      "sha256": "43dc00c8092f4f70df2a4e52b1c7a3419e27d6d9450dfb8547f2b6f67f4eb941",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL12B",
+      "content_class": "latin",
+      "logical_name": "HL12B",
+      "path": "latin/source/hl12b.png",
+      "profile": "source",
+      "sha256": "9bc6d08a25ed4e97b81d1714383a3d50b20eaa28890f58921a17060f94cf275e",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL12B-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL12B",
+      "path": "latin/source/hl12b-al-ar1.png",
+      "profile": "source",
+      "sha256": "c0e7713b62e73b74d1c982b10a7d235c94a8574f0350aaf00be1b04a5ec4ac57",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL12I",
+      "content_class": "latin",
+      "logical_name": "HL12I",
+      "path": "latin/source/hl12i.png",
+      "profile": "source",
+      "sha256": "515913ba3d2c54baca5edae19ea95f32a3c65e899b8ad555a0cfdf083d198729",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly"
+    },
+    {
+      "artifact_name": "HL12I-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL12I",
+      "path": "latin/source/hl12i-al-ar1.png",
+      "profile": "source",
+      "sha256": "c3daf9415fc52ba8c5506bb434d9a1ff67cbd85694b9f423fe604fb8b74691fe",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly"
+    },
+    {
+      "artifact_name": "HL14",
+      "content_class": "latin",
+      "logical_name": "HL14",
+      "path": "latin/source/hl14.png",
+      "profile": "source",
+      "sha256": "4c203b404f413b2bf5ebf935c92062a67c959495ca8e3cd24b5fb83e74739e6b",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL14-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL14",
+      "path": "latin/source/hl14-al-ar1.png",
+      "profile": "source",
+      "sha256": "8e622803d99bf82b7e0ebfde55514c504aced8107109bc08a8af6ee7b6b7f75e",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL18",
+      "content_class": "latin",
+      "logical_name": "HL18",
+      "path": "latin/source/hl18.png",
+      "profile": "source",
+      "sha256": "ceea776e48b079f7b994f74408b6c4d15e01699e7993208bfea1a631073c0160",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL18-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL18",
+      "path": "latin/source/hl18-al-ar1.png",
+      "profile": "source",
+      "sha256": "99d3e8e7e7f246a89201c0559877bc75a5370d078e5f998b9db33c165fb9cdf9",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL6",
+      "content_class": "latin",
+      "logical_name": "HL6",
+      "path": "latin/source/hl6.png",
+      "profile": "source",
+      "sha256": "8e4e05ab64053b291d373e459ed2a95a1b4815a27723fcd6ba4d4738ef1c5eaf",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL6-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL6",
+      "path": "latin/source/hl6-al-ar1.png",
+      "profile": "source",
+      "sha256": "869f9d9e62c9bd5948655faf877606c82c0adf796519e9d454a539eccaffebaf",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7",
+      "content_class": "latin",
+      "logical_name": "HL7",
+      "path": "latin/source/hl7.png",
+      "profile": "source",
+      "sha256": "f83ff4f9ddd69afa6fc39e3a5c6ceea5b85f27417ddb265c375333b5cbde7891",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL7",
+      "path": "latin/source/hl7-al-ar1.png",
+      "profile": "source",
+      "sha256": "2bca6c4891f6dfa6cabb2e375368d3d8d79cd37a0a5ee032404411669a405f53",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7B",
+      "content_class": "latin",
+      "logical_name": "HL7B",
+      "path": "latin/source/hl7b.png",
+      "profile": "source",
+      "sha256": "f83ff4f9ddd69afa6fc39e3a5c6ceea5b85f27417ddb265c375333b5cbde7891",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7B-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL7B",
+      "path": "latin/source/hl7b-al-ar1.png",
+      "profile": "source",
+      "sha256": "2bca6c4891f6dfa6cabb2e375368d3d8d79cd37a0a5ee032404411669a405f53",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7BI",
+      "content_class": "latin",
+      "logical_name": "HL7BI",
+      "path": "latin/source/hl7bi.png",
+      "profile": "source",
+      "sha256": "f40339bffe11f8e8731e9b3b09b97bfc411ea268c69e2d698ca4dc87d870dad3",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7BI-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL7BI",
+      "path": "latin/source/hl7bi-al-ar1.png",
+      "profile": "source",
+      "sha256": "30b094c9e3e8a643f440b54438bc4f9f5070c5cd1ed9f6726d65aff28491e7a5",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7I",
+      "content_class": "latin",
+      "logical_name": "HL7I",
+      "path": "latin/source/hl7i.png",
+      "profile": "source",
+      "sha256": "f40339bffe11f8e8731e9b3b09b97bfc411ea268c69e2d698ca4dc87d870dad3",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL7I-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL7I",
+      "path": "latin/source/hl7i-al-ar1.png",
+      "profile": "source",
+      "sha256": "30b094c9e3e8a643f440b54438bc4f9f5070c5cd1ed9f6726d65aff28491e7a5",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL8",
+      "content_class": "latin",
+      "logical_name": "HL8",
+      "path": "latin/source/hl8.png",
+      "profile": "source",
+      "sha256": "f624a44ce85d5a801fcc3fd2ce4d5f5a008c96179bfdf8402f2cd642bdda0ba8",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL8-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL8",
+      "path": "latin/source/hl8-al-ar1.png",
+      "profile": "source",
+      "sha256": "df6455341ba6d2619d9538be123f40edcb66ae8be5ed54e29ee5812346b6b834",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL8B",
+      "content_class": "latin",
+      "logical_name": "HL8B",
+      "path": "latin/source/hl8b.png",
+      "profile": "source",
+      "sha256": "89a31be8f0fe13a2fe37e839ffd215c05643eeae371027b7070e2bd464d4d8c5",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "HL8B-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "HL8B",
+      "path": "latin/source/hl8b-al-ar1.png",
+      "profile": "source",
+      "sha256": "e3cffe24aad2ab9f7c4e2669049b71ad974c926de077421601d146cbc9c18676",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "MEDFNT",
+      "content_class": "latin",
+      "logical_name": "MEDFNT",
+      "path": "latin/source/medfnt.png",
+      "profile": "source",
+      "sha256": "cd0552baed9d984778087b59742d582d3f50b73518e137105070cc1a953e5000",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "METS",
+      "content_class": "latin",
+      "logical_name": "METS",
+      "path": "latin/source/mets.png",
+      "profile": "source",
+      "sha256": "a580f812b9bbde97f15b4679189a6b47584bf5dc2b2b6bbfe45b3c43ee0eb2d0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "METSI",
+      "content_class": "latin",
+      "logical_name": "METSI",
+      "path": "latin/source/metsi.png",
+      "profile": "source",
+      "sha256": "8f4c3141dd5f4a6d5b4b0932511b6a61fb84057f710c62b1fb8e5ba6b23dbbc0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "NONM",
+      "content_class": "latin",
+      "logical_name": "NONM",
+      "path": "latin/source/nonm.png",
+      "profile": "source",
+      "sha256": "f2f123fa2327c6a8af61703789e8696be413382428375f55e6e5eccb6b724357",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "NONS",
+      "content_class": "latin",
+      "logical_name": "NONS",
+      "path": "latin/source/nons.png",
+      "profile": "source",
+      "sha256": "aebc5f4d3c3a9d26e3028ef1a4f54ef1c76ff1f759d99220b1528e0cc01746f1",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "PRNT10",
+      "content_class": "latin",
+      "logical_name": "PRNT10",
+      "path": "latin/source/prnt10.png",
+      "profile": "source",
+      "sha256": "0b37ba380f8130e7de0ca80e309e9297c1ebbe8bd3f7a157ee53a2d59aae1604",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "PRNT10-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "PRNT10",
+      "path": "latin/source/prnt10-al-ar1.png",
+      "profile": "source",
+      "sha256": "0b6eab5bdcc218f4e9418b244b97eaaa14d7b8697553cbd2b8a8d4a9e2d7c707",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "PRONTO",
+      "content_class": "latin",
+      "logical_name": "PRONTO",
+      "path": "latin/source/pronto.png",
+      "profile": "source",
+      "sha256": "38b5f9f654abcbea29b70abffdf60973a368f707d230abf357663f354beb564a",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "PRT12B",
+      "content_class": "latin",
+      "logical_name": "PRT12B",
+      "path": "latin/source/prt12b.png",
+      "profile": "source",
+      "sha256": "abe7e7bce543dc7186c6903c4f5f93a02893f662f5f84fce521ff54cec18a1e0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "PRT12B-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "PRT12B",
+      "path": "latin/source/prt12b-al-ar1.png",
+      "profile": "source",
+      "sha256": "b70e0bf7b45a560ff09547ece8822d0cebd9481059f89fb3d6eece24d836613e",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SAIL10",
+      "content_class": "latin",
+      "logical_name": "SAIL10",
+      "path": "latin/source/sail10.png",
+      "profile": "source",
+      "sha256": "a0bdc406403572861bfbbbcf89de9dcbe4978f76174157ee290ba48107063018",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SMT10",
+      "content_class": "latin",
+      "logical_name": "SMT10",
+      "path": "latin/source/smt10.png",
+      "profile": "source",
+      "sha256": "d00680c49a09385319ba90a4d5d72e9c56e48ca166683901600b50443e5e3c7f",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SMT10-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "SMT10",
+      "path": "latin/source/smt10-al-ar1.png",
+      "profile": "source",
+      "sha256": "2901a174c116b2c66d25c01c2bc30972c975125e001df9afede4debc53701ce7",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SMT10A",
+      "content_class": "latin",
+      "logical_name": "SMT10A",
+      "path": "latin/source/smt10a.png",
+      "profile": "source",
+      "sha256": "d00680c49a09385319ba90a4d5d72e9c56e48ca166683901600b50443e5e3c7f",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SMT10A-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "SMT10A",
+      "path": "latin/source/smt10a-al-ar1.png",
+      "profile": "source",
+      "sha256": "2901a174c116b2c66d25c01c2bc30972c975125e001df9afede4debc53701ce7",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SMT14",
+      "content_class": "latin",
+      "logical_name": "SMT14",
+      "path": "latin/source/smt14.png",
+      "profile": "source",
+      "sha256": "e9c5914c3328495441cfe74a49c62c93d12f1eed9388888b195ae4570f5acb1d",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SMT14-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "SMT14",
+      "path": "latin/source/smt14-al-ar1.png",
+      "profile": "source",
+      "sha256": "9fabcc8848c7b2c6d93d0750adf61dbc23b33075aed82772de7111c1af6bfc80",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SMT14A",
+      "content_class": "latin",
+      "logical_name": "SMT14A",
+      "path": "latin/source/smt14a.png",
+      "profile": "source",
+      "sha256": "e9c5914c3328495441cfe74a49c62c93d12f1eed9388888b195ae4570f5acb1d",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "SMT14A-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "SMT14A",
+      "path": "latin/source/smt14a-al-ar1.png",
+      "profile": "source",
+      "sha256": "9fabcc8848c7b2c6d93d0750adf61dbc23b33075aed82772de7111c1af6bfc80",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "ST10",
+      "content_class": "latin",
+      "logical_name": "ST10",
+      "path": "latin/source/st10.png",
+      "profile": "source",
+      "sha256": "6dc89bd708baaffebd3fcea054c43f398b61de884776940cc73dcc8074459332",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "ST10-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "ST10",
+      "path": "latin/source/st10-al-ar1.png",
+      "profile": "source",
+      "sha256": "3cbeeaa6d9b48f7ff80c3a4049dec86e49677f8e78126dbca5d7a8656c5fbc19",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "ST6",
+      "content_class": "latin",
+      "logical_name": "ST6",
+      "path": "latin/source/st6.png",
+      "profile": "source",
+      "sha256": "d00680c49a09385319ba90a4d5d72e9c56e48ca166683901600b50443e5e3c7f",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "ST6-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "ST6",
+      "path": "latin/source/st6-al-ar1.png",
+      "profile": "source",
+      "sha256": "2901a174c116b2c66d25c01c2bc30972c975125e001df9afede4debc53701ce7",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "ST8",
+      "content_class": "latin",
+      "logical_name": "ST8",
+      "path": "latin/source/st8.png",
+      "profile": "source",
+      "sha256": "e9c5914c3328495441cfe74a49c62c93d12f1eed9388888b195ae4570f5acb1d",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "ST8-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "ST8",
+      "path": "latin/source/st8-al-ar1.png",
+      "profile": "source",
+      "sha256": "9fabcc8848c7b2c6d93d0750adf61dbc23b33075aed82772de7111c1af6bfc80",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TNTO14",
+      "content_class": "latin",
+      "logical_name": "TNTO14",
+      "path": "latin/source/tnto14.png",
+      "profile": "source",
+      "sha256": "5e2d70503fd5862103bb73cd4a09811c53aea0768d475d9ef4d71f8c463e08b0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TNTO14-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TNTO14",
+      "path": "latin/source/tnto14-al-ar1.png",
+      "profile": "source",
+      "sha256": "683090a87021191f8d7d6b499790e7447be36080ce82cbfb03f46c94c64e77b5",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TNTOB",
+      "content_class": "latin",
+      "logical_name": "TNTOB",
+      "path": "latin/source/tntob.png",
+      "profile": "source",
+      "sha256": "dc0c2c7efc95044c7c8f3181907159625031a4172fe9049c75731306babde0d9",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TNTOB-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TNTOB",
+      "path": "latin/source/tntob-al-ar1.png",
+      "profile": "source",
+      "sha256": "dc0c2c7efc95044c7c8f3181907159625031a4172fe9049c75731306babde0d9",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TONTO",
+      "content_class": "latin",
+      "logical_name": "TONTO",
+      "path": "latin/source/tonto.png",
+      "profile": "source",
+      "sha256": "5e2d70503fd5862103bb73cd4a09811c53aea0768d475d9ef4d71f8c463e08b0",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TONTO-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TONTO",
+      "path": "latin/source/tonto-al-ar1.png",
+      "profile": "source",
+      "sha256": "683090a87021191f8d7d6b499790e7447be36080ce82cbfb03f46c94c64e77b5",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR10",
+      "content_class": "latin",
+      "logical_name": "TR10",
+      "path": "latin/source/tr10.png",
+      "profile": "source",
+      "sha256": "a241cfe89bf90bee4d49eb0538b39f469658306e254259dd3f2f4cec6fe67a83",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR10-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR10",
+      "path": "latin/source/tr10-al-ar1.png",
+      "profile": "source",
+      "sha256": "a27829da6ce2eef08ca8116a730a21e2d8cff648b6f16c065a68bd2fe79188ea",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR10B",
+      "content_class": "latin",
+      "logical_name": "TR10B",
+      "path": "latin/source/tr10b.png",
+      "profile": "source",
+      "sha256": "9196319c5e40d1a591dfc3362053b3283cf16665ac9406e0caef44d765f48bba",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR10B-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR10B",
+      "path": "latin/source/tr10b-al-ar1.png",
+      "profile": "source",
+      "sha256": "e2d4f2f5ce3be80e44deafcea2e2ce93a5dc068bafc405b80f10c2afe5a3ccfb",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR10I",
+      "content_class": "latin",
+      "logical_name": "TR10I",
+      "path": "latin/source/tr10i.png",
+      "profile": "source",
+      "sha256": "76fcd14b758fb7a9d56d9a7bd0e004076b46daf09ddf379e24d78a8fc7dfc798",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR10I-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR10I",
+      "path": "latin/source/tr10i-al-ar1.png",
+      "profile": "source",
+      "sha256": "3bb13e85cf4d410f32b675394daea79e858d36cf23237c70f1cee460386e2c7e",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR12",
+      "content_class": "latin",
+      "logical_name": "TR12",
+      "path": "latin/source/tr12.png",
+      "profile": "source",
+      "sha256": "c35ea09846dd60c3ae46bdc33cfe86c291ed0258cd6482c5267ee69a9cfb97db",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR12-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR12",
+      "path": "latin/source/tr12-al-ar1.png",
+      "profile": "source",
+      "sha256": "833c5bb58e87d5d080755ef1fc6116358b19b847f430a07a4c8500564b5d0869",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR12B",
+      "content_class": "latin",
+      "logical_name": "TR12B",
+      "path": "latin/source/tr12b.png",
+      "profile": "source",
+      "sha256": "d68b7cf1fb4a3ea3a31475f87154b893b6f272ce67ff4ea983d7c1131a4c7463",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR12B-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR12B",
+      "path": "latin/source/tr12b-al-ar1.png",
+      "profile": "source",
+      "sha256": "5fc1bb118f0523f79ad8b6b3e9e9db0c82fbcde229f615e21cdfa101dfbe227e",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR12I",
+      "content_class": "latin",
+      "logical_name": "TR12I",
+      "path": "latin/source/tr12i.png",
+      "profile": "source",
+      "sha256": "23a6ca4195d7bb7c1e7413cb752ad9ba4e704932a56a9e6a8e86cdce58b74d0d",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR12I-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR12I",
+      "path": "latin/source/tr12i-al-ar1.png",
+      "profile": "source",
+      "sha256": "88a80421a5e1808c976cf7f239ca3d8e2627db5648bd7c2664ad7fb97a3d6214",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR14",
+      "content_class": "latin",
+      "logical_name": "TR14",
+      "path": "latin/source/tr14.png",
+      "profile": "source",
+      "sha256": "94f820fb5c3d0f59a7b8475c919c71e3dec98479648c086abcb0c509dca70175",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR14-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR14",
+      "path": "latin/source/tr14-al-ar1.png",
+      "profile": "source",
+      "sha256": "833c5bb58e87d5d080755ef1fc6116358b19b847f430a07a4c8500564b5d0869",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR18",
+      "content_class": "latin",
+      "logical_name": "TR18",
+      "path": "latin/source/tr18.png",
+      "profile": "source",
+      "sha256": "a2420edbbd0931d4ec648b0362814dc21d3f8855d5f94d019ed0d281b487f63b",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR18-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR18",
+      "path": "latin/source/tr18-al-ar1.png",
+      "profile": "source",
+      "sha256": "27eac9942735d36dc914c9fc8997ac972770acdcb11acbd40ec6251592503653",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR8",
+      "content_class": "latin",
+      "logical_name": "TR8",
+      "path": "latin/source/tr8.png",
+      "profile": "source",
+      "sha256": "89bf7b0594751523c7737385d2bd9c3dc3d5eabf1dd49168383a49b40a6ca317",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR8-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR8",
+      "path": "latin/source/tr8-al-ar1.png",
+      "profile": "source",
+      "sha256": "a4a2ce072ab0fa1dca630b1d3de2572aa455ae3e54be2f02054aa42b8d421028",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR8B",
+      "content_class": "latin",
+      "logical_name": "TR8B",
+      "path": "latin/source/tr8b.png",
+      "profile": "source",
+      "sha256": "0a974748d2fdd03bb3e1d18e98cfdc5ba3fc945d3c3c49a32dcc65b0712f11a4",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR8B-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR8B",
+      "path": "latin/source/tr8b-al-ar1.png",
+      "profile": "source",
+      "sha256": "d044c040b9812b0cb7de604de89854498944185fddd3cd95ba3900d19dd55012",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "TR8I",
+      "content_class": "latin",
+      "logical_name": "TR8I",
+      "path": "latin/source/tr8i.png",
+      "profile": "source",
+      "sha256": "2d8b150092b30054f4f9fee12bff353aca4790cb3c504c2fcfbdd70c21bf0397",
+      "specimen_kind": "unicode-pangram",
+      "text": "THE FIVE BOXING LISP WIZARDS JUMP QUICKLY."
+    },
+    {
+      "artifact_name": "TR8I-AL-AR1",
+      "content_class": "latin",
+      "logical_name": "TR8I",
+      "path": "latin/source/tr8i-al-ar1.png",
+      "profile": "source",
+      "sha256": "8da456a83cd2a20de564614fd492374c1cc234189e67f063e0180953e000a191",
+      "specimen_kind": "unicode-pangram",
+      "text": "THE FIVE BOXING LISP WIZARDS JUMP QUICKLY."
+    },
+    {
+      "artifact_name": "TVFONT",
+      "content_class": "latin",
+      "logical_name": "TVFONT",
+      "path": "latin/source/tvfont.png",
+      "profile": "source",
+      "sha256": "7bc30e0fed235752ace035670839e3896c55affc981463105a06e8dc79b9ee6d",
+      "specimen_kind": "unicode-pangram",
+      "text": "The five boxing Lisp wizards jump quickly."
+    },
+    {
+      "artifact_name": "ARROW",
+      "content_class": "symbols",
+      "path": "symbols/runtime/arrow.png",
+      "profile": "runtime",
+      "runtime_name": "ARROW",
+      "sha256": "973a3e10cc3de8352350004f57e6382f1cfc75c50b35ed99d28794e0928cc8c3",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MOUSE",
+      "content_class": "symbols",
+      "path": "symbols/runtime/mouse.png",
+      "profile": "runtime",
+      "runtime_name": "MOUSE",
+      "sha256": "f29eae8d395b23a5e82dfbc2596b1d007dc13efdce5182ce3d8f646771c7d9b2",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "NTOG",
+      "content_class": "symbols",
+      "path": "symbols/runtime/ntog.png",
+      "profile": "runtime",
+      "runtime_name": "TOG",
+      "sha256": "55811503ee1b617a47d4781d987255eb2b92738e09a2223d14f48a9974a2abbd",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "S30CHS",
+      "content_class": "symbols",
+      "path": "symbols/runtime/s30chs.png",
+      "profile": "runtime",
+      "runtime_name": "S30CHS",
+      "sha256": "34e9c4d097f9bd1c474251c34560ac2712392946dc6252ecc7b45922a98b6d8e",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "SEARCH",
+      "content_class": "symbols",
+      "path": "symbols/runtime/search.png",
+      "profile": "runtime",
+      "runtime_name": "SEARCH",
+      "sha256": "f2eb485cbc1450ba1c6c882fcdd4440935ada2c8bb30de4138e250b76a05283c",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "SHIP",
+      "content_class": "symbols",
+      "path": "symbols/runtime/ship.png",
+      "profile": "runtime",
+      "runtime_name": "SHIP",
+      "sha256": "f4538c4e64de8f530e4ea670ec5b02a58df4185371a32ced9bce109ad607562b",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "TOG",
+      "content_class": "symbols",
+      "path": "symbols/runtime/tog.png",
+      "profile": "runtime",
+      "runtime_name": "TOG",
+      "sha256": "55811503ee1b617a47d4781d987255eb2b92738e09a2223d14f48a9974a2abbd",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "APL14",
+      "content_class": "symbols",
+      "logical_name": "APL14",
+      "path": "symbols/source/apl14.png",
+      "profile": "source",
+      "sha256": "7898dfe450d36611b57b031e7dce00a22aa35d648221c51f24eeaf09dc750dda",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "APL14-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "APL14",
+      "path": "symbols/source/apl14-al-ar1.png",
+      "profile": "source",
+      "sha256": "842da09439693327b4152876a36f9b75db6f085e3f1d23f5e3f995a845012031",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "ARR10",
+      "content_class": "symbols",
+      "logical_name": "ARR10",
+      "path": "symbols/source/arr10.png",
+      "profile": "source",
+      "sha256": "51db8b9195e04a326e379c63d1055da0fe432b41a94120eb2e4a95cce8d4aaf4",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "ARR10-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "ARR10",
+      "path": "symbols/source/arr10-al-ar1.png",
+      "profile": "source",
+      "sha256": "7f05391113f3de70fb5b1979cc98006d8e2d83ffdaafa8cec416bce13fbb1916",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "ARROW",
+      "content_class": "symbols",
+      "logical_name": "ARROW",
+      "path": "symbols/source/arrow.png",
+      "profile": "source",
+      "sha256": "fafbb1838c05039effc69e5f551b8c1c592bd7862914aa4d4dbde17aa7d94eb4",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "ARROW-KST",
+      "content_class": "symbols",
+      "logical_name": "ARROW",
+      "path": "symbols/source/arrow-kst.png",
+      "profile": "source",
+      "sha256": "df67c7ffad7d143c048f448fa9df1306c44d5e67633bd12d72ddb84ec0531b99",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "BUG",
+      "content_class": "symbols",
+      "logical_name": "BUG",
+      "path": "symbols/source/bug.png",
+      "profile": "source",
+      "sha256": "6198df25217958d21c41d6199bc8611334e2cd0d02ea4269a1473686faaefa13",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "BUG-KST",
+      "content_class": "symbols",
+      "logical_name": "BUG",
+      "path": "symbols/source/bug-kst.png",
+      "profile": "source",
+      "sha256": "96d579545f15c98ec0e5eae195ba4cf12134022de85dd44e7c4045e0f2b3e0e0",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "CLARGK",
+      "content_class": "symbols",
+      "logical_name": "CLARGK",
+      "path": "symbols/source/clargk.png",
+      "profile": "source",
+      "sha256": "91122e5f2be4d2aa1850aa70dc05a889efc9a2651356bab966f810ac787dddbc",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "CLARGK-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "CLARGK",
+      "path": "symbols/source/clargk-al-ar1.png",
+      "profile": "source",
+      "sha256": "825d934eefead2dae36c3bbe8a2ea61d053993ec1eb0497c645518defba327b4",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "CYR12",
+      "content_class": "symbols",
+      "logical_name": "CYR12",
+      "path": "symbols/source/cyr12.png",
+      "profile": "source",
+      "sha256": "79235fe556c846874e3b05b8247380dc0818c89c75b21012c5c190b4012dcc31",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "CYR12-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "CYR12",
+      "path": "symbols/source/cyr12-al-ar1.png",
+      "profile": "source",
+      "sha256": "d9f577845dcad0dfdf9d88950be62b6cc4a9b0b2849f582febf51fc327469606",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "GATES3",
+      "content_class": "symbols",
+      "logical_name": "GATES3",
+      "path": "symbols/source/gates3.png",
+      "profile": "source",
+      "sha256": "5a31537f2fa507410ba358cb31c5e5b679a34998920005281999b0d8181ff819",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "GATES3-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "GATES3",
+      "path": "symbols/source/gates3-al-ar1.png",
+      "profile": "source",
+      "sha256": "bf5868162eecf9503af234940dfec00b1a6bcfff40dcf9e7af44ca2e2e572bda",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "GATS3A",
+      "content_class": "symbols",
+      "logical_name": "GATS3A",
+      "path": "symbols/source/gats3a.png",
+      "profile": "source",
+      "sha256": "c5e7d69248ddd6f96e65c0e03af993666f20c3dd750784f58e4cf09ef793a479",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "GATS3A-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "GATS3A",
+      "path": "symbols/source/gats3a-al-ar1.png",
+      "profile": "source",
+      "sha256": "bf5868162eecf9503af234940dfec00b1a6bcfff40dcf9e7af44ca2e2e572bda",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "HIP10A",
+      "content_class": "symbols",
+      "logical_name": "HIP10A",
+      "path": "symbols/source/hip10a.png",
+      "profile": "source",
+      "sha256": "91122e5f2be4d2aa1850aa70dc05a889efc9a2651356bab966f810ac787dddbc",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "HIP10A-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "HIP10A",
+      "path": "symbols/source/hip10a-al-ar1.png",
+      "profile": "source",
+      "sha256": "825d934eefead2dae36c3bbe8a2ea61d053993ec1eb0497c645518defba327b4",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "HIPO10",
+      "content_class": "symbols",
+      "logical_name": "HIPO10",
+      "path": "symbols/source/hipo10.png",
+      "profile": "source",
+      "sha256": "9326b08bea6b9f7b55560e016cb14a7a20348e4a1890a3e0467940ccd748fd44",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "HIPO10-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "HIPO10",
+      "path": "symbols/source/hipo10-al-ar1.png",
+      "profile": "source",
+      "sha256": "d8cb2bb88e4c42537ab4e291c036fc3f80604cb72632b2d3259497288e1e1767",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MAT10A",
+      "content_class": "symbols",
+      "logical_name": "MAT10A",
+      "path": "symbols/source/mat10a.png",
+      "profile": "source",
+      "sha256": "4f6d055fc20d128b1db21d6e539b53232549c0e8dfd58e1f15047c919b6434bc",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MAT10A-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "MAT10A",
+      "path": "symbols/source/mat10a-al-ar1.png",
+      "profile": "source",
+      "sha256": "73788c8fedc1fbc971a57f3e6f950ec53d1a10fb60692cda239312322a517ed7",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MATH10",
+      "content_class": "symbols",
+      "logical_name": "MATH10",
+      "path": "symbols/source/math10.png",
+      "profile": "source",
+      "sha256": "4f6d055fc20d128b1db21d6e539b53232549c0e8dfd58e1f15047c919b6434bc",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MATH10-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "MATH10",
+      "path": "symbols/source/math10-al-ar1.png",
+      "profile": "source",
+      "sha256": "d3cd4e4c2d37a2226dbf5773b18c31ee20714d3d387e55952262e04d024feeec",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MATH16",
+      "content_class": "symbols",
+      "logical_name": "MATH16",
+      "path": "symbols/source/math16.png",
+      "profile": "source",
+      "sha256": "4f6d055fc20d128b1db21d6e539b53232549c0e8dfd58e1f15047c919b6434bc",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MATH16-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "MATH16",
+      "path": "symbols/source/math16-al-ar1.png",
+      "profile": "source",
+      "sha256": "73788c8fedc1fbc971a57f3e6f950ec53d1a10fb60692cda239312322a517ed7",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MOUSE",
+      "content_class": "symbols",
+      "logical_name": "MOUSE",
+      "path": "symbols/source/mouse.png",
+      "profile": "source",
+      "sha256": "ac4abc652c71f3e6d8b922f156887ebce51ea6bde0a5de0f21f8962607d79a6f",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MUSC10",
+      "content_class": "symbols",
+      "logical_name": "MUSC10",
+      "path": "symbols/source/musc10.png",
+      "profile": "source",
+      "sha256": "bbf554cd68e4ac7839bc8ff29331d713578191d3f3174875751d7ab223e1a574",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "MUSC10-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "MUSC10",
+      "path": "symbols/source/musc10-al-ar1.png",
+      "profile": "source",
+      "sha256": "38467a9ee666f4ed7913f20019c62cb037e20fea9ba243c447620ac159eaa1c7",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "PLNK16",
+      "content_class": "symbols",
+      "logical_name": "PLNK16",
+      "path": "symbols/source/plnk16.png",
+      "profile": "source",
+      "sha256": "e1b8461585f9d8212f874555d7292c26c1553a53553eaffe50c18f3f79a5c376",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "PLNK16-AL-AR1",
+      "content_class": "symbols",
+      "logical_name": "PLNK16",
+      "path": "symbols/source/plnk16-al-ar1.png",
+      "profile": "source",
+      "sha256": "89665f412c4a67652c95301124c3af7571cfeb7c6e3a2bca8274cfc1a7a6d899",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "SWFONT",
+      "content_class": "symbols",
+      "logical_name": "SWFONT",
+      "path": "symbols/source/swfont.png",
+      "profile": "source",
+      "sha256": "bf195a3b358e5586879f5c8d881e449a3901517226d5a4f51d4b032e571bc3d9",
+      "specimen_kind": "raw-glyph-sheet"
+    },
+    {
+      "artifact_name": "TOG",
+      "content_class": "symbols",
+      "logical_name": "TOG",
+      "path": "symbols/source/tog.png",
+      "profile": "source",
+      "sha256": "330a361a9f18ad7ca647da8c75b806c4e3126157150b03e78129303e5cbe9450",
+      "specimen_kind": "raw-glyph-sheet"
+    }
+  ]
+}

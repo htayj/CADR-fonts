@@ -17,6 +17,11 @@ BMP Private Use Area allocation documented in [UNICODE.md](docs/UNICODE.md).
 The result is four installable profiles and 400 BDFs. The Unicode profiles also
 include pangram PNGs for every artifact with a complete visible Latin alphabet.
 
+All 200 generated artifacts can be inspected without installing anything in
+the tracked [font specimen gallery](SPECIMENS.md): Latin fonts use the
+Lisp-themed pangram and specialty fonts use complete glyph sheets. A fresh
+build must reproduce every committed PNG and the gallery index exactly.
+
 The source and runtime identities are deliberately not collapsed. The source
 profiles answer “what surviving authoring representations contain”; the
 runtime profiles answer “what this System 46 snapshot would display for a
@@ -35,6 +40,8 @@ make check-external
 make reproducible
 make compare-genera
 make audit-runtime-names
+make specimens
+make check-specimens
 ```
 
 `make check-external` builds all four profiles under `dist/`, runs the unit and
@@ -51,6 +58,11 @@ and its standard library. `make reproducible` performs two isolated builds and
 compares every output byte. The reviewed build passes this gate for 371 raw
 aliases and 371 Unicode aliases across the four font paths, 742 aliases total,
 and for every emitted glyph.
+
+`make specimens` refreshes the tracked GitHub gallery from the reviewed build;
+`make check-specimens` is the non-mutating gate. It closes the gallery over
+160 Latin pangrams and 40 symbols glyph sheets and verifies every PNG byte,
+path, identity, and digest against the generated distribution.
 
 When the sibling `../genera-emu` checkout is present, `make compare-genera`
 repeats the compatibility audit against its published BDF artifacts. It

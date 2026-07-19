@@ -13,7 +13,9 @@ The upstream `src/README` describes the tree as System 46 recovered from four
 ITS backup tapes. Its `src/LICENSE` is a three-clause BSD license, despite the
 README's informal “MIT license” wording. The license has SHA-256
 `05b8de7c86c946cc747ab71a9aaa7dd56e37365278b5585ab685156eaa90fb92`
-and is copied to `dist/LICENSE.source` on every build.
+and is tracked verbatim at `LICENSE.source`; every build also copies it from
+the pinned witness to `dist/LICENSE.source`. The tracked copy accompanies the
+committed specimen derivatives; the generated copy accompanies build outputs.
 
 `config/source-manifest.json` closes the build over 31 physical authoring
 inputs in `src/lmfont`: two ARC containers, 15 standalone AST files, eight KST

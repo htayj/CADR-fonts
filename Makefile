@@ -1,6 +1,7 @@
 PYTHON ?= python3
 
-.PHONY: dist test check check-runtime check-external reproducible compare-genera audit-runtime-names clean
+.PHONY: dist test check check-runtime check-external reproducible specimens \
+	check-specimens compare-genera audit-runtime-names clean
 
 dist:
 	$(PYTHON) scripts/build.py
@@ -24,6 +25,12 @@ check-external: check
 
 reproducible:
 	$(PYTHON) scripts/check_reproducibility.py
+
+specimens: dist
+	$(PYTHON) scripts/update_specimen_gallery.py
+
+check-specimens: dist
+	$(PYTHON) scripts/update_specimen_gallery.py --check
 
 compare-genera: dist
 	$(PYTHON) scripts/compare_legacy_bdf.py
