@@ -8,8 +8,9 @@ published artifact without installing it. The Latin collection uses the
 Lisp-themed pangram; the symbols collection uses complete raw-code glyph
 sheets because those repertoires are not sentences.
 
-The recovered bitmap payload and these direct specimens retain the pinned
-upstream [BSD-3-Clause source license](LICENSE.source).
+Repository-authored gallery tooling, metadata, and documentation use the project
+[BSD-3-Clause license](LICENSE). The recovered bitmap payload and direct
+specimens retain the pinned upstream [source license](LICENSE.source).
 
 Gallery grouping is content-derived: a font is Latin when at least one
 visible emitted Unicode glyph is a Basic Latin letter; `symbols` is the

@@ -14,6 +14,9 @@ from lisp_machine_fonts import prepare_output_directory
 
 ROOT = Path(__file__).resolve().parents[1]
 LATIN_CODES = frozenset((*range(0x41, 0x5B), *range(0x61, 0x7B)))
+PROJECT_LICENSE_SHA256 = (
+    "64b21e556cd37bb07b437113db1c8c98058b684705aacacd608564172723c449"
+)
 SOURCE_LICENSE_SHA256 = (
     "05b8de7c86c946cc747ab71a9aaa7dd56e37365278b5585ab685156eaa90fb92"
 )
@@ -130,13 +133,15 @@ def artifact_inventory(distribution: Path) -> tuple[list[dict[str, object]], str
 
 def build_gallery(distribution: Path) -> tuple[dict[str, bytes], bytes, bytes]:
     artifacts, source_revision = artifact_inventory(distribution.resolve())
+    project_license = ROOT / "LICENSE"
     tracked_license = ROOT / "LICENSE.source"
     generated_license = distribution / "LICENSE.source"
     if (
-        sha256_file(tracked_license) != SOURCE_LICENSE_SHA256
+        sha256_file(project_license) != PROJECT_LICENSE_SHA256
+        or sha256_file(tracked_license) != SOURCE_LICENSE_SHA256
         or tracked_license.read_bytes() != generated_license.read_bytes()
     ):
-        raise GalleryError("tracked and generated upstream source licenses differ")
+        raise GalleryError("tracked project/source license closure differs")
     image_files: dict[str, bytes] = {}
     records: list[dict[str, object]] = []
 
@@ -198,6 +203,10 @@ def build_gallery(distribution: Path) -> tuple[dict[str, bytes], bytes, bytes]:
     manifest = {
         "schema_version": 1,
         "source_revision": source_revision,
+        "project_license": {
+            "path": "LICENSE",
+            "sha256": PROJECT_LICENSE_SHA256,
+        },
         "source_license": {
             "path": "LICENSE.source",
             "sha256": SOURCE_LICENSE_SHA256,
@@ -232,8 +241,9 @@ def build_gallery(distribution: Path) -> tuple[dict[str, bytes], bytes, bytes]:
         "Lisp-themed pangram; the symbols collection uses complete raw-code glyph",
         "sheets because those repertoires are not sentences.",
         "",
-        "The recovered bitmap payload and these direct specimens retain the pinned",
-        "upstream [BSD-3-Clause source license](LICENSE.source).",
+        "Repository-authored gallery tooling, metadata, and documentation use the project",
+        "[BSD-3-Clause license](LICENSE). The recovered bitmap payload and direct",
+        "specimens retain the pinned upstream [source license](LICENSE.source).",
         "",
         "Gallery grouping is content-derived: a font is Latin when at least one",
         "visible emitted Unicode glyph is a Basic Latin letter; `symbols` is the",

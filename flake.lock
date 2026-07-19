@@ -1,0 +1,45 @@
+{
+  "nodes": {
+    "cadr-source": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1550169306,
+        "narHash": "sha256-QRs1VbmksJ6wOQHH+mJE5Y8L2hWrlk0doP5KmQwQqFo=",
+        "owner": "mietek",
+        "repo": "mit-cadr-system-software",
+        "rev": "8e978d7d1704096a63edd4386a3b8326a2e584af",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mietek",
+        "repo": "mit-cadr-system-software",
+        "rev": "8e978d7d1704096a63edd4386a3b8326a2e584af",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1784356753,
+        "narHash": "sha256-12KrbMiWLcf8m7pCvAtZh1ZrgF85ZXDXvfR/fWTKy84=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "61b7c44c4073f0b827768aff0049561b5110ea5a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "cadr-source": "cadr-source",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

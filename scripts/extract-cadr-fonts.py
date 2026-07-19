@@ -1375,6 +1375,8 @@ def main() -> int:
                 "SHA256SUMS",
                 "runtime",
                 "unicode",
+                "release",
+                "packages",
             },
         )
     except ValueError as error:

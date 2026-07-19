@@ -14,6 +14,10 @@
     "symbols": 40,
     "total": 200
   },
+  "project_license": {
+    "path": "LICENSE",
+    "sha256": "64b21e556cd37bb07b437113db1c8c98058b684705aacacd608564172723c449"
+  },
   "schema_version": 1,
   "selection": {
     "latin": "at least one visible emitted Unicode BDF glyph in U+0041-U+005A or U+0061-U+007A",

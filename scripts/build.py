@@ -51,10 +51,10 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def git(*arguments: str) -> str:
+def git(repository: Path, *arguments: str) -> str:
     try:
         process = subprocess.run(
-            ["git", "-C", str(SOURCE_REPOSITORY), *arguments],
+            ["git", "-C", str(repository), *arguments],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -66,27 +66,44 @@ def git(*arguments: str) -> str:
     return process.stdout.strip()
 
 
-def load_and_verify_source() -> tuple[dict[str, object], Path]:
+def load_and_verify_source(
+    source_repository: Path = SOURCE_REPOSITORY,
+    *,
+    allow_source_snapshot: bool = False,
+) -> tuple[dict[str, object], Path]:
     manifest = json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
     if manifest.get("schema_version") != 1:
         raise BuildError("unsupported source-manifest schema")
-    if not SOURCE_REPOSITORY.is_dir():
+    if not source_repository.is_dir():
         raise BuildError(
             "source submodule is missing; run: git submodule update --init --recursive"
         )
 
-    revision = git("rev-parse", "HEAD")
     expected_revision = manifest["revision"]
-    if revision != expected_revision:
-        raise BuildError(
-            f"source revision is {revision}, expected {expected_revision}; "
-            "run: git submodule update --init"
+    if (source_repository / ".git").exists():
+        revision = git(source_repository, "rev-parse", "HEAD")
+        if revision != expected_revision:
+            raise BuildError(
+                f"source revision is {revision}, expected {expected_revision}; "
+                "run: git submodule update --init"
+            )
+        dirty = git(
+            source_repository,
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=all",
         )
-    dirty = git("status", "--porcelain=v1", "--untracked-files=all")
-    if dirty:
-        raise BuildError("source submodule is dirty; refusing a non-reproducible build")
+        if dirty:
+            raise BuildError(
+                "source submodule is dirty; refusing a non-reproducible build"
+            )
+    elif not allow_source_snapshot:
+        raise BuildError(
+            "source witness is not a Git checkout; declarative package builds may "
+            "pass --allow-source-snapshot after supplying the pinned snapshot"
+        )
 
-    source_root = SOURCE_REPOSITORY / str(manifest["source_root"])
+    source_root = source_repository / str(manifest["source_root"])
     expected_files = {str(record["path"]): record for record in manifest["files"]}
     actual_names = {
         path.name
@@ -112,7 +129,7 @@ def load_and_verify_source() -> tuple[dict[str, object], Path]:
             )
 
     license_record = manifest["license"]
-    license_path = SOURCE_REPOSITORY / str(license_record["path"])
+    license_path = source_repository / str(license_record["path"])
     if (
         license_path.stat().st_size != license_record["byte_size"]
         or sha256(license_path) != license_record["sha256"]
@@ -120,7 +137,7 @@ def load_and_verify_source() -> tuple[dict[str, object], Path]:
         raise BuildError("source license does not match the pinned manifest")
     runtime_evidence = manifest["reviewed_findings"]["runtime_name_qfasl_evidence"]
     for logical_name, record in runtime_evidence.items():
-        path = SOURCE_REPOSITORY / str(record["path"])
+        path = source_repository / str(record["path"])
         if (
             path.stat().st_size != record["byte_size"]
             or sha256(path) != record["sha256"]
@@ -425,6 +442,20 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "dist")
     parser.add_argument(
+        "--source-repository",
+        type=Path,
+        default=SOURCE_REPOSITORY,
+        help="MIT CADR source checkout or pinned source snapshot",
+    )
+    parser.add_argument(
+        "--allow-source-snapshot",
+        action="store_true",
+        help=(
+            "allow a non-Git source tree after every manifest-selected input, "
+            "license, and runtime evidence file passes its pinned hash"
+        ),
+    )
+    parser.add_argument(
         "--omit-json",
         action="store_true",
         help="omit normalized per-font JSON; intended for smaller later releases",
@@ -433,7 +464,10 @@ def main() -> int:
     output = args.output.resolve()
 
     try:
-        manifest, source_root = load_and_verify_source()
+        manifest, source_root = load_and_verify_source(
+            args.source_repository.resolve(),
+            allow_source_snapshot=args.allow_source_snapshot,
+        )
         command = [
             sys.executable,
             str(EXTRACTOR),

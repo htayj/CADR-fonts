@@ -265,3 +265,19 @@ shape synthesis.
 
 The output syntax and `SWIDTH`/`DWIDTH` conversion follow the official
 [BDF 2.1 standard](https://www.x.org/releases/X11R7.0/doc/PDF/bdf.pdf).
+
+## OpenType Bitmap release derivative
+
+Release OTB files are one-bit embedded-bitmap containers generated from the
+Unicode BDF profiles only. They are not outlines, traced vectors, scaled
+rasters, or antialiased replacements. Packaging exposes OTB to Fontconfig for
+modern desktop clients and retains the Unicode BDF directories for X core-font
+use.
+
+`scripts/check_otb.py` independently reads each packaged Unicode BDF and the
+EBDT/EBLC strike in its paired OTB. For every encoded scalar it requires an
+identical character map, horizontal advance, and set of baseline-relative ink
+coordinates. `fonttosfnt` may crop transparent outer rows and columns from the
+stored bitmap box; this is accepted only because the displayed pixels and
+escapement remain exact. The Unicode BDF remains the authoritative derivative
+record for explicit raster boxes, XLFD metadata, and provenance.

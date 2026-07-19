@@ -1,8 +1,8 @@
 # CADR fonts
 
 This repository reproducibly recovers two complementary public MIT CADR System
-46 bitmap-font profiles as inspectable JSON and PNG specimens plus installable
-BDF 2.1 fonts with complete X Logical Font Description (XLFD) names:
+46 bitmap-font profiles as inspectable JSON and PNG specimens plus usable
+Unicode BDF 2.1 and OpenType Bitmap (OTB) fonts with complete identities:
 
 - the **source profile** preserves 151 authored AST, KST, Alto, and archive
   representations, including meaningful source variants;
@@ -10,12 +10,14 @@ BDF 2.1 fonts with complete X Logical Font Description (XLFD) names:
   the serialized `FONT` arrays that System 46 would draw when loaded: 47
   current logical fonts and two explicitly legacy compiled versions.
 
-Each raw profile also has a separately named Unicode derivative. The raw BDFs
-retain CADR codes and `Misc-FontSpecific`; the derivatives re-encode the same
-glyphs under `ISO10646-1` using the reviewed standard-character map and fixed
-BMP Private Use Area allocation documented in [UNICODE.md](docs/UNICODE.md).
-The result is four installable profiles and 400 BDFs. The Unicode profiles also
-include pangram PNGs for every artifact with a complete visible Latin alphabet.
+Each raw profile has a separately named Unicode derivative. The raw BDFs retain
+CADR codes and `Misc-FontSpecific`; the derivatives re-encode the same glyphs
+under `ISO10646-1` using the reviewed standard-character map and fixed BMP
+Private Use Area allocation documented in [UNICODE.md](docs/UNICODE.md). The
+result is four generated BDF profiles and 400 BDFs. Release archives make the
+Unicode BDFs and Unicode-derived OTBs the user-facing fonts; raw BDFs are kept
+under a clearly separated `fonts/raw/` tree only for historical traceability.
+Linux distribution packages install only the Unicode BDFs and OTBs.
 
 All 200 generated artifacts can be inspected without installing anything in
 the tracked [font specimen gallery](SPECIMENS.md): Latin fonts use the
@@ -28,9 +30,11 @@ runtime profiles answer “what this System 46 snapshot would display for a
 defined character.” Unicode derivation changes addressing, not that boundary
 or any displayed geometry.
 
-The source witness is a pinned Git submodule. Generated files stay under the
-ignored `dist/` directory for now; a GitHub release workflow is intentionally
-deferred until the local build and release contents are agreed.
+The source witness is a pinned Git submodule. Local generated files stay under
+the ignored `dist/` directory. Tags matching `v*` run the same verification,
+build two content-partitioned archives, build and install-test Linux packages,
+and publish a GitHub Release only when that tag has no existing release. See
+[Packaging](docs/PACKAGING.md) and [Releasing](docs/RELEASING.md).
 
 ## Build and verify
 
@@ -40,7 +44,8 @@ make check-external
 make reproducible
 make compare-genera
 make audit-runtime-names
-make specimens
+make release VERSION=v0.1.0
+make check-release VERSION=v0.1.0
 make check-specimens
 ```
 
@@ -59,10 +64,20 @@ compares every output byte. The reviewed build passes this gate for 371 raw
 aliases and 371 Unicode aliases across the four font paths, 742 aliases total,
 and for every emitted glyph.
 
+`make release` creates deterministic Latin and symbols archives under
+`dist/release/`; `make check-release` checks their closed manifests,
+checksums, content partition, deterministic tar metadata, and every OTB. The
+OTB gate proves exact character advances and baseline-relative set pixels for
+all 20,307 encoded glyphs emitted by the Unicode BDFs. `fonttosfnt` may remove transparent rows or
+columns from a glyph's stored bitmap box, so storage boxes need not be
+byte-for-byte copies; the one-bit pixels at display coordinates and advances
+must be identical. The generated Unicode BDF remains the authoritative
+derivative record.
+
 `make specimens` refreshes the tracked GitHub gallery from the reviewed build;
-`make check-specimens` is the non-mutating gate. It closes the gallery over
-160 Latin pangrams and 40 symbols glyph sheets and verifies every PNG byte,
-path, identity, and digest against the generated distribution.
+`make check-specimens` is the non-mutating gate used by CI. It closes the
+gallery over 160 Latin pangrams and 40 symbols glyph sheets and verifies every
+PNG byte, path, identity, and digest against the generated distribution.
 
 When the sibling `../genera-emu` checkout is present, `make compare-genera`
 repeats the compatibility audit against its published BDF artifacts. It
@@ -103,6 +118,23 @@ The current reviewed result is:
 - 160 Unicode Latin pangram specimens: 118 source artifacts and 42 runtime
   artifacts, retaining distinct authored, current-runtime, and legacy-runtime
   representations rather than collapsing them by logical name.
+
+The release partition is derived from emitted Unicode content, never from a
+filename or family label. An artifact is in **Latin** if it contains any
+visible Basic Latin letter U+0041-U+005A or U+0061-U+007A. The **symbols**
+collection is the exact complement; despite the short name it includes drawing
+and sprite fonts as well as Greek, Cyrillic, APL, mathematics, and music
+repertoires. The current closure is:
+
+| Collection | Source | Runtime | Total |
+| --- | ---: | ---: | ---: |
+| Latin | 118 | 42 | 160 |
+| Symbols | 33 | 7 | 40 |
+
+Every source/runtime artifact belongs to exactly one collection, and no
+logical family crosses the boundary. The stricter pangram predicate happens to
+select the same 160 Latin artifacts in the current corpus, but specimen
+presence is not the release selection rule.
 
 The earlier `genera-emu` extraction produced 150 artifacts. This repository
 corrects its AST raster-height model: `BUG` has a 32-row authored AST raster but
@@ -158,6 +190,12 @@ dist/
       bdf/                Unicode runtime BDFs plus fonts.dir/fonts.alias
       pangrams/           Latin-capable runtime artifact sentence specimens
       catalog.json        resolved runtime encodings and geometry digest
+  release/
+    CADR-fonts-latin-<version>.tar.gz
+    CADR-fonts-latin-<version>.tar.gz.sha256
+    CADR-fonts-symbols-<version>.tar.gz
+    CADR-fonts-symbols-<version>.tar.gz.sha256
+  packages/               locally built DEB/RPM/Arch/Void packages
   BUILD-MANIFEST.json     four-profile counts, catalogs, aliases, and specimens
   SOURCE-MANIFEST.json    closed authoring-source manifest
   LICENSE.source          upstream three-clause BSD license
@@ -247,8 +285,33 @@ transformations. The output follows the official
 [BDF 2.1 standard](https://www.x.org/releases/X11R7.0/doc/PDF/bdf.pdf) and
 [XLFD conventions](https://www.x.org/releases/X11R7.6/doc/xorg-docs/specs/XLFD/xlfd.html).
 
-## Release status
+## Releases and packages
 
-There is no `.github/workflows` file yet. [RELEASING.md](docs/RELEASING.md)
-records the proposed tag pipeline and the decisions still needed before it is
-safe to publish releases.
+Each release publishes two generic archives and their adjacent SHA-256 files:
+
+- `CADR-fonts-latin-<version>.tar.gz` contains 118 source and 42 runtime
+  artifacts with visible Basic Latin letters;
+- `CADR-fonts-symbols-<version>.tar.gz` contains the complementary 33 source
+  and seven runtime specialty artifacts.
+
+Both archives include usable Unicode BDFs, Unicode-derived OTBs, specimens,
+closed metadata, and separate project/source BSD-3-Clause notices. Raw
+CADR-encoded BDFs are present only under `fonts/raw/` for provenance
+comparison. For normal desktop use, install the OTBs; for an X core-font
+server, install the Unicode BDF directories and their generated indexes.
+
+The same release also publishes separate `cadr-fonts-latin` and
+`cadr-fonts-symbols` packages in DEB, RPM, Arch, and Void formats, each with an
+adjacent SHA-256 file. The repository flake provides
+`cadr-fonts-latin` and `cadr-fonts-symbols` for x86_64 and AArch64 Linux. See
+[Packaging](docs/PACKAGING.md) for paths, local commands, and the additional
+manual package recipes.
+
+## License
+
+Repository-authored tooling, documentation, metadata, and packaging material
+are distributed under the root [BSD-3-Clause license](LICENSE). The recovered
+MIT CADR font payload and its direct derivatives retain the pinned upstream
+[BSD-3-Clause notice](LICENSE.source). Release archives and packages install
+these separately as `LICENSE.project` and `LICENSE.source` so both attribution
+chains remain explicit.

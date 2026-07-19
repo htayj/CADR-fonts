@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import struct
 import sys
 import tempfile
 import unittest
+from unittest import mock
 import zlib
 
 
@@ -525,6 +527,60 @@ class OutputDirectoryTests(unittest.TestCase):
                     output, clean=True, owned_names={"bdf", "catalog.json"}
                 )
             self.assertEqual(unknown.read_text(encoding="ascii"), "not generated")
+
+
+class SourceSnapshotTests(unittest.TestCase):
+    def test_non_git_snapshot_requires_opt_in_and_exact_hashes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repository = root / "source"
+            source_root = repository / "src" / "lmfont"
+            source_root.mkdir(parents=True)
+            font_data = b"fixture font input\n"
+            license_data = b"fixture license\n"
+            runtime_data = b"fixture runtime evidence\n"
+            (source_root / "fixture.ast").write_bytes(font_data)
+            (repository / "src" / "LICENSE").write_bytes(license_data)
+            (source_root / "fixture.qfasl").write_bytes(runtime_data)
+
+            def record(data: bytes) -> dict[str, object]:
+                return {
+                    "byte_size": len(data),
+                    "sha256": hashlib.sha256(data).hexdigest(),
+                }
+
+            manifest = {
+                "schema_version": 1,
+                "revision": "0" * 40,
+                "source_root": "src/lmfont",
+                "files": [{"path": "fixture.ast", **record(font_data)}],
+                "license": {"path": "src/LICENSE", **record(license_data)},
+                "reviewed_findings": {
+                    "runtime_name_qfasl_evidence": {
+                        "FIXTURE": {
+                            "path": "src/lmfont/fixture.qfasl",
+                            **record(runtime_data),
+                        }
+                    }
+                },
+            }
+            manifest_path = root / "manifest.json"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with mock.patch.object(builder, "SOURCE_MANIFEST", manifest_path):
+                with self.assertRaisesRegex(builder.BuildError, "not a Git checkout"):
+                    builder.load_and_verify_source(repository)
+                observed, observed_root = builder.load_and_verify_source(
+                    repository, allow_source_snapshot=True
+                )
+                self.assertEqual(observed, manifest)
+                self.assertEqual(observed_root, source_root)
+
+                (source_root / "fixture.ast").write_bytes(b"changed\n")
+                with self.assertRaisesRegex(builder.BuildError, "source mismatch"):
+                    builder.load_and_verify_source(
+                        repository, allow_source_snapshot=True
+                    )
 
 
 if __name__ == "__main__":

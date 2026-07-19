@@ -346,6 +346,23 @@ a browser. `scripts/update_specimen_gallery.py --check` requires the tracked
 PNG bytes, paths, identities, hashes, and Markdown to match a fresh build; the
 committed images are presentation derivatives and do not add Unicode evidence.
 
+## Release and package encoding contract
+
+Each content-partitioned release archive contains the selected Unicode BDFs
+under `fonts/unicode/{source,runtime}` and OTB conversions made only from those
+Unicode BDFs under `fonts/otb/{source,runtime}`. Raw CADR-code BDFs are retained
+under `fonts/raw/` solely to keep the transformation traceable. Linux and Nix
+packages install only the Unicode BDF and OTB trees; they do not expose the raw
+profiles as user fonts.
+
+The OTB checker compares every packaged character map with its Unicode BDF and
+requires the same one-bit set pixels at baseline-relative coordinates and the
+same advance for all 20,307 encoded BDF-derived glyphs. The unencoded `.notdef`
+added to each OTB is outside that comparison. The converter may trim transparent storage
+rows or columns, which changes neither displayed ink nor escapement. The
+Unicode BDF and this mapping document remain authoritative for explicit
+metrics and provenance.
+
 ## BDF, ISO 10646, and X core constraints
 
 Unicode derivative BDFs store the scalar value directly as decimal BDF

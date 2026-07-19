@@ -293,3 +293,37 @@ The runtime boundary covers all 49 font QFASLs present in this pinned
 `src/lmfont` snapshot, classified as 47 current logical fonts and two older
 versions. Neither is a claim to recover every CADR font ever made or fonts from
 another system release.
+
+## Release derivation and content partition
+
+Release generation begins only after the raw and Unicode source/runtime
+profiles pass their closed corpus checks. It recomputes membership from each
+emitted Unicode BDF: **Latin** means at least one visible encoded letter in
+U+0041-U+005A or U+0061-U+007A, while **symbols** is the exact complement.
+The symbols name covers drawing and sprite families plus Greek, Cyrillic, APL,
+mathematics, and music repertoires; names and specimen presence do not select
+membership.
+
+The reviewed partition contains 118 source and 42 runtime Latin artifacts and
+33 source and seven runtime symbols artifacts. Every one of the 200 identities
+appears once, and a source/runtime logical family may not cross the boundary.
+Each generic archive carries the selected Unicode BDFs and Unicode-derived OTBs
+as usable fonts. Raw CADR-code BDFs remain in a separate `fonts/raw/` tree so
+the address transformation remains auditable; distro packages deliberately
+install only Unicode BDFs and OTBs.
+
+OTB conversion is checked independently for all 20,307 encoded glyphs derived
+from the Unicode BDFs; the unencoded `.notdef` added to each OTB is outside the
+claim. The checker requires the exact Unicode repertoire, one-bit bitmap strike, character
+advance, and baseline-relative set pixels of the Unicode BDF. It permits only
+transparent storage-box trimming, which does not alter display geometry. The
+Unicode BDF remains the authoritative derivative record.
+
+Deterministic archives use sorted members, numeric owner/group zero, fixed
+modes, and the tagged commit timestamp for both tar and gzip metadata. Each
+archive contains a closed manifest and internal checksums and has an adjacent
+compressed-file checksum. Repository-authored tooling, documentation, metadata,
+and packaging material carries the approved BSD-3-Clause text as
+`LICENSE.project`; the recovered font payload and direct derivatives retain the
+pinned upstream BSD-3-Clause text as `LICENSE.source`. Both files and their
+scopes are recorded independently in the release manifest.
