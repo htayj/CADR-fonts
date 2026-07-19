@@ -1,8 +1,12 @@
 # Release plan
 
 GitHub Actions and release publication are deliberately not enabled yet. The
-local build is the authority while output contents, repository naming, project
-code license, and versioning policy are still being settled.
+local build is the authority while release contents, project code license, and
+versioning policy are still being settled.
+
+The public upstream repository is
+[`htayj/CADR-fonts`](https://github.com/htayj/CADR-fonts), its `origin` uses
+SSH, and its default branch is `master`.
 
 ## Proposed tag workflow
 
@@ -29,7 +33,6 @@ contain a second implementation of font selection, naming, or checksumming.
 
 ## Decisions required first
 
-- GitHub owner/repository, remote, and intended default branch.
 - Project-tooling license; the recovered source payload itself is BSD-3-Clause.
 - Whether releases include normalized JSON and PNG sheets or only BDF plus
   catalogs, indexes, license, and checksums.
