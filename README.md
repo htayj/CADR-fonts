@@ -44,8 +44,8 @@ make check-external
 make reproducible
 make compare-genera
 make audit-runtime-names
-make release VERSION=v0.1.0
-make check-release VERSION=v0.1.0
+make release VERSION=v0.1.1
+make check-release VERSION=v0.1.1
 make check-specimens
 ```
 

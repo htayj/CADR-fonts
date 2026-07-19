@@ -1,6 +1,6 @@
 # Local template for 'cadr-fonts-symbols'; see packaging/void/README.md.
 pkgname=cadr-fonts-symbols
-version=0.1.0
+version=0.1.1
 revision=1
 archs="noarch"
 hostmakedepends="python3"
@@ -13,9 +13,9 @@ license="BSD-3-Clause"
 homepage="https://github.com/htayj/CADR-fonts"
 font_dirs="/usr/share/fonts/cadr-fonts/symbols/bdf/source /usr/share/fonts/cadr-fonts/symbols/bdf/runtime /usr/share/fonts/cadr-fonts/symbols/otb/source /usr/share/fonts/cadr-fonts/symbols/otb/runtime"
 
-# This remains a deliberately local template until v0.1.0 exists. Put the
-# checkout and its built dist/release directory somewhere visible inside the
-# xbps-src chroot, then set these variables in etc/conf.
+# This remains a deliberately local template. Put the checkout and its built
+# dist/release directory somewhere visible inside the xbps-src chroot, then
+# set these variables in etc/conf.
 do_install() {
 	local src=${CADR_FONTS_SOURCE_DIR:-}
 	local release_dir=${CADR_FONTS_RELEASE_DIR:-}

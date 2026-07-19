@@ -547,8 +547,13 @@ jobs:
             *alpha*|*beta*|*rc*|*pre*) release_flags+=(--prerelease) ;;
           esac
 
+          release_notes="Reproducible Unicode CADR font archives split into Latin and symbols collections, plus tested Linux packages for $TAG_NAME."
+          if [[ "$TAG_NAME" == "v0.1.1" ]]; then
+            release_notes="Corrects GERM35's historical 16-bit raster order in the raw and Unicode BDFs, Unicode-derived OTB fonts, and specimens. Code points and metrics are unchanged. Includes reproducible Latin and symbols archives plus tested Linux packages."
+          fi
+
           gh release create "$TAG_NAME" "${assets[@]}" \
             --verify-tag \
             --title "CADR Fonts $TAG_NAME" \
-            --notes "Reproducible Unicode CADR font archives split into Latin and symbols collections, plus tested Linux packages for $TAG_NAME." \
+            --notes "$release_notes" \
             "${release_flags[@]}"

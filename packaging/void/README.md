@@ -8,7 +8,7 @@ exists.
 Build and check the local release first:
 
 ```sh
-make release check-release VERSION=v0.1.0
+make release check-release VERSION=v0.1.1
 ```
 
 Make this checkout visible inside the Void packages tree (placing it below

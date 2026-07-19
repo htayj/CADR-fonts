@@ -24,7 +24,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import sys
 from typing import Iterable
@@ -62,6 +62,15 @@ MAX_TABLE_ENTRIES = 100_000
 MAX_ARRAY_ELEMENTS = 20_000_000
 MAX_INITIALIZATION_VALUES = 2_000_000
 MAX_NESTING = 128
+RASTER_ORDER_OVERRIDE_ARTIFACTS = {"GERM35"}
+RASTER_ORDER_EVIDENCE_PATHS = {
+    "src/lmio1/fcmp.66",
+    "src/lmio/tvdefs.52",
+    "src/lmio/tv.347",
+    "src/moon/wall.3",
+}
+FCMP_16_SERIALIZED_ORDER = "16-bit-screen"
+FCMP_16_NORMALIZATION = "reverse-each-serialized-32-bit-raster-word"
 
 
 class QfaslError(ValueError):
@@ -93,6 +102,103 @@ class DecodedRuntimeFont:
     parser: "FontQfaslParser"
     words: tuple[int, ...]
     source_sha256: str
+
+
+def _validate_raster_order_overrides(
+    manifest: dict, specs: tuple[RuntimeArtifactSpec, ...]
+) -> dict[str, dict[str, object]]:
+    """Validate the closed, historical exceptions to normal raster decoding."""
+
+    overrides = manifest.get("raster_order_overrides")
+    if not isinstance(overrides, dict):
+        raise QfaslError("runtime manifest lacks raster-order overrides")
+    if set(overrides) != RASTER_ORDER_OVERRIDE_ARTIFACTS:
+        raise QfaslError("runtime manifest raster-order override set changed")
+    if not set(overrides) <= {spec.artifact_name for spec in specs}:
+        raise QfaslError("raster-order override names an unknown artifact")
+
+    profile = overrides["GERM35"]
+    if not isinstance(profile, dict) or set(profile) != {
+        "display_normalization",
+        "historical_evidence",
+        "historical_screen_mode",
+        "reference_compiler_entrypoint",
+        "reviewed_display_oracle",
+        "serialized_raster_order",
+        "structural_signature",
+    }:
+        raise QfaslError("GERM35 raster-order override schema changed")
+    if (
+        profile["historical_screen_mode"] != "16-bit"
+        or profile["reference_compiler_entrypoint"] != "FCMP-16"
+        or profile["serialized_raster_order"] != FCMP_16_SERIALIZED_ORDER
+        or profile["display_normalization"] != FCMP_16_NORMALIZATION
+        or profile["structural_signature"]
+        != {
+            "indexing_table": True,
+            "raster_width": 16,
+            "rasters_per_word": 2,
+        }
+    ):
+        raise QfaslError("GERM35 raster-order contract changed")
+
+    evidence = profile["historical_evidence"]
+    if not isinstance(evidence, list) or len(evidence) != len(
+        RASTER_ORDER_EVIDENCE_PATHS
+    ):
+        raise QfaslError("GERM35 raster-order evidence set changed")
+    evidence_paths = set()
+    for record in evidence:
+        if not isinstance(record, dict) or set(record) != {
+            "byte_size",
+            "line_ranges",
+            "observation",
+            "path",
+            "sha256",
+        }:
+            raise QfaslError("GERM35 raster-order evidence schema changed")
+        evidence_path = PurePosixPath(str(record["path"]))
+        if (
+            evidence_path.is_absolute()
+            or ".." in evidence_path.parts
+            or not evidence_path.parts
+            or evidence_path.parts[0] != "src"
+        ):
+            raise QfaslError("GERM35 raster-order evidence path is unsafe")
+        evidence_paths.add(evidence_path.as_posix())
+        if (
+            not isinstance(record["byte_size"], int)
+            or record["byte_size"] < 1
+            or not isinstance(record["sha256"], str)
+            or len(record["sha256"]) != 64
+            or any(character not in "0123456789abcdef" for character in record["sha256"])
+            or not isinstance(record["line_ranges"], list)
+            or not record["line_ranges"]
+            or not all(isinstance(value, str) and value for value in record["line_ranges"])
+            or not isinstance(record["observation"], str)
+            or not record["observation"]
+        ):
+            raise QfaslError("GERM35 raster-order evidence record is invalid")
+    if evidence_paths != RASTER_ORDER_EVIDENCE_PATHS:
+        raise QfaslError("GERM35 raster-order evidence paths changed")
+
+    oracle = profile["reviewed_display_oracle"]
+    if not isinstance(oracle, dict) or set(oracle) != {
+        "canonicalization",
+        "ink_bearing_glyph_count",
+        "sha256",
+    }:
+        raise QfaslError("GERM35 display oracle schema changed")
+    if (
+        not isinstance(oracle["canonicalization"], str)
+        or not oracle["canonicalization"]
+        or oracle["ink_bearing_glyph_count"] != 74
+        or not isinstance(oracle["sha256"], str)
+        or len(oracle["sha256"]) != 64
+        or any(character not in "0123456789abcdef" for character in oracle["sha256"])
+    ):
+        raise QfaslError("GERM35 display oracle is invalid")
+    return overrides
 
 
 def load_runtime_manifest(
@@ -157,6 +263,7 @@ def load_runtime_manifest(
             and spec.expected_source_relation_details is not None
         ):
             raise QfaslError("exact source relations must not carry difference details")
+    _validate_raster_order_overrides(manifest, specs)
     return manifest, specs
 
 
@@ -670,6 +777,29 @@ def _serialized_font_binding(
     return font_bindings[0]
 
 
+def _normalize_serialized_raster_bits(
+    raster_bits: list[int], raster_order_profile: dict[str, object] | None
+) -> list[int]:
+    """Convert a reviewed serialized raster order to display coordinates."""
+
+    if raster_order_profile is None:
+        return raster_bits
+    if (
+        raster_order_profile["serialized_raster_order"]
+        != FCMP_16_SERIALIZED_ORDER
+        or raster_order_profile["display_normalization"]
+        != FCMP_16_NORMALIZATION
+    ):
+        raise QfaslError("unsupported reviewed raster-order normalization")
+    if len(raster_bits) % 32:
+        raise QfaslError("16-bit-screen raster is not composed of complete words")
+    return [
+        bit
+        for offset in range(0, len(raster_bits), 32)
+        for bit in reversed(raster_bits[offset : offset + 32])
+    ]
+
+
 def font_from_binding(
     artifact_name: str,
     expected_runtime_name: str,
@@ -677,6 +807,7 @@ def font_from_binding(
     bindings: dict[Symbol, object],
     *,
     expected_runtime_symbol: str | None = None,
+    raster_order_profile: dict[str, object] | None = None,
 ) -> BitmapFont:
     symbol, array = _serialized_font_binding(bindings)
     expected_symbol = expected_runtime_symbol or f"FONTS:{expected_runtime_name}"
@@ -722,12 +853,25 @@ def font_from_binding(
         if any(indexes[index] > indexes[index + 1] for index in range(128)):
             raise QfaslError("FONT indexing table is not monotonic")
     storage_characters = indexes[-1] if indexes is not None else 128
+    if raster_order_profile is not None:
+        observed_signature = {
+            "indexing_table": indexes is not None,
+            "raster_width": raster_width,
+            "rasters_per_word": rasters_per_word,
+        }
+        if observed_signature != raster_order_profile["structural_signature"]:
+            raise QfaslError(
+                "reviewed raster-order structural signature changed: "
+                f"{observed_signature}"
+            )
     expected_raster_bits = 32 * words_per_character * storage_characters
     if array.length != expected_raster_bits:
         raise QfaslError(
             f"FONT raster has {array.length} bits, expected {expected_raster_bits}"
         )
-    raster_bits = array.values()
+    raster_bits = _normalize_serialized_raster_bits(
+        array.values(), raster_order_profile
+    )
     if array.initialization is None or len(array.initialization) % 2:
         raise QfaslError("FONT raster does not contain complete 32-bit words")
     raster_qs = [
@@ -781,6 +925,40 @@ def font_from_binding(
     serialized_leader_name = (
         leader_name.qualified_name if isinstance(leader_name, Symbol) else None
     )
+    if raster_order_profile is None:
+        raster_order_metadata = {
+            "historical_screen_mode": None,
+            "raster_order_reference": None,
+            "serialized_raster_order": None,
+            "display_raster_normalization": "none",
+            "controller_mode_provenance": (
+                "not encoded in the FONT leader; no artifact-specific "
+                "raster-order override is assigned"
+            ),
+        }
+    else:
+        raster_order_metadata = {
+            "historical_screen_mode": raster_order_profile[
+                "historical_screen_mode"
+            ],
+            "raster_order_reference": (
+                raster_order_profile["reference_compiler_entrypoint"]
+                + " in pinned fcmp.66"
+            ),
+            "serialized_raster_order": raster_order_profile[
+                "serialized_raster_order"
+            ],
+            "display_raster_normalization": raster_order_profile[
+                "display_normalization"
+            ],
+            "controller_mode_provenance": (
+                "reviewed as 16-bit screen order from the unique 16-pixel "
+                "wide-font structural signature and pinned historical "
+                "evidence; the later FCMP-16 entry point is the reference "
+                "implementation, not a claimed 1978 invocation"
+            ),
+        }
+
     return BitmapFont(
         name=artifact_name,
         character_height=character_height,
@@ -824,11 +1002,8 @@ def font_from_binding(
             "bitmap_width_semantics": (
                 "runtime storage/draw width; compiler padding is retained"
             ),
-            "controller_mode_provenance": (
-                "not encoded in the FONT leader; export follows runtime bit-array "
-                "coordinates and does not assign 16-bit or 32-bit screen provenance"
-            ),
-        },
+        }
+        | raster_order_metadata,
     )
 
 
@@ -838,6 +1013,7 @@ def _decode_bytes(
     artifact_name: str,
     runtime_name: str,
     runtime_symbol: str | None = None,
+    raster_order_profile: dict[str, object] | None = None,
 ) -> tuple[BitmapFont, FontQfaslParser, tuple[int, ...]]:
     words = tuple(evacuated_words(raw))
     nibbles = qfasl_nibbles(words)
@@ -849,6 +1025,7 @@ def _decode_bytes(
         source_name,
         bindings,
         expected_runtime_symbol=runtime_symbol,
+        raster_order_profile=raster_order_profile,
     )
     return font, parser, words
 
@@ -858,6 +1035,7 @@ def _decode_file(
     artifact_name: str,
     runtime_name: str,
     runtime_symbol: str | None = None,
+    raster_order_profile: dict[str, object] | None = None,
 ) -> tuple[BitmapFont, FontQfaslParser, tuple[int, ...]]:
     return _decode_bytes(
         path.read_bytes(),
@@ -865,6 +1043,7 @@ def _decode_file(
         artifact_name,
         runtime_name,
         runtime_symbol,
+        raster_order_profile,
     )
 
 
@@ -901,6 +1080,7 @@ def decode_reviewed_fonts(
     """Decode all closed-manifest inputs to inert in-memory font objects."""
 
     manifest, specs = load_runtime_manifest(manifest_path)
+    raster_order_overrides = _validate_raster_order_overrides(manifest, specs)
     if not source.is_dir():
         raise QfaslError(f"runtime font source is not a directory: {source}")
 
@@ -924,8 +1104,19 @@ def decode_reviewed_fonts(
         str(license_record["sha256"]),
     )
 
+    source_checkout = source.parent.parent
+    for profile in raster_order_overrides.values():
+        for evidence in profile["historical_evidence"]:
+            relative = PurePosixPath(str(evidence["path"]))
+            _reviewed_bytes(
+                source_checkout.joinpath(*relative.parts),
+                int(evidence["byte_size"]),
+                str(evidence["sha256"]),
+            )
+
     decoded = []
     for spec in specs:
+        raster_order_profile = raster_order_overrides.get(spec.artifact_name)
         raw = _reviewed_bytes(
             source / spec.source_file,
             spec.byte_size,
@@ -938,6 +1129,7 @@ def decode_reviewed_fonts(
                 spec.artifact_name,
                 spec.runtime_name,
                 spec.runtime_symbol,
+                raster_order_profile,
             )
         except QfaslError as error:
             raise QfaslError(f"{spec.source_file}: {error}") from error
@@ -977,6 +1169,8 @@ def decode_reviewed_fonts(
                 ),
             },
         )
+        if raster_order_profile is not None:
+            _validate_reviewed_display_oracle(font, raster_order_profile)
         decoded.append(
             DecodedRuntimeFont(
                 spec=spec,
@@ -1009,6 +1203,40 @@ def _semantic_glyph(glyph: Glyph) -> dict[str, object]:
     }
 
 
+def _normalized_font_semantic_record(
+    artifact_name: str, font: BitmapFont
+) -> dict[str, object]:
+    return {
+        "artifact_name": artifact_name,
+        "character_height": font.character_height,
+        "raster_height": font.raster_height,
+        "baseline": font.baseline,
+        "glyphs": [
+            _semantic_glyph(glyph)
+            for glyph in sorted(font.glyphs, key=lambda glyph: glyph.code)
+        ],
+    }
+
+
+def _validate_reviewed_display_oracle(
+    font: BitmapFont, raster_order_profile: dict[str, object]
+) -> None:
+    oracle = raster_order_profile["reviewed_display_oracle"]
+    visible_count = sum(any(glyph.rows) for glyph in font.glyphs)
+    if visible_count != oracle["ink_bearing_glyph_count"]:
+        raise QfaslError(
+            f"{font.name}: reviewed ink-bearing glyph count changed: "
+            f"{visible_count}"
+        )
+    observed = _semantic_digest(
+        _normalized_font_semantic_record(font.name, font)
+    )
+    if observed != oracle["sha256"]:
+        raise QfaslError(
+            f"{font.name}: reviewed display geometry changed: {observed}"
+        )
+
+
 def _bdf_semantic_glyphs(font: BitmapFont) -> tuple[Glyph, ...]:
     """Mirror the shared writer's documented no-op placeholder policy."""
 
@@ -1029,16 +1257,7 @@ def runtime_normalized_semantic_inventory(
     """Canonical lossless runtime FONT geometry for regression oracles."""
 
     return [
-        {
-            "artifact_name": item.spec.artifact_name,
-            "character_height": item.font.character_height,
-            "raster_height": item.font.raster_height,
-            "baseline": item.font.baseline,
-            "glyphs": [
-                _semantic_glyph(glyph)
-                for glyph in sorted(item.font.glyphs, key=lambda glyph: glyph.code)
-            ],
-        }
+        _normalized_font_semantic_record(item.spec.artifact_name, item.font)
         for item in sorted(decoded, key=lambda item: item.spec.artifact_name)
     ]
 
@@ -1163,6 +1382,9 @@ def write_runtime_distribution(
                 "expected_source_relation_details": (
                     spec.expected_source_relation_details
                 ),
+                "raster_order_override": manifest[
+                    "raster_order_overrides"
+                ].get(spec.artifact_name),
                 "source_file": f"src/lmfont/{spec.source_file}",
                 "source_byte_size": spec.byte_size,
                 "source_sha256": item.source_sha256,
@@ -1247,6 +1469,7 @@ def write_runtime_distribution(
         "source_license_copy": "LICENSE.source",
         "runtime_manifest": "runtime-source-manifest.json",
         "runtime_manifest_sha256": _sha256(manifest_bytes),
+        "raster_order_overrides": manifest["raster_order_overrides"],
         "semantic_inventory_digests": runtime_semantic_inventory_digests(
             decoded
         ),

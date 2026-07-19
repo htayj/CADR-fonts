@@ -51,6 +51,27 @@ SHA-256, decoded PDP-10-word digest, nibble count, and complete consumption,
 and rejects all other operations. It does not evaluate a Lisp form or execute
 a Lisp Machine instruction.
 
+Serialized raster words are not always in the same order as display pixels.
+The pinned later compiler source's ordinary `FCMP` entry point reverses each
+32-bit `QRAST` word for a 32-bit display, while its compatibility entry point
+`FCMP-16` leaves the older 16-bit screen order intact. `GERM35` predates that
+source and is the corpus's unique font with both a
+16-pixel raster stripe and a wide-character indexing table—the structural
+signature of the 16-bit mode represented by `FCMP-16` for a glyph wider than
+16 pixels. This does not claim that the 1978 artifact invoked that later
+function name. Its
+manifest-pinned compiler and screen-definition witnesses therefore require
+reversing each serialized 32-bit word during export. This simultaneously puts
+the two packed raster rows in top-to-bottom order and their pixels in
+left-to-right order, while preserving the indexing table's left-to-right
+stripe order. The operation changes pixels only; advances, bearings, baseline,
+and character addresses are retained.
+
+No other runtime artifact receives that normalization. For those artifacts,
+the decoder retains the serialized bit-array coordinate interpretation and
+does not claim a 16- or 32-bit compiler entry point that the `FONT` leader
+itself does not encode.
+
 The closed runtime corpus contains 49 compiled objects:
 
 - 30 current objects with surviving source-profile counterparts;
@@ -114,6 +135,11 @@ codes display:
 The runtime BDFs carry the decompiled objects directly. Source BDFs retain the
 authored observations, including `ARROW-KST` and `BIGFNT-KST`, instead of being
 rewritten to resemble a later compiled file.
+
+Compiled-only `GERM35` has no authored geometry to compare. Its independent
+display oracle is instead the reviewed 16-bit-order reconstruction described
+above: 128 resident slots, 75 installable glyphs, 74 ink-bearing glyphs, and
+proportional spacing.
 
 `N43XMS` is a genuinely different older `43VXMS`: 69 glyphs have different set
 pixels from the current object. `NTOG` is display-identical to current `TOG`

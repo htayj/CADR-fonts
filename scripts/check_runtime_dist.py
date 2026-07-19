@@ -442,6 +442,11 @@ def check_runtime_distribution(output: Path) -> dict[str, object]:
         in catalog["display_layout_policy"]["system_46_mixed_font_line_map"],
         "mixed-font baseline policy changed",
     )
+    raster_order_overrides = manifest["raster_order_overrides"]
+    require(
+        catalog["raster_order_overrides"] == raster_order_overrides,
+        "runtime raster-order overrides are stale",
+    )
 
     records = list(catalog["font_artifacts"])
     specs = {record["artifact_name"]: record for record in manifest["artifacts"]}
@@ -473,10 +478,41 @@ def check_runtime_distribution(output: Path) -> dict[str, object]:
             require(record.get(key) == spec.get(key), f"{artifact_name}: manifest {key} drift")
         require(record["source_sha256"] == spec["sha256"], f"{artifact_name}: source hash drift")
         require(record["source_byte_size"] == spec["byte_size"], f"{artifact_name}: source size drift")
+        expected_raster_order = raster_order_overrides.get(artifact_name)
+        require(
+            record["raster_order_override"] == expected_raster_order,
+            f"{artifact_name}: raster-order override drift",
+        )
 
         json_path = runtime_root / record["outputs"]["json"]
         normalized = json.loads(json_path.read_text(encoding="utf-8"))
         glyphs = [normalized_glyph(glyph) for glyph in normalized["glyphs"]]
+        observations = normalized["metadata"]
+        require(
+            observations == record["observations"],
+            f"{artifact_name}: JSON/catalog observations drift",
+        )
+        if expected_raster_order is None:
+            require(
+                observations["display_raster_normalization"] == "none"
+                and observations["historical_screen_mode"] is None
+                and observations["raster_order_reference"] is None
+                and observations["serialized_raster_order"] is None,
+                f"{artifact_name}: unreviewed raster-order normalization",
+            )
+        else:
+            require(
+                observations["display_raster_normalization"]
+                == expected_raster_order["display_normalization"]
+                and observations["historical_screen_mode"]
+                == expected_raster_order["historical_screen_mode"]
+                and observations["raster_order_reference"]
+                == expected_raster_order["reference_compiler_entrypoint"]
+                + " in pinned fcmp.66"
+                and observations["serialized_raster_order"]
+                == expected_raster_order["serialized_raster_order"],
+                f"{artifact_name}: reviewed raster-order metadata drift",
+            )
         normalized_glyph_count += len(glyphs)
         normalized_inventory.append(
             {
@@ -546,6 +582,35 @@ def check_runtime_distribution(output: Path) -> dict[str, object]:
     require(spacing == {"P": 37, "M": 5, "C": 7}, f"runtime spacing inventory changed: {spacing}")
     require(normalized_glyph_count == 6170, "normalized runtime slot count changed")
     require(bdf_glyph_count == 5689, "runtime BDF glyph count changed")
+    structural_matches = sorted(
+        record["artifact_name"]
+        for record in records
+        if record["observations"]["raster_width"] == 16
+        and record["observations"]["rasters_per_word"] == 2
+        and record["observations"]["indexing_table"]
+    )
+    require(
+        structural_matches == ["GERM35"],
+        f"16-bit raster structural signature changed: {structural_matches}",
+    )
+    germ35 = next(
+        record
+        for record in normalized_inventory
+        if record["artifact_name"] == "GERM35"
+    )
+    germ35_oracle = raster_order_overrides["GERM35"][
+        "reviewed_display_oracle"
+    ]
+    germ35_visible_count = sum(any(glyph["rows"]) for glyph in germ35["glyphs"])
+    require(
+        germ35_visible_count == germ35_oracle["ink_bearing_glyph_count"] == 74,
+        f"GERM35 ink-bearing glyph count changed: {germ35_visible_count}",
+    )
+    germ35_hash = semantic_digest(germ35)
+    require(
+        germ35_hash == germ35_oracle["sha256"],
+        f"GERM35 reviewed display geometry changed: {germ35_hash}",
+    )
     for directory, suffix in (("bdf", ".bdf"), ("json", ".json"), ("sheets", ".png")):
         require(
             len(list((runtime_root / directory).glob(f"*{suffix}"))) == 49,

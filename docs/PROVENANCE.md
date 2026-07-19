@@ -73,6 +73,23 @@ implements only the closed corpus's reviewed serialized-object subset and
 rejects all unsupported or executable operations. It never loads a QFASL,
 evaluates a form, or executes target code.
 
+`GERM35` also has a closed raster-order evidence record. The pinned
+[`fcmp.66`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fcmp.66#L29-L76)
+provides the later reference implementation: it distinguishes `FCMP-16` from
+the default 32-bit compiler, gives 16-bit wide fonts 16-pixel indexed stripes,
+and reverses raster words only in 32-bit mode.
+Pinned
+[`tvdefs.52`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio/tvdefs.52#L4-L30)
+states that 16-bit screens order both pixels within a row and rows within a
+word oppositely from the normal convention. `GERM35` is the only reviewed
+runtime object with `raster_width = 16`, `rasters_per_word = 2`, and an
+indexing table, so the exception is structural and artifact-specific rather
+than a visual guess. Because the artifact predates that compiler source,
+`FCMP-16` is recorded as the reference entry point, not claimed as the literal
+function used to create GERM35 in 1978. The manifest additionally pins the preserved directory
+date and the later 32-bit TV implementation as chronological cross-checks,
+then commits a GERM35-only normalized display-geometry oracle.
+
 ## Unicode mapping evidence and policy boundary
 
 The Unicode profile is a derivative view of the raw source and runtime
@@ -194,9 +211,9 @@ The runtime manifest commits a second pair. Its normalized oracle covers all
 49 objects and all 6,170 resident slots, including 481 JSON-only zero-width,
 zero-advance, no-ink placeholders; its BDF oracle covers the exact line metrics
 and geometry of all 5,689 emitted runtime glyphs. The reviewed SHA-256 values
-are `6f20481c016147ca0b74dca1253f4ce71b371a02f3db19a3dd3f1bff00e0081c`
+are `4df48ac7ad77103497fe060404689e40f9e13aa5ae6d2b61b0bac0886c2d3544`
 for normalized runtime geometry and
-`f7ae074cb314c443bdf7b9f04531a1e85a1234784945af1f760bf2d3b25776dc`
+`64d76d91a777a451789b4222468569ef2f7a7936c4f63c0283f5124cf465939d`
 for runtime BDF geometry.
 
 ## Legacy compatibility audit
@@ -235,6 +252,16 @@ The remaining source-backed references match every source-represented glyph.
 The older `N43XMS` differs from current `43VXMS` in 69 glyphs, while older
 `NTOG` and current `TOG` are display-identical but serialization-distinct.
 
+`GERM35` is compiled-only and therefore outside that source-pair comparison.
+Its separate historical gate reconstructs the unreversed 16-bit-order words in
+display order, verifies that no other artifact takes the exception, and checks
+the complete 128-slot result against SHA-256
+`681976ee7e14cfc8a5515996d616695191d1e05b4d6d565a2ea97e94134c43c9`.
+Release v0.1.0 incorrectly interpreted those serialized words as display
+coordinates, producing row-paired and horizontally reversed fragments.
+Release v0.1.1 corrects that geometry in the raw, Unicode, OTB, and specimen
+outputs without changing GERM35's code points or metrics.
+
 Static comparison is followed by an independent native-X gate. It compiles all
 four profiles to PCF and indexes them with `mkfontdir`. Raw eight-bit probes are
 drawn through Xvfb/Xlib with `XDrawString`; Unicode BMP probes use real
@@ -259,6 +286,7 @@ format descriptions:
 - AST: [`RD-AST` in `fcmp.66`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fcmp.66#L228-L264).
 - KST: [`FNTCNV` KST reader](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fntcnv.28#L331-L382).
 - Alto: [`FNTCNV` Alto reader](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fntcnv.28#L747-L819).
+- 16-/32-bit runtime raster order: the later reference [`FCMP`/`FCMP-16` implementation in `fcmp.66`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fcmp.66#L29-L76) and [`FONT` screen-order notes in `tvdefs.52`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio/tvdefs.52#L4-L30).
 - Runtime positioning: [`SHEET-TYO` in `shwarm.162`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmwin/shwarm.162#L354-L388).
 - Default VSP: [`SHEET :INIT` in `sheet.383`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmwin/sheet.383#L397-L426).
 - Mixed-font baseline and line height: [`SHEET-NEW-FONT-MAP` in `sheet.383`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmwin/sheet.383#L507-L539).

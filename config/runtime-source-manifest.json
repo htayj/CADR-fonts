@@ -743,6 +743,67 @@
     "sha256": "05b8de7c86c946cc747ab71a9aaa7dd56e37365278b5585ab685156eaa90fb92",
     "spdx": "BSD-3-Clause"
   },
+  "raster_order_overrides": {
+    "GERM35": {
+      "display_normalization": "reverse-each-serialized-32-bit-raster-word",
+      "historical_evidence": [
+        {
+          "byte_size": 10446,
+          "line_ranges": [
+            "29-37",
+            "49-76",
+            "117-169",
+            "217-226"
+          ],
+          "observation": "In this later reference compiler, FCMP defaults to 32-bit mode, FCMP-16 selects 16-bit mode, only that mode caps wide-font stripes at 16 pixels, and only 32-bit mode reverses each QRAST word before serialization.",
+          "path": "src/lmio1/fcmp.66",
+          "sha256": "c6efa82ffcb242ee6258e514689e8ddab5d3f9a244f88ca225ab9fd4c9e24a07"
+        },
+        {
+          "byte_size": 11783,
+          "line_ranges": [
+            "4-9",
+            "16-30"
+          ],
+          "observation": "The FONT definition says 16-bit and 32-bit screens require differently ordered fonts; for 16-bit screens both bits within a row and rows within a word are ordered left to right.",
+          "path": "src/lmio/tvdefs.52",
+          "sha256": "3049634797d9e9a1333a8bbc6b6e5a704fc0e4cf75e9af625051d526046cd13a"
+        },
+        {
+          "byte_size": 35974,
+          "line_ranges": [
+            "344-376",
+            "525-534"
+          ],
+          "observation": "The preserved directory listing dates GERM35.QFASL to 1978-07-28, S35GER.QFASL to 1978-11-27, and the pinned FCMP.66 reference source to 1980-02-16; FCMP-16 therefore describes the compatible order but is not claimed as GERM35's literal build entry point.",
+          "path": "src/moon/wall.3",
+          "sha256": "f3e82f13d17ef8927f219b6e3cf637587d95665dc5d6110b63e8c7829295b224"
+        },
+        {
+          "byte_size": 45138,
+          "line_ranges": [
+            "1-12"
+          ],
+          "observation": "The replacement TV implementation identifies itself as the new 1978-08-27 version primarily for 32-bit displays, one month after GERM35.QFASL.",
+          "path": "src/lmio/tv.347",
+          "sha256": "bf6c732a7eaad10f03ce703507bc4362d5b61d18fd3331d4ee5c97e08738a318"
+        }
+      ],
+      "historical_screen_mode": "16-bit",
+      "reference_compiler_entrypoint": "FCMP-16",
+      "reviewed_display_oracle": {
+        "canonicalization": "GERM35 record of artifact name, character height, raster height, baseline, and all runtime slots' code, bitmap width, advance, x and y offsets, and display-normalized rows; JSON serialized with sorted keys and compact separators",
+        "ink_bearing_glyph_count": 74,
+        "sha256": "681976ee7e14cfc8a5515996d616695191d1e05b4d6d565a2ea97e94134c43c9"
+      },
+      "serialized_raster_order": "16-bit-screen",
+      "structural_signature": {
+        "indexing_table": true,
+        "raster_width": 16,
+        "rasters_per_word": 2
+      }
+    }
+  },
   "repository": "https://github.com/mietek/mit-cadr-system-software.git",
   "revision": "8e978d7d1704096a63edd4386a3b8326a2e584af",
   "schema_version": 1,
@@ -751,12 +812,12 @@
       "canonicalization": "artifact-sorted records of BDF SIZE, FONTBOUNDINGBOX, FONT_ASCENT, FONT_DESCENT, and each emitted glyph's code, DWIDTH-equivalent advance, BBX width and offsets, and decoded rows; zero-width zero-advance no-ink placeholders omitted; JSON serialized with sorted keys and compact separators",
       "emitted_glyph_count": 5689,
       "omitted_nonrendering_placeholder_count": 481,
-      "sha256": "f7ae074cb314c443bdf7b9f04531a1e85a1234784945af1f760bf2d3b25776dc"
+      "sha256": "64d76d91a777a451789b4222468569ef2f7a7936c4f63c0283f5124cf465939d"
     },
     "normalized_runtime_font_geometry": {
       "canonicalization": "artifact-sorted records of character height, raster height, baseline, and every runtime FONT slot's code, bitmap width, advance, x and y offsets, and decoded rows; JSON serialized with sorted keys and compact separators",
       "glyph_count": 6170,
-      "sha256": "6f20481c016147ca0b74dca1253f4ce71b371a02f3db19a3dd3f1bff00e0081c"
+      "sha256": "4df48ac7ad77103497fe060404689e40f9e13aa5ae6d2b61b0bac0886c2d3544"
     }
   },
   "source_root": "src/lmfont"

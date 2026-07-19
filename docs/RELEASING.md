@@ -142,6 +142,10 @@ release-critical gates are:
 - strict inert QFASL decoding, all reviewed source/runtime classification and
   semantic-inventory oracles, and the exceptional display comparisons for
   `ARROW`, `BIGFNT`, current `MEDFNT`, and runtime `MOUSE`;
+- the GERM35-only 16-bit structural signature, pinned compiler/screen
+  evidence (with later `FCMP-16` as the reference implementation), complete
+  display-geometry oracle, and proof that no other runtime font receives its
+  raster-word normalization;
 - 151 source and 49 runtime artifacts, 20,307 emitted glyphs per encoding, and
   byte-for-byte raw-to-Unicode geometry preservation;
 - exact 118/42 Latin and 33/7 symbols partition, with complete and disjoint
@@ -171,7 +175,7 @@ archive epoch:
 
 ```sh
 git submodule update --init --recursive
-version=v0.1.0
+version=v0.1.1
 epoch=$(git show -s --format=%ct HEAD)
 make ci VERSION="$version" SOURCE_DATE_EPOCH="$epoch"
 export SOURCE_DATE_EPOCH="$epoch"

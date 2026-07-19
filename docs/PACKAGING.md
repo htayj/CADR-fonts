@@ -91,7 +91,7 @@ Build and independently verify both generic archives with a version string and
 the source commit timestamp:
 
 ```sh
-version=v0.1.0
+version=v0.1.1
 epoch=$(git show -s --format=%ct HEAD)
 make check-release VERSION="$version" SOURCE_DATE_EPOCH="$epoch"
 make release-reproducible VERSION="$version" SOURCE_DATE_EPOCH="$epoch"
@@ -123,8 +123,8 @@ can be repeated with:
 ```sh
 scripts/test-linux-package-container.sh \
   --runtime docker --format deb \
-  --package dist/packages/deb/cadr-fonts-latin_0.1.0-1_all.deb \
-  --package dist/packages/deb/cadr-fonts-symbols_0.1.0-1_all.deb
+  --package dist/packages/deb/cadr-fonts-latin_0.1.1-1_all.deb \
+  --package dist/packages/deb/cadr-fonts-symbols_0.1.1-1_all.deb
 ```
 
 Use the matching format and files for the other package systems. Passing both
@@ -159,9 +159,9 @@ guix install -L packaging/guix cadr-fonts-latin cadr-fonts-symbols
 ```
 
 The recipe's source closure contains the generator, mapping/manifests, pinned
-font payload, and the three exact CADR files whose hashes support the Unicode
-mapping evidence. It installs neither raw CADR-code BDFs nor unrelated CADR
-source files.
+font payload, and the seven exact CADR files whose hashes support the Unicode
+mapping and GERM35 raster-order evidence. It installs neither raw CADR-code
+BDFs nor unrelated CADR source files.
 
 ## Manual source-package recipes
 

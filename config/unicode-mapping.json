@@ -71,7 +71,7 @@
     "source_resolution_inventory_sha256": "55a68552c725d92381180a945f15440ad893c58949d7ec6b9f52d830440ec7eb",
     "source_unicode_geometry_sha256": "97c27d6dded8ecba3383de5efaeef91e55ad4b8848dda61379875d8e789cb2c4",
     "runtime_resolution_inventory_sha256": "0d05282e05ae76d5dcbe117787da8dfdb8f5820e46fd48d7a01c4c67c4b41a54",
-    "runtime_unicode_geometry_sha256": "5033bb1e5784cdbf5bb12265b0daee119eccfc5b02797970ca5535839e6e4a0e"
+    "runtime_unicode_geometry_sha256": "0f0d71dfb7c2e4cf4ca852f39a426130cf8c2a10da7db6be13b3efdc252d8124"
   },
   "repertoires": {
     "standard-cadr": {

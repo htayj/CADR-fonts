@@ -215,7 +215,7 @@
       "path": "latin/runtime/germ35.png",
       "profile": "runtime",
       "runtime_name": "GERM35",
-      "sha256": "71a5e737cd22d53f5235835c4749f852df1cda60ff0782876f7897965830b6d0",
+      "sha256": "0f815ed67f3bb3fdc4ffa5e8f14d811e96ef64e4a081a5c935973356a9d95591",
       "specimen_kind": "unicode-pangram",
       "text": "The five boxing Lisp wizards jump quickly."
     },

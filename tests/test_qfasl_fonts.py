@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -110,6 +111,42 @@ class RuntimeManifestTests(unittest.TestCase):
         }
         self.assertEqual(len(exact), 28)
 
+    def test_germ35_raster_order_exception_has_pinned_evidence(self) -> None:
+        manifest, _specs = qfasl.load_runtime_manifest(MANIFEST)
+        self.assertEqual(set(manifest["raster_order_overrides"]), {"GERM35"})
+        profile = manifest["raster_order_overrides"]["GERM35"]
+        self.assertEqual(profile["historical_screen_mode"], "16-bit")
+        self.assertEqual(profile["reference_compiler_entrypoint"], "FCMP-16")
+        self.assertEqual(
+            profile["structural_signature"],
+            {
+                "indexing_table": True,
+                "raster_width": 16,
+                "rasters_per_word": 2,
+            },
+        )
+        evidence = {
+            record["path"]: record["sha256"]
+            for record in profile["historical_evidence"]
+        }
+        self.assertEqual(
+            evidence,
+            {
+                "src/lmio1/fcmp.66": (
+                    "c6efa82ffcb242ee6258e514689e8ddab5d3f9a244f88ca225ab9fd4c9e24a07"
+                ),
+                "src/lmio/tvdefs.52": (
+                    "3049634797d9e9a1333a8bbc6b6e5a704fc0e4cf75e9af625051d526046cd13a"
+                ),
+                "src/lmio/tv.347": (
+                    "bf6c732a7eaad10f03ce703507bc4362d5b61d18fd3331d4ee5c97e08738a318"
+                ),
+                "src/moon/wall.3": (
+                    "f3e82f13d17ef8927f219b6e3cf637587d95665dc5d6110b63e8c7829295b224"
+                ),
+            },
+        )
+
 
 class RuntimeDecodeTests(unittest.TestCase):
     @classmethod
@@ -154,6 +191,160 @@ class RuntimeDecodeTests(unittest.TestCase):
         self.assertEqual(arrow[0o3].advance, 14)
         for code in (0o34, 0o35, 0o36):
             self.assertTrue(any(mouse[code].rows), f"missing visible MOUSE {code:o}")
+
+    def test_germ35_uses_reviewed_16_bit_display_order(self) -> None:
+        corrected = [
+            item
+            for item in self.decoded
+            if item.font.metadata["display_raster_normalization"] != "none"
+        ]
+        self.assertEqual([item.spec.artifact_name for item in corrected], ["GERM35"])
+
+        structural_matches = sorted(
+            item.spec.artifact_name
+            for item in self.decoded
+            if item.font.metadata["raster_width"] == 16
+            and item.font.metadata["rasters_per_word"] == 2
+            and item.font.metadata["indexing_table"]
+        )
+        self.assertEqual(structural_matches, ["GERM35"])
+
+        germ = self.by_artifact["GERM35"].font
+        self.assertEqual(germ.metadata["historical_screen_mode"], "16-bit")
+        self.assertEqual(
+            germ.metadata["raster_order_reference"],
+            "FCMP-16 in pinned fcmp.66",
+        )
+        self.assertEqual(
+            germ.metadata["serialized_raster_order"], "16-bit-screen"
+        )
+        self.assertEqual(len(germ.glyphs), 128)
+        self.assertEqual(len(qfasl._bdf_semantic_glyphs(germ)), 75)
+        self.assertEqual(sum(any(glyph.rows) for glyph in germ.glyphs), 74)
+        self.assertEqual(
+            qfasl.bdf_profile(
+                germ,
+                foundry="Misc",
+                family_name="MIT CADR GERM35",
+                add_style_name="System 46 Runtime",
+            )["spacing"],
+            "P",
+        )
+
+        glyphs = {glyph.code: glyph for glyph in germ.glyphs}
+        capital_a = glyphs[ord("A")]
+        self.assertEqual(
+            (
+                capital_a.bitmap_width,
+                capital_a.advance,
+                capital_a.x_offset,
+                capital_a.y_offset,
+            ),
+            (32, 23, 0, -9),
+        )
+        self.assertEqual(capital_a.rows[7], 0x1F007000)
+        self.assertEqual(capital_a.rows[8], 0x3F99F000)
+        self.assertEqual(capital_a.rows[30], 0x00010000)
+        self.assertEqual(
+            hashlib.sha256(
+                b"".join(row.to_bytes(4, "big") for row in capital_a.rows)
+            ).hexdigest(),
+            "2a8e52c6f116e1f4a15d6f0d5b691d7ddd563e5b2b66f3d33148c1be288a9741",
+        )
+
+        lowercase_a = glyphs[ord("a")]
+        self.assertEqual(lowercase_a.rows[14:17], (0x0600, 0x0FC0, 0x1FF0))
+        self.assertEqual(lowercase_a.rows[27], 0x7FF8)
+
+    def test_germ35_rows_match_the_historical_16_bit_packing_formula(self) -> None:
+        """Reconstruct display rows directly from serialized QRAST words."""
+
+        item = self.by_artifact["GERM35"]
+        _symbol, raster = qfasl._serialized_font_binding(item.parser.bindings)
+        indexes = raster.leader[0o14].values()
+        words_per_character = raster.leader[0o10]
+        raster_qs = [
+            int(raster.initialization[index])
+            | (int(raster.initialization[index + 1]) << 16)
+            for index in range(0, len(raster.initialization), 2)
+        ]
+
+        for glyph in item.font.glyphs:
+            bitmap_width = (
+                indexes[glyph.code + 1] - indexes[glyph.code]
+            ) * 16
+            self.assertEqual(glyph.bitmap_width, bitmap_width)
+            expected_rows = []
+            for row in range(item.font.raster_height):
+                packed_row = 0
+                for column in range(bitmap_width):
+                    storage_character = indexes[glyph.code] + column // 16
+                    word_index = (
+                        words_per_character * storage_character + row // 2
+                    )
+                    bit_position = (1 - row % 2) * 16 + (15 - column % 16)
+                    packed_row = (
+                        packed_row << 1
+                    ) | ((raster_qs[word_index] >> bit_position) & 1)
+                expected_rows.append(packed_row)
+            self.assertEqual(
+                glyph.rows,
+                tuple(expected_rows),
+                f"GERM35 code {glyph.code:o} differs from QIFY-RASTER-HARD",
+            )
+
+    def test_germ35_normalization_changes_only_display_pixels(self) -> None:
+        item = self.by_artifact["GERM35"]
+        serialized, _parser, _words = qfasl._decode_bytes(
+            (SOURCE / item.spec.source_file).read_bytes(),
+            item.spec.source_file,
+            item.spec.artifact_name,
+            item.spec.runtime_name,
+            item.spec.runtime_symbol,
+        )
+        corrected = item.font
+        self.assertEqual(
+            (
+                corrected.character_height,
+                corrected.raster_height,
+                corrected.baseline,
+            ),
+            (
+                serialized.character_height,
+                serialized.raster_height,
+                serialized.baseline,
+            ),
+        )
+        corrected_metrics = [
+            (
+                glyph.code,
+                glyph.bitmap_width,
+                glyph.advance,
+                glyph.x_offset,
+                glyph.y_offset,
+            )
+            for glyph in corrected.glyphs
+        ]
+        serialized_metrics = [
+            (
+                glyph.code,
+                glyph.bitmap_width,
+                glyph.advance,
+                glyph.x_offset,
+                glyph.y_offset,
+            )
+            for glyph in serialized.glyphs
+        ]
+        self.assertEqual(corrected_metrics, serialized_metrics)
+        self.assertEqual(
+            sum(
+                corrected_glyph.rows != serialized_glyph.rows
+                for corrected_glyph, serialized_glyph in zip(
+                    corrected.glyphs, serialized.glyphs
+                )
+            ),
+            74,
+        )
 
     def test_reviewed_semantic_oracles_cover_lossless_and_bdf_geometry(self) -> None:
         observed = qfasl.runtime_semantic_inventory_digests(self.decoded)
@@ -243,6 +434,16 @@ class RuntimeDecodeTests(unittest.TestCase):
                 )
             )
             self.assertEqual(copied_manifest, self.manifest)
+            self.assertEqual(
+                catalog["raster_order_overrides"],
+                self.manifest["raster_order_overrides"],
+            )
+            raster_orders = {
+                record["artifact_name"]: record["raster_order_override"]
+                for record in catalog["font_artifacts"]
+                if record["raster_order_override"] is not None
+            }
+            self.assertEqual(set(raster_orders), {"GERM35"})
 
 
 if __name__ == "__main__":

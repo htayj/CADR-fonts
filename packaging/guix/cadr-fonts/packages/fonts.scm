@@ -79,13 +79,18 @@
              (string=? relative "src/lmdoc")
              (string=? relative "src/lmdoc/char.18")
              (string=? relative "src/lmio1")
+             (string=? relative "src/lmio1/fcmp.66")
              (string=? relative "src/lmio1/fntcnv.28")
              (string=? relative "src/lmio")
-             (string=? relative "src/lmio/fread.21")))))
+             (string=? relative "src/lmio/fread.21")
+             (string=? relative "src/lmio/tv.347")
+             (string=? relative "src/lmio/tvdefs.52")
+             (string=? relative "src/moon")
+             (string=? relative "src/moon/wall.3")))))
 
 (define %cadr-source-snapshot
-  ;; The generator needs src/LICENSE, src/lmfont, and the three pinned source
-  ;; files that close the Unicode mapping's historical evidence hashes.
+  ;; The generator needs src/LICENSE, src/lmfont, and the pinned source files
+  ;; that close the Unicode mapping and GERM35 raster-order evidence hashes.
   ;; Restricting the snapshot to those tracked witnesses avoids putting the
   ;; unrelated CADR system tree in every package derivation.
   (local-file %cadr-source-checkout
