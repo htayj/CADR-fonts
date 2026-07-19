@@ -116,6 +116,14 @@ expressions of that policy, not independent historical witnesses. The raw
 `Misc-FontSpecific` BDF encodings and raw catalogs remain unchanged and retain
 authority for archival CADR codes and geometry.
 
+The per-artifact Latin pangram PNGs are likewise generated presentation aids,
+not historical witnesses or new character-identification evidence. Their
+selection is derived only after Unicode resolution: complete visible
+U+0041-U+005A plus a positive-advance U+0020. This excludes application and
+symbol repertoires whose raw ASCII-numbered slots are not Latin characters.
+Each catalog records the exact rendered text, case decision, bounds, line
+layout, renderer hash, image hash, and dimensions.
+
 ## Identity and alias contract
 
 Full XLFD names distinguish authored artifacts from current and legacy runtime

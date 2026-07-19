@@ -379,6 +379,10 @@ def check_build_manifest(
         "combined installable artifact count changed",
     )
     require(
+        build["total_pangram_sheet_count"] == 160,
+        "combined Unicode pangram sheet count changed",
+    )
+    require(
         unicode_source_profile["raw_profile"] == "authoring_source"
         and unicode_source_profile["artifact_count"] == 151,
         "Unicode source profile link changed",
@@ -387,6 +391,11 @@ def check_build_manifest(
         unicode_runtime_profile["raw_profile"] == "system_46_runtime"
         and unicode_runtime_profile["artifact_count"] == 49,
         "Unicode runtime profile link changed",
+    )
+    require(
+        unicode_source_profile["pangram_sheet_count"] == 118
+        and unicode_runtime_profile["pangram_sheet_count"] == 42,
+        "Unicode Latin pangram specimen counts changed",
     )
     require(
         "defined by each emitted BDF" in build["undefined_character_policy"],

@@ -267,9 +267,11 @@ dist/unicode/
   UNICODE-MAPPING.json
   source/
     bdf/                  Unicode source BDFs plus fonts.dir/fonts.alias
+    pangrams/             Latin-capable source artifact specimens
     catalog.json
   runtime/
     bdf/                  Unicode runtime BDFs plus fonts.dir/fonts.alias
+    pangrams/             Latin-capable runtime artifact specimens
     catalog.json
 ```
 
@@ -301,6 +303,41 @@ xlsfonts 'cadr-unicode-*'
 ```
 
 The short names are X core font aliases; they are not Fontconfig family names.
+
+### Latin pangram specimens
+
+The Unicode build emits an artifact-level PNG specimen when the emitted BDF
+contains a positive-advance U+0020 SPACE and visible glyphs for every capital
+letter U+0041 through U+005A. This is a content predicate over reviewed Unicode
+identities. It does not classify a specialty font as Latin merely because raw
+slots `101-132` contain unrelated shapes.
+
+The closed corpus currently yields 118 source specimens and 42 runtime
+specimens. All authored variants remain separate, as do current and labelled
+legacy runtime artifacts, so the 160 files can expose real geometry differences
+that a logical-name-only gallery would hide.
+
+The specimen sentence is the verified Lisp-themed pangram:
+
+> The five boxing Lisp wizards jump quickly.
+
+The mixed-case form is used only when every requested non-space character has
+visible ink and U+0020 has positive advance. Otherwise the same sentence is
+rendered in uppercase; this covers the uppercase-only `40VSHD` and the `TR8I`
+representations whose lowercase `z` slot has advance but no ink. If an
+otherwise eligible font lacks a visible U+002E FULL STOP, only that terminal
+punctuation is omitted. The exact text and case decision are recorded beside
+every image in the profile catalog, so no missing-character fallback
+participates.
+
+PNG generation is dependency-free and deterministic. It uses the exact
+one-bit bitmap rows, advances, signed bearings, ascent, and descent of the
+Unicode BDF. Lines wrap greedily at a maximum native advance of 640 pixels,
+retain the CADR default `VSP = 2`, include ink outside nominal metrics, add
+three native pixels of outer padding, and apply nearest-neighbor integer scale
+2. The checker independently recomputes eligibility, case choice, wrapping,
+bounds, baselines, dimensions, filenames, and hashes and pins the 118/42
+selection closure.
 
 ## BDF, ISO 10646, and X core constraints
 

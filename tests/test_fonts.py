@@ -7,6 +7,7 @@ import struct
 import sys
 import tempfile
 import unittest
+import zlib
 
 
 REPOSITORY = Path(__file__).resolve().parents[1]
@@ -282,6 +283,128 @@ class XlfdOutputTests(unittest.TestCase):
             png = (Path(first) / first_paths["sheet"]).read_bytes()
             self.assertTrue(png.startswith(b"\x89PNG\r\n\x1a\n"))
             self.assertEqual(struct.unpack(">I", png[8:12])[0], 13)
+
+
+class TextSpecimenTests(unittest.TestCase):
+    @staticmethod
+    def font() -> common.BitmapFont:
+        return common.BitmapFont(
+            name="Text specimen",
+            character_height=3,
+            raster_height=3,
+            baseline=2,
+            glyphs=(
+                common.Glyph(32, 0, 1, 0, 0, ()),
+                common.Glyph(65, 2, 3, 0, -1, (0b10, 0b01, 0b11)),
+                common.Glyph(66, 2, 3, 0, -1, (0b11, 0b10, 0b11)),
+            ),
+            source_format="synthetic test",
+            source_name="fixture",
+        )
+
+    def test_greedy_wrap_vsp_metadata_and_deterministic_png(self) -> None:
+        font = self.font()
+        with tempfile.TemporaryDirectory() as directory:
+            first = Path(directory) / "first.png"
+            second = Path(directory) / "second.png"
+            metadata = common.write_text_specimen(
+                font, "AA BB", first, max_advance=7, scale=2
+            )
+            repeated = common.write_text_specimen(
+                font, "AA BB", second, max_advance=7, scale=2
+            )
+            self.assertEqual(metadata, repeated)
+            self.assertEqual(first.read_bytes(), second.read_bytes())
+            self.assertEqual(
+                [line["text"] for line in metadata["lines"]], ["AA", "BB"]
+            )
+            self.assertEqual(
+                [line["advance"] for line in metadata["lines"]], [6, 6]
+            )
+            self.assertEqual(
+                [line["baseline"] for line in metadata["lines"]], [2, 7]
+            )
+            self.assertEqual(metadata["vsp"], 2)
+            self.assertEqual(metadata["native_line_height"], 5)
+            self.assertEqual(metadata["native_padding"], 3)
+            self.assertEqual(metadata["content_native_width"], 6)
+            self.assertEqual(metadata["content_native_height"], 8)
+            self.assertEqual(metadata["canvas_native_width"], 12)
+            self.assertEqual(metadata["canvas_native_height"], 14)
+            self.assertEqual((metadata["width"], metadata["height"]), (24, 28))
+            self.assertEqual(
+                [line["canvas_baseline"] for line in metadata["lines"]], [5, 10]
+            )
+            self.assertEqual(
+                [line["pixel_baseline"] for line in metadata["lines"]], [10, 20]
+            )
+            png = first.read_bytes()
+            self.assertEqual(struct.unpack(">II", png[16:24]), (24, 28))
+
+    def test_all_bearing_and_vertical_overflow_pixels_are_retained(self) -> None:
+        font = common.BitmapFont(
+            name="Overflow",
+            character_height=3,
+            raster_height=3,
+            baseline=2,
+            glyphs=(
+                common.Glyph(65, 3, 2, -1, 0, (0b100, 0b010, 0b001)),
+                common.Glyph(66, 3, 2, 1, -2, (0b100, 0b010, 0b001)),
+            ),
+            source_format="synthetic test",
+            source_name="fixture",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "overflow.png"
+            metadata = common.write_text_specimen(
+                font, "AB", path, max_advance=4, scale=1
+            )
+            self.assertEqual(
+                metadata["content_native_bounds"],
+                {"left": -1, "top": -1, "right": 6, "bottom": 4},
+            )
+            self.assertEqual(metadata["content_native_width"], 7)
+            self.assertEqual(metadata["content_native_height"], 5)
+            self.assertEqual(metadata["canvas_native_width"], 13)
+            self.assertEqual(metadata["canvas_native_height"], 11)
+            self.assertEqual((metadata["width"], metadata["height"]), (13, 11))
+
+            png = path.read_bytes()
+            compressed = bytearray()
+            offset = 8
+            while offset < len(png):
+                length = struct.unpack(">I", png[offset : offset + 4])[0]
+                kind = png[offset + 4 : offset + 8]
+                payload = png[offset + 8 : offset + 8 + length]
+                if kind == b"IDAT":
+                    compressed.extend(payload)
+                offset += 12 + length
+            scanlines = zlib.decompress(bytes(compressed))
+            row_size = 13 * 3 + 1
+            self.assertEqual(scanlines[0], 0)
+            self.assertEqual(tuple(scanlines[1:4]), (250, 250, 248))
+            first_pixel = 3 * row_size + 1 + 3 * 3
+            self.assertEqual(
+                tuple(scanlines[first_pixel : first_pixel + 3]), (18, 20, 22)
+            )
+            last_pixel = 7 * row_size + 1 + 9 * 3
+            self.assertEqual(
+                tuple(scanlines[last_pixel : last_pixel + 3]), (18, 20, 22)
+            )
+
+    def test_missing_characters_and_unfittable_glyphs_are_rejected(self) -> None:
+        font = self.font()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "unused.png"
+            with self.assertRaisesRegex(ValueError, r"lacks.*U\+0043"):
+                common.write_text_specimen(
+                    font, "AC", path, max_advance=20, scale=1
+                )
+            with self.assertRaisesRegex(ValueError, r"U\+0041 advance 3 exceeds"):
+                common.write_text_specimen(
+                    font, "A", path, max_advance=2, scale=1
+                )
+            self.assertFalse(path.exists())
 
 
 class XIndexTests(unittest.TestCase):

@@ -13,9 +13,16 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import string
 from typing import Iterable
 
-from lisp_machine_fonts import prepare_output_directory, safe_filename
+from lisp_machine_fonts import (
+    BitmapFont,
+    Glyph,
+    prepare_output_directory,
+    safe_filename,
+    write_text_specimen,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,6 +30,12 @@ DEFAULT_MAPPING = ROOT / "config" / "unicode-mapping.json"
 PUA_FIRST = 0xE000
 PUA_LAST = 0xF8FF
 PUA_BLOCK_SIZE = 128
+PANGRAM_SENTENCE = "The five boxing Lisp wizards jump quickly."
+PANGRAM_SCALE = 2
+PANGRAM_MAX_ADVANCE = 640
+PANGRAM_PADDING = 3
+PANGRAM_VSP = 2
+PANGRAM_LATIN_CODES = frozenset({ord(" "), *map(ord, string.ascii_uppercase)})
 REQUIRED_SEMANTIC_ORACLES = (
     "source_resolution_inventory_sha256",
     "source_unicode_geometry_sha256",
@@ -615,6 +628,144 @@ def _glyph_geometry(block: list[str], path: Path, raw_code: int) -> dict[str, ob
     }
 
 
+def _unicode_bitmap_font(
+    name: str,
+    source_name: str,
+    transformed: dict[str, object],
+) -> BitmapFont:
+    """Rebuild the common bitmap model from one reviewed Unicode transform."""
+
+    font_geometry = transformed["font_geometry"]
+    ascent = int(font_geometry["font_ascent"])
+    descent = int(font_geometry["font_descent"])
+    box_fields = tuple(map(int, str(font_geometry["font_bounding_box"]).split()))
+    require(len(box_fields) == 4, f"{source_name}: malformed FONTBOUNDINGBOX")
+    glyphs: list[Glyph] = []
+    for record in transformed["geometry"]:
+        dwidth = tuple(map(int, str(record["dwidth"]).split()))
+        bbx = tuple(map(int, str(record["bbx"]).split()))
+        require(
+            len(dwidth) == 2 and dwidth[1] == 0,
+            f"{source_name}: non-horizontal Unicode DWIDTH",
+        )
+        require(len(bbx) == 4, f"{source_name}: malformed Unicode BBX")
+        width, height, x_offset, y_offset = bbx
+        require(width >= 0 and height >= 0, f"{source_name}: negative Unicode BBX")
+        bitmap = record["bitmap"]
+        require(
+            isinstance(bitmap, list) and len(bitmap) == height,
+            f"{source_name}: Unicode bitmap height differs from BBX",
+        )
+        byte_width = max(1, (width + 7) // 8)
+        padding = byte_width * 8 - width
+        padding_mask = (1 << padding) - 1 if padding else 0
+        rows: list[int] = []
+        for row in bitmap:
+            require(
+                isinstance(row, str)
+                and len(row) == byte_width * 2
+                and all(character in "0123456789ABCDEF" for character in row),
+                f"{source_name}: malformed Unicode bitmap row",
+            )
+            stored = int(row, 16)
+            require(
+                stored & padding_mask == 0,
+                f"{source_name}: Unicode bitmap has set storage-padding bits",
+            )
+            rows.append(stored >> padding)
+        glyphs.append(
+            Glyph(
+                code=int(record["unicode"]),
+                bitmap_width=width,
+                advance=dwidth[0],
+                x_offset=x_offset,
+                y_offset=y_offset,
+                rows=tuple(rows),
+            )
+        )
+    return BitmapFont(
+        name=name,
+        character_height=ascent + descent,
+        raster_height=box_fields[1],
+        baseline=ascent,
+        glyphs=tuple(glyphs),
+        source_format="reviewed ISO10646-1 derivative",
+        source_name=source_name,
+        metadata={"unicode_xlfd_name": transformed["unicode_xlfd_name"]},
+    )
+
+
+def _glyph_is_visible(glyph: Glyph) -> bool:
+    return any(glyph.rows)
+
+
+def pangram_specimen_choice(font: BitmapFont) -> dict[str, str] | None:
+    """Choose mixed-case text or an uppercase fallback without substitution."""
+
+    glyphs = {glyph.code: glyph for glyph in font.glyphs}
+    if not PANGRAM_LATIN_CODES <= set(glyphs):
+        return None
+    if glyphs[ord(" ")].advance <= 0 or any(
+        not _glyph_is_visible(glyphs[code])
+        for code in PANGRAM_LATIN_CODES - {ord(" ")}
+    ):
+        return None
+
+    sentence_without_period = PANGRAM_SENTENCE.removesuffix(".")
+    candidates = (
+        ("mixed", PANGRAM_SENTENCE),
+        ("mixed", sentence_without_period),
+        ("uppercase", PANGRAM_SENTENCE.upper()),
+        ("uppercase", sentence_without_period.upper()),
+    )
+    for case, text in candidates:
+        supported = True
+        for character in set(text):
+            glyph = glyphs.get(ord(character))
+            if glyph is None or (
+                character == " " and glyph.advance <= 0
+            ) or (character != " " and not _glyph_is_visible(glyph)):
+                supported = False
+                break
+        if supported:
+            return {
+                "case": case,
+                "text": text,
+                "terminal_punctuation": (
+                    "present" if text.endswith(".") else "omitted-unavailable"
+                ),
+            }
+    raise UnicodeBuildError(
+        f"{font.name}: complete visible uppercase Latin font cannot render pangram"
+    )
+
+
+def _write_pangram_specimen(
+    font: BitmapFont,
+    path: Path,
+    *,
+    path_display: str,
+) -> dict[str, object] | None:
+    choice = pangram_specimen_choice(font)
+    if choice is None:
+        return None
+    layout = write_text_specimen(
+        font,
+        choice["text"],
+        path,
+        max_advance=PANGRAM_MAX_ADVANCE,
+        scale=PANGRAM_SCALE,
+        padding=PANGRAM_PADDING,
+    )
+    return {
+        "path": path_display,
+        "sha256": sha256(path),
+        "coverage_policy": "visible U+0041-U+005A plus positive-advance U+0020",
+        **layout,
+        **choice,
+    }
+
+
 def transform_bdf(
     raw_path: Path,
     unicode_path: Path,
@@ -878,6 +1029,31 @@ def _write_catalog(
         "private_use_glyph_count": sum(
             record["private_use_glyph_count"] for record in artifacts
         ),
+        "pangram_specimens": {
+            "sentence": PANGRAM_SENTENCE,
+            "sheet_count": sum("pangram_specimen" in record for record in artifacts),
+            "latin_eligibility": (
+                "visible U+0041-U+005A plus positive-advance U+0020 in the "
+                "emitted Unicode BDF"
+            ),
+            "case_policy": (
+                "use the mixed-case sentence when every requested non-space glyph "
+                "has ink and U+0020 has positive advance; otherwise use the same "
+                "sentence in uppercase"
+            ),
+            "missing_period_policy": (
+                "omit only the terminal full stop when the otherwise eligible font "
+                "does not represent a visible U+002E"
+            ),
+            "scale": PANGRAM_SCALE,
+            "maximum_native_line_advance": PANGRAM_MAX_ADVANCE,
+            "native_padding": PANGRAM_PADDING,
+            "vertical_spacing_pixels": PANGRAM_VSP,
+            "renderer": {
+                "path": "scripts/lisp_machine_fonts.py",
+                "sha256": sha256(ROOT / "scripts" / "lisp_machine_fonts.py"),
+            },
+        },
         "resolution_inventory_sha256": resolution_digest,
         "unicode_geometry_sha256": geometry_digest,
         "derivative_policy": (
@@ -933,6 +1109,7 @@ def build_unicode_distribution(
     shutil.copyfile(mapping_path, mapping_copy)
     for profile_name in ("source", "runtime"):
         (unicode_root / profile_name / "bdf").mkdir(parents=True)
+        (unicode_root / profile_name / "pangrams").mkdir(parents=True)
 
     mapping_id = manifest["mapping_id"]
     unicode_version = manifest["unicode_version"]
@@ -952,6 +1129,12 @@ def build_unicode_distribution(
         transformed = transform_bdf(
             raw_path, unicode_path, mapping, mapping_id=mapping_id
         )
+        specimen_name = Path(filename).with_suffix(".png").name
+        specimen = _write_pangram_specimen(
+            _unicode_bitmap_font(raw_record["name"], str(unicode_path), transformed),
+            unicode_root / "source" / "pangrams" / specimen_name,
+            path_display=f"pangrams/{specimen_name}",
+        )
         artifact = {
             "artifact_name": raw_record["name"],
             "logical_name": raw_record["logical_name"],
@@ -967,6 +1150,8 @@ def build_unicode_distribution(
             "private_use_glyph_count": transformed["private_use_glyph_count"],
             "resolved_mappings": transformed["resolved_mappings"],
         }
+        if specimen is not None:
+            artifact["pangram_specimen"] = specimen
         source_artifacts.append(artifact)
         source_resolution.extend(
             {
@@ -1017,6 +1202,14 @@ def build_unicode_distribution(
         transformed = transform_bdf(
             raw_path, unicode_path, mapping, mapping_id=mapping_id
         )
+        specimen_name = Path(filename).with_suffix(".png").name
+        specimen = _write_pangram_specimen(
+            _unicode_bitmap_font(
+                raw_record["artifact_name"], str(unicode_path), transformed
+            ),
+            unicode_root / "runtime" / "pangrams" / specimen_name,
+            path_display=f"pangrams/{specimen_name}",
+        )
         artifact = {
             "artifact_name": raw_record["artifact_name"],
             "runtime_name": raw_record["runtime_name"],
@@ -1033,6 +1226,8 @@ def build_unicode_distribution(
             "private_use_glyph_count": transformed["private_use_glyph_count"],
             "resolved_mappings": transformed["resolved_mappings"],
         }
+        if specimen is not None:
+            artifact["pangram_specimen"] = specimen
         runtime_artifacts.append(artifact)
         runtime_resolution.extend(
             {
@@ -1152,6 +1347,12 @@ def main() -> int:
                 "runtime_artifact_count": result["runtime_catalog"]["artifact_count"],
                 "source_alias_count": len(result["source_aliases"]),
                 "runtime_alias_count": len(result["runtime_aliases"]),
+                "source_pangram_sheet_count": result["source_catalog"][
+                    "pangram_specimens"
+                ]["sheet_count"],
+                "runtime_pangram_sheet_count": result["runtime_catalog"][
+                    "pangram_specimens"
+                ]["sheet_count"],
             },
             indent=2,
         )

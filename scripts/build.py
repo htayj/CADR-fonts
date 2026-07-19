@@ -352,6 +352,9 @@ def write_build_manifest(
                 "private_use_glyph_count": unicode_source_catalog[
                     "private_use_glyph_count"
                 ],
+                "pangram_sheet_count": unicode_source_catalog[
+                    "pangram_specimens"
+                ]["sheet_count"],
                 "alias_count": len(unicode_result["source_aliases"]),
                 "raw_profile": "authoring_source",
             },
@@ -368,6 +371,9 @@ def write_build_manifest(
                 "private_use_glyph_count": unicode_runtime_catalog[
                     "private_use_glyph_count"
                 ],
+                "pangram_sheet_count": unicode_runtime_catalog[
+                    "pangram_specimens"
+                ]["sheet_count"],
                 "alias_count": len(unicode_result["runtime_aliases"]),
                 "raw_profile": "system_46_runtime",
             },
@@ -384,6 +390,10 @@ def write_build_manifest(
             + runtime_catalog["artifact_count"]
             + unicode_source_catalog["artifact_count"]
             + unicode_runtime_catalog["artifact_count"]
+        ),
+        "total_pangram_sheet_count": (
+            unicode_source_catalog["pangram_specimens"]["sheet_count"]
+            + unicode_runtime_catalog["pangram_specimens"]["sheet_count"]
         ),
         "undefined_character_policy": (
             "no glyph is synthesized in either raw or Unicode profiles; rendering "
@@ -519,6 +529,14 @@ def main() -> int:
                 "runtime_logical_name_count": runtime_catalog[
                     "runtime_logical_name_count"
                 ],
+                "unicode_pangram_sheet_count": (
+                    unicode_result["source_catalog"]["pangram_specimens"][
+                        "sheet_count"
+                    ]
+                    + unicode_result["runtime_catalog"]["pangram_specimens"][
+                        "sheet_count"
+                    ]
+                ),
                 "variant_count": catalog["variant_count"],
                 "source_revision": manifest["revision"],
                 "checksums": str(output / "SHA256SUMS"),

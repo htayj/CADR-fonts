@@ -4,6 +4,7 @@ import copy
 import importlib.util
 import json
 from pathlib import Path
+import string
 import sys
 import tempfile
 import unittest
@@ -664,6 +665,76 @@ class UnicodeMappingTests(unittest.TestCase):
         self.assertEqual(standard[0o101]["unicode"], 0x0041)
         self.assertEqual(standard[0o177]["unicode"], 0x222B)
 
+    def test_lisp_pangram_and_visible_latin_selection_are_closed(self) -> None:
+        self.assertEqual(
+            builder.PANGRAM_SENTENCE,
+            "The five boxing Lisp wizards jump quickly.",
+        )
+        self.assertTrue(
+            set(string.ascii_lowercase) <= set(builder.PANGRAM_SENTENCE.lower())
+        )
+
+        glyphs = [builder.Glyph(ord(" "), 0, 2, 0, 0, ())]
+        glyphs.extend(
+            builder.Glyph(ord(character), 1, 2, 0, 0, (1,))
+            for character in string.ascii_uppercase + string.ascii_lowercase + "."
+        )
+
+        def font(selected: list[builder.Glyph]) -> builder.BitmapFont:
+            return builder.BitmapFont(
+                name="Pangram fixture",
+                character_height=3,
+                raster_height=3,
+                baseline=2,
+                glyphs=tuple(selected),
+                source_format="fixture",
+                source_name="fixture",
+            )
+
+        mixed = builder.pangram_specimen_choice(font(glyphs))
+        self.assertEqual(
+            mixed,
+            {
+                "case": "mixed",
+                "text": builder.PANGRAM_SENTENCE,
+                "terminal_punctuation": "present",
+            },
+        )
+
+        blank_lower_z = [
+            builder.Glyph(glyph.code, glyph.bitmap_width, glyph.advance,
+                          glyph.x_offset, glyph.y_offset, (0,))
+            if glyph.code == ord("z")
+            else glyph
+            for glyph in glyphs
+        ]
+        uppercase = builder.pangram_specimen_choice(font(blank_lower_z))
+        self.assertEqual(uppercase["case"], "uppercase")
+        self.assertEqual(uppercase["text"], builder.PANGRAM_SENTENCE.upper())
+
+        blank_period = [
+            builder.Glyph(glyph.code, glyph.bitmap_width, glyph.advance,
+                          glyph.x_offset, glyph.y_offset, (0,))
+            if glyph.code == ord(".")
+            else glyph
+            for glyph in glyphs
+        ]
+        no_period = builder.pangram_specimen_choice(font(blank_period))
+        self.assertEqual(no_period["case"], "mixed")
+        self.assertEqual(no_period["terminal_punctuation"], "omitted-unavailable")
+        self.assertFalse(no_period["text"].endswith("."))
+
+        no_capital_a = [glyph for glyph in glyphs if glyph.code != ord("A")]
+        self.assertIsNone(builder.pangram_specimen_choice(font(no_capital_a)))
+        zero_space = [
+            builder.Glyph(glyph.code, glyph.bitmap_width, 0,
+                          glyph.x_offset, glyph.y_offset, glyph.rows)
+            if glyph.code == ord(" ")
+            else glyph
+            for glyph in glyphs
+        ]
+        self.assertIsNone(builder.pangram_specimen_choice(font(zero_space)))
+
 
 class UnicodeTransformTests(unittest.TestCase):
     def test_transform_changes_only_addresses_and_unicode_identity(self) -> None:
@@ -725,6 +796,14 @@ class UnicodeTransformTests(unittest.TestCase):
             )
         self.assertEqual(unicode["glyphs"][0x00B7]["dwidth"], "3 0")
         self.assertEqual(unicode["glyphs"][0x00B7]["bitmap"], ["00", "00", "00"])
+        specimen_font = builder._unicode_bitmap_font(
+            "Fixture", str(unicode_path), result
+        )
+        specimen_glyphs = {glyph.code: glyph for glyph in specimen_font.glyphs}
+        self.assertEqual(specimen_font.character_height, 5)
+        self.assertEqual(specimen_font.baseline, 4)
+        self.assertEqual(specimen_glyphs[0x2190].rows, (0b11, 0b01))
+        self.assertIsNone(builder.pangram_specimen_choice(specimen_font))
 
     def test_transform_rejects_two_raw_codes_at_one_unicode_address(self) -> None:
         mapping = copy.deepcopy(fixture_mapping())

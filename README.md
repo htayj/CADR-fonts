@@ -14,7 +14,8 @@ Each raw profile also has a separately named Unicode derivative. The raw BDFs
 retain CADR codes and `Misc-FontSpecific`; the derivatives re-encode the same
 glyphs under `ISO10646-1` using the reviewed standard-character map and fixed
 BMP Private Use Area allocation documented in [UNICODE.md](docs/UNICODE.md).
-The result is four installable profiles and 400 BDFs.
+The result is four installable profiles and 400 BDFs. The Unicode profiles also
+include pangram PNGs for every artifact with a complete visible Latin alphabet.
 
 The source and runtime identities are deliberately not collapsed. The source
 profiles answer “what surviving authoring representations contain”; the
@@ -87,6 +88,9 @@ The current reviewed result is:
 - 400 BDFs and 40,614 emitted glyph instances across all four profiles;
 - 272 source-path and 99 runtime-path aliases in the raw profiles, 371 total,
   mirrored by 371 disjoint `cadr-unicode-*` aliases for 742 aliases overall.
+- 160 Unicode Latin pangram specimens: 118 source artifacts and 42 runtime
+  artifacts, retaining distinct authored, current-runtime, and legacy-runtime
+  representations rather than collapsing them by logical name.
 
 The earlier `genera-emu` extraction produced 150 artifacts. This repository
 corrects its AST raster-height model: `BUG` has a 32-row authored AST raster but
@@ -136,11 +140,13 @@ dist/
     UNICODE-MAPPING.json  release copy of the reviewed mapping contract
     source/
       bdf/                Unicode source BDFs plus fonts.dir/fonts.alias
+      pangrams/           Latin-capable source artifact sentence specimens
       catalog.json        resolved source encodings and geometry digest
     runtime/
       bdf/                Unicode runtime BDFs plus fonts.dir/fonts.alias
+      pangrams/           Latin-capable runtime artifact sentence specimens
       catalog.json        resolved runtime encodings and geometry digest
-  BUILD-MANIFEST.json     four-profile counts, catalogs, and alias policies
+  BUILD-MANIFEST.json     four-profile counts, catalogs, aliases, and specimens
   SOURCE-MANIFEST.json    closed authoring-source manifest
   LICENSE.source          upstream three-clause BSD license
   SHA256SUMS              digest of every other distributed file
@@ -166,6 +172,17 @@ The Unicode aliases preserve the same selection rules under the disjoint
 `cadr-unicode-runtime-legacy-*`, and `cadr-unicode-*` namespaces. See
 [the Unicode profile](docs/UNICODE.md) for the exact map, complete repertoire
 allocation, and X core usage.
+
+The Unicode catalogs select pangram specimens from emitted content, not font
+names or raw slot numbers. A font qualifies only when U+0020 has positive
+advance and U+0041-U+005A are all present with visible ink. The specimen is the
+compact Lisp-themed pangram “The five boxing Lisp wizards jump quickly.” Fonts
+where a non-space glyph requested by the mixed-case sentence is blank or
+missing use the same text in uppercase; an unavailable terminal full stop is
+explicitly omitted and recorded. The dependency-free renderer uses the
+recovered one-bit pixels and metrics directly, wraps at a 640-source-pixel
+advance, adds three native pixels of padding, and scales each pixel to a 2-by-2
+block without interpolation.
 
 ## Metric and identity boundaries
 

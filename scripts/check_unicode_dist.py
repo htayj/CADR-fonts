@@ -8,6 +8,9 @@ import hashlib
 import json
 from pathlib import Path
 import shlex
+import string
+import struct
+import zlib
 
 from build_unicode_fonts import (
     DEFAULT_MAPPING,
@@ -34,6 +37,16 @@ SOURCE_GLYPH_COUNT = 14618
 RUNTIME_GLYPH_COUNT = 5689
 SOURCE_ALIAS_COUNT = 272
 RUNTIME_ALIAS_COUNT = 99
+SOURCE_PANGRAM_SHEET_COUNT = 118
+RUNTIME_PANGRAM_SHEET_COUNT = 42
+SOURCE_PANGRAM_CASE_COUNTS = {"mixed": 115, "uppercase": 3}
+RUNTIME_PANGRAM_CASE_COUNTS = {"mixed": 40, "uppercase": 2}
+PANGRAM_SENTENCE = "The five boxing Lisp wizards jump quickly."
+PANGRAM_SCALE = 2
+PANGRAM_MAX_ADVANCE = 640
+PANGRAM_PADDING = 3
+PANGRAM_VSP = 2
+PANGRAM_LATIN_CODES = frozenset({ord(" "), *map(ord, string.ascii_uppercase)})
 
 
 class UnicodeDistError(AssertionError):
@@ -138,6 +151,344 @@ def parse_bdf(path: Path) -> dict[str, object]:
         "properties": _parse_properties(lines, path),
         "glyphs": glyphs,
     }
+
+
+def _glyph_advance(glyph: dict[str, object]) -> int:
+    fields = tuple(map(int, str(glyph["dwidth"]).split()))
+    require(len(fields) == 2 and fields[1] == 0, "pangram glyph DWIDTH changed")
+    return fields[0]
+
+
+def _glyph_visible(glyph: dict[str, object]) -> bool:
+    return any(int(row, 16) for row in glyph["bitmap"])
+
+
+def _expected_pangram_choice(
+    unicode_bdf: dict[str, object],
+) -> dict[str, str] | None:
+    """Independently select complete, visible Latin fonts and specimen case."""
+
+    glyphs = unicode_bdf["glyphs"]
+    if not PANGRAM_LATIN_CODES <= set(glyphs):
+        return None
+    if _glyph_advance(glyphs[ord(" ")]) <= 0 or any(
+        not _glyph_visible(glyphs[code])
+        for code in PANGRAM_LATIN_CODES - {ord(" ")}
+    ):
+        return None
+
+    sentence_without_period = PANGRAM_SENTENCE.removesuffix(".")
+    candidates = (
+        ("mixed", PANGRAM_SENTENCE),
+        ("mixed", sentence_without_period),
+        ("uppercase", PANGRAM_SENTENCE.upper()),
+        ("uppercase", sentence_without_period.upper()),
+    )
+    for case, text in candidates:
+        supported = True
+        for character in set(text):
+            glyph = glyphs.get(ord(character))
+            if glyph is None or (
+                character == " " and _glyph_advance(glyph) <= 0
+            ) or (character != " " and not _glyph_visible(glyph)):
+                supported = False
+                break
+        if supported:
+            return {
+                "case": case,
+                "text": text,
+                "terminal_punctuation": (
+                    "present" if text.endswith(".") else "omitted-unavailable"
+                ),
+            }
+    raise UnicodeDistError(
+        "complete visible uppercase Latin font cannot render the pangram"
+    )
+
+
+def _expected_wrapped_lines(
+    text: str,
+    glyphs: dict[int, dict[str, object]],
+) -> list[str]:
+    """Apply the documented maximum advance independently of the PNG writer."""
+
+    def advance(value: str) -> int:
+        return sum(_glyph_advance(glyphs[ord(character)]) for character in value)
+
+    lines: list[str] = []
+    for paragraph in text.split("\n"):
+        remainder = paragraph
+        while advance(remainder) > PANGRAM_MAX_ADVANCE:
+            fitting_end = 0
+            fitting_advance = 0
+            last_space = -1
+            for index, character in enumerate(remainder):
+                candidate = fitting_advance + _glyph_advance(
+                    glyphs[ord(character)]
+                )
+                if candidate > PANGRAM_MAX_ADVANCE:
+                    break
+                fitting_end = index + 1
+                fitting_advance = candidate
+                if character == " ":
+                    last_space = index
+            require(fitting_end > 0, "pangram glyph exceeds maximum line advance")
+            if last_space > 0:
+                lines.append(remainder[:last_space])
+                remainder = remainder[last_space + 1 :]
+            else:
+                lines.append(remainder[:fitting_end])
+                remainder = remainder[fitting_end:]
+        lines.append(remainder)
+    return lines
+
+
+def _expected_pangram_layout(
+    unicode_bdf: dict[str, object], text: str
+) -> dict[str, object]:
+    glyphs = unicode_bdf["glyphs"]
+    properties = unicode_bdf["properties"]
+    ascent = int(properties["FONT_ASCENT"])
+    descent = int(properties["FONT_DESCENT"])
+    character_height = ascent + descent
+    lines = _expected_wrapped_lines(text, glyphs)
+    line_height = character_height + PANGRAM_VSP
+    minimum_x = 0
+    maximum_x = 0
+    minimum_y = 0
+    maximum_y = character_height + (len(lines) - 1) * line_height
+    line_records: list[dict[str, object]] = []
+    for line_index, line in enumerate(lines):
+        pen_x = 0
+        baseline = ascent + line_index * line_height
+        for character in line:
+            glyph = glyphs[ord(character)]
+            width, height, x_offset, y_offset = tuple(
+                map(int, str(glyph["bbx"]).split())
+            )
+            glyph_x = pen_x + x_offset
+            glyph_top = baseline - y_offset - height
+            advance = _glyph_advance(glyph)
+            minimum_x = min(minimum_x, pen_x, pen_x + advance, glyph_x)
+            maximum_x = max(
+                maximum_x,
+                pen_x,
+                pen_x + advance,
+                glyph_x + width,
+            )
+            minimum_y = min(minimum_y, glyph_top)
+            maximum_y = max(maximum_y, glyph_top + height)
+            pen_x += advance
+        minimum_x = min(minimum_x, pen_x)
+        maximum_x = max(maximum_x, pen_x)
+        line_records.append(
+            {
+                "index": line_index,
+                "text": line,
+                "advance": pen_x,
+                "baseline": baseline,
+            }
+        )
+
+    content_width = maximum_x - minimum_x
+    content_height = maximum_y - minimum_y
+    canvas_width = content_width + PANGRAM_PADDING * 2
+    canvas_height = content_height + PANGRAM_PADDING * 2
+    for record in line_records:
+        canvas_baseline = PANGRAM_PADDING + int(record["baseline"]) - minimum_y
+        record["canvas_baseline"] = canvas_baseline
+        record["pixel_baseline"] = canvas_baseline * PANGRAM_SCALE
+    return {
+        "text": text,
+        "max_native_advance": PANGRAM_MAX_ADVANCE,
+        "scale": PANGRAM_SCALE,
+        "native_padding": PANGRAM_PADDING,
+        "vsp": PANGRAM_VSP,
+        "native_line_height": line_height,
+        "content_native_bounds": {
+            "left": minimum_x,
+            "top": minimum_y,
+            "right": maximum_x,
+            "bottom": maximum_y,
+        },
+        "content_native_width": content_width,
+        "content_native_height": content_height,
+        "canvas_native_width": canvas_width,
+        "canvas_native_height": canvas_height,
+        "width": canvas_width * PANGRAM_SCALE,
+        "height": canvas_height * PANGRAM_SCALE,
+        "line_count": len(line_records),
+        "lines": line_records,
+    }
+
+
+def _read_rgb_png(path: Path) -> tuple[int, int, list[bytes]]:
+    """Decode the dependency-free renderer's RGB8 PNG without sharing it."""
+
+    data = path.read_bytes()
+    require(data[:8] == b"\x89PNG\r\n\x1a\n", f"{path}: malformed PNG signature")
+    offset = 8
+    ihdr: bytes | None = None
+    compressed = bytearray()
+    saw_iend = False
+    while offset < len(data):
+        require(offset + 12 <= len(data), f"{path}: truncated PNG chunk")
+        length = struct.unpack(">I", data[offset : offset + 4])[0]
+        end = offset + 12 + length
+        require(end <= len(data), f"{path}: truncated PNG payload")
+        kind = data[offset + 4 : offset + 8]
+        payload = data[offset + 8 : offset + 8 + length]
+        observed_crc = struct.unpack(">I", data[offset + 8 + length : end])[0]
+        require(
+            observed_crc == zlib.crc32(kind + payload) & 0xFFFFFFFF,
+            f"{path}: PNG chunk CRC changed",
+        )
+        if kind == b"IHDR":
+            require(ihdr is None, f"{path}: duplicate PNG IHDR")
+            ihdr = payload
+        elif kind == b"IDAT":
+            compressed.extend(payload)
+        elif kind == b"IEND":
+            require(not payload, f"{path}: malformed PNG IEND")
+            saw_iend = True
+        else:
+            raise UnicodeDistError(f"{path}: unexpected PNG chunk {kind!r}")
+        offset = end
+    require(offset == len(data) and saw_iend, f"{path}: malformed PNG tail")
+    require(ihdr is not None and len(ihdr) == 13, f"{path}: malformed PNG IHDR")
+    width, height, depth, color, compression, filtering, interlace = struct.unpack(
+        ">IIBBBBB", ihdr
+    )
+    require(
+        (depth, color, compression, filtering, interlace) == (8, 2, 0, 0, 0),
+        f"{path}: PNG is not non-interlaced RGB8",
+    )
+    try:
+        scanlines = zlib.decompress(bytes(compressed))
+    except zlib.error as error:
+        raise UnicodeDistError(f"{path}: malformed PNG compression") from error
+    row_size = width * 3
+    require(
+        len(scanlines) == height * (row_size + 1),
+        f"{path}: PNG scanline size changed",
+    )
+    rows: list[bytes] = []
+    for row_number in range(height):
+        start = row_number * (row_size + 1)
+        require(scanlines[start] == 0, f"{path}: PNG uses a filtered scanline")
+        rows.append(scanlines[start + 1 : start + 1 + row_size])
+    return width, height, rows
+
+
+def _expected_pangram_ink(
+    unicode_bdf: dict[str, object], layout: dict[str, object]
+) -> set[tuple[int, int]]:
+    glyphs = unicode_bdf["glyphs"]
+    bounds = layout["content_native_bounds"]
+    minimum_x = int(bounds["left"])
+    minimum_y = int(bounds["top"])
+    pixels: set[tuple[int, int]] = set()
+    for line in layout["lines"]:
+        pen_x = 0
+        baseline = int(line["baseline"])
+        for character in line["text"]:
+            glyph = glyphs[ord(character)]
+            width, height, x_offset, y_offset = tuple(
+                map(int, str(glyph["bbx"]).split())
+            )
+            byte_width = max(1, (width + 7) // 8)
+            padding_bits = byte_width * 8 - width
+            glyph_x = pen_x + x_offset
+            glyph_top = baseline - y_offset - height
+            for row_number, row in enumerate(glyph["bitmap"]):
+                logical_row = int(row, 16) >> padding_bits
+                for column in range(width):
+                    if not logical_row & (1 << (width - column - 1)):
+                        continue
+                    native_x = PANGRAM_PADDING + glyph_x - minimum_x + column
+                    native_y = PANGRAM_PADDING + glyph_top - minimum_y + row_number
+                    for y_offset_scaled in range(PANGRAM_SCALE):
+                        for x_offset_scaled in range(PANGRAM_SCALE):
+                            pixels.add(
+                                (
+                                    native_x * PANGRAM_SCALE + x_offset_scaled,
+                                    native_y * PANGRAM_SCALE + y_offset_scaled,
+                                )
+                            )
+            pen_x += _glyph_advance(glyph)
+    return pixels
+
+
+def _check_pangram_png(
+    path: Path,
+    unicode_bdf: dict[str, object],
+    layout: dict[str, object],
+) -> None:
+    width, height, rows = _read_rgb_png(path)
+    require(
+        (width, height) == (layout["width"], layout["height"]),
+        f"{path}: pangram PNG dimensions changed",
+    )
+    ink = (18, 20, 22)
+    background = (250, 250, 248)
+    observed: set[tuple[int, int]] = set()
+    for y, row in enumerate(rows):
+        for x in range(width):
+            color = tuple(row[x * 3 : x * 3 + 3])
+            if color == ink:
+                observed.add((x, y))
+            else:
+                require(
+                    color == background,
+                    f"{path}: pangram PNG contains an undocumented color",
+                )
+    expected = _expected_pangram_ink(unicode_bdf, layout)
+    require(
+        observed == expected,
+        f"{path}: pangram pixels differ from Unicode BDF "
+        f"(missing {len(expected - observed)}, extra {len(observed - expected)})",
+    )
+
+
+def _check_pangram_specimen(
+    *,
+    profile_root: Path,
+    artifact: dict[str, object],
+    unicode_bdf: dict[str, object],
+    bdf_filename: str,
+) -> str | None:
+    choice = _expected_pangram_choice(unicode_bdf)
+    if choice is None:
+        require(
+            "pangram_specimen" not in artifact,
+            f"{artifact['artifact_name']}: ineligible font has a pangram specimen",
+        )
+        return None
+
+    require(
+        "pangram_specimen" in artifact,
+        f"{artifact['artifact_name']}: eligible Latin font lacks a pangram specimen",
+    )
+    specimen_name = Path(bdf_filename).with_suffix(".png").name
+    relative = f"pangrams/{specimen_name}"
+    specimen_path = profile_root / relative
+    require(specimen_path.is_file(), f"missing pangram specimen {specimen_path}")
+    layout = _expected_pangram_layout(unicode_bdf, choice["text"])
+    expected = {
+        "path": relative,
+        "sha256": sha256(specimen_path),
+        "coverage_policy": (
+            "visible U+0041-U+005A plus positive-advance U+0020"
+        ),
+        **layout,
+        **choice,
+    }
+    require(
+        artifact["pangram_specimen"] == expected,
+        f"{artifact['artifact_name']}: pangram specimen catalog drift",
+    )
+    _check_pangram_png(specimen_path, unicode_bdf, layout)
+    return choice["case"]
 
 
 def _xlfd_fields(name: str, path: Path) -> list[str]:
@@ -528,6 +879,7 @@ def _check_artifact(
     list[dict[str, object]],
     list[dict[str, object]],
     dict[str, object],
+    str | None,
 ]:
     require(artifact["repertoire"] == expected_repertoire, "repertoire assignment drift")
     require(artifact["raw_bdf"] == expected_raw_display, "raw BDF path drift")
@@ -620,6 +972,12 @@ def _check_artifact(
                 "bitmap": raw_glyph["bitmap"],
             }
         )
+    pangram_case = _check_pangram_specimen(
+        profile_root=profile_root,
+        artifact=artifact,
+        unicode_bdf=unicode,
+        bdf_filename=expected_raw_path.name,
+    )
     return (
         resolved,
         geometry_records,
@@ -629,6 +987,7 @@ def _check_artifact(
             "font_ascent": raw["properties"]["FONT_ASCENT"],
             "font_descent": raw["properties"]["FONT_DESCENT"],
         },
+        pangram_case,
     )
 
 
@@ -695,6 +1054,7 @@ def _check_profile(
     resolution_inventory: list[dict[str, object]] = []
     geometry_inventory: list[dict[str, object]] = []
     unicode_xlfds: set[str] = set()
+    pangram_cases: list[str] = []
     for artifact, raw_record in zip(artifacts, raw_records):
         artifact_name = artifact["artifact_name"]
         if profile_directory == "source":
@@ -716,7 +1076,7 @@ def _check_profile(
                 f"{artifact_name}: runtime identity drift",
             )
         repertoire = assignments[assignment_key]
-        resolved, geometry, font_geometry = _check_artifact(
+        resolved, geometry, font_geometry, pangram_case = _check_artifact(
             profile_root=profile_root,
             artifact=artifact,
             expected_raw_path=expected_raw_path,
@@ -724,6 +1084,8 @@ def _check_profile(
             expected_repertoire=repertoire,
             mapping=mappings[repertoire],
         )
+        if pangram_case is not None:
+            pangram_cases.append(pangram_case)
         resolution_inventory.extend(
             {"artifact": artifact_name, "repertoire": repertoire, **record}
             for record in resolved
@@ -792,6 +1154,66 @@ def _check_profile(
     require(
         len(list((profile_root / "bdf").glob("*.bdf"))) == expected_count,
         "Unicode BDF directory contains missing or extra artifacts",
+    )
+    expected_pangram_count = (
+        SOURCE_PANGRAM_SHEET_COUNT
+        if profile_directory == "source"
+        else RUNTIME_PANGRAM_SHEET_COUNT
+    )
+    expected_case_counts = (
+        SOURCE_PANGRAM_CASE_COUNTS
+        if profile_directory == "source"
+        else RUNTIME_PANGRAM_CASE_COUNTS
+    )
+    observed_case_counts = {
+        case: pangram_cases.count(case) for case in sorted(set(pangram_cases))
+    }
+    require(
+        len(pangram_cases) == expected_pangram_count
+        and observed_case_counts == expected_case_counts,
+        f"Unicode {profile_directory} pangram selection changed: "
+        f"{observed_case_counts}",
+    )
+    expected_pangram_catalog = {
+        "sentence": PANGRAM_SENTENCE,
+        "sheet_count": expected_pangram_count,
+        "latin_eligibility": (
+            "visible U+0041-U+005A plus positive-advance U+0020 in the "
+            "emitted Unicode BDF"
+        ),
+        "case_policy": (
+            "use the mixed-case sentence when every requested non-space glyph "
+            "has ink and U+0020 has positive advance; otherwise use the same "
+            "sentence in uppercase"
+        ),
+        "missing_period_policy": (
+            "omit only the terminal full stop when the otherwise eligible font "
+            "does not represent a visible U+002E"
+        ),
+        "scale": PANGRAM_SCALE,
+        "maximum_native_line_advance": PANGRAM_MAX_ADVANCE,
+        "native_padding": PANGRAM_PADDING,
+        "vertical_spacing_pixels": PANGRAM_VSP,
+        "renderer": {
+            "path": "scripts/lisp_machine_fonts.py",
+            "sha256": sha256(ROOT / "scripts" / "lisp_machine_fonts.py"),
+        },
+    }
+    require(
+        catalog["pangram_specimens"] == expected_pangram_catalog,
+        f"Unicode {profile_directory} pangram catalog policy changed",
+    )
+    expected_pangram_files = {
+        Path(artifact["pangram_specimen"]["path"]).name
+        for artifact in artifacts
+        if "pangram_specimen" in artifact
+    }
+    observed_pangram_entries = {
+        path.name for path in (profile_root / "pangrams").iterdir()
+    }
+    require(
+        observed_pangram_entries == expected_pangram_files,
+        f"Unicode {profile_directory} pangram directory is not closed",
     )
 
     aliases = (
@@ -877,6 +1299,11 @@ def _check_build_manifest(
             "private_use_glyph_count",
         ):
             require(record[field] == catalog[field], f"{name}: {field} stale")
+        require(
+            record["pangram_sheet_count"]
+            == catalog["pangram_specimens"]["sheet_count"],
+            f"{name}: pangram sheet count stale",
+        )
         require(record["alias_count"] == len(result["aliases"]), f"{name}: alias count stale")
     require(build["raw_artifact_count"] == 200, "raw artifact total changed")
     require(
@@ -887,6 +1314,7 @@ def _check_build_manifest(
         build["total_installable_artifact_count"] == 400,
         "installable artifact total changed",
     )
+    require(build["total_pangram_sheet_count"] == 160, "pangram sheet total changed")
 
 
 def check_unicode_distribution(
@@ -963,6 +1391,12 @@ def check_unicode_distribution(
         "runtime_glyph_count": runtime_result["catalog"]["emitted_glyph_count"],
         "source_alias_count": len(source_result["aliases"]),
         "runtime_alias_count": len(runtime_result["aliases"]),
+        "source_pangram_sheet_count": source_result["catalog"][
+            "pangram_specimens"
+        ]["sheet_count"],
+        "runtime_pangram_sheet_count": runtime_result["catalog"][
+            "pangram_specimens"
+        ]["sheet_count"],
         "allocated_pua_block_count": mapping_result["allocated_pua_block_count"],
         "source_resolution_inventory_sha256": source_result["resolution_digest"],
         "source_unicode_geometry_sha256": source_result["geometry_digest"],

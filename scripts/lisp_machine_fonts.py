@@ -488,6 +488,196 @@ def _draw_label(canvas: _Canvas, text: str, x: int, y: int) -> None:
         x += 4
 
 
+def _wrapped_text_lines(
+    text: str,
+    glyphs_by_code: dict[int, Glyph],
+    max_advance: int,
+) -> list[str]:
+    """Wrap text greedily at spaces, falling back to character boundaries.
+
+    Newlines are forced breaks.  A space used as a wrap opportunity is not
+    carried to either output line, matching ordinary word-wrapping behavior.
+    Words longer than the available advance are split at the last fitting
+    character so every returned line observes ``max_advance``.
+    """
+
+    def advance(value: str) -> int:
+        return sum(glyphs_by_code[ord(character)].advance for character in value)
+
+    lines: list[str] = []
+    for paragraph in text.split("\n"):
+        remainder = paragraph
+        while advance(remainder) > max_advance:
+            fitting_end = 0
+            fitting_advance = 0
+            last_space = -1
+            for index, character in enumerate(remainder):
+                candidate_advance = (
+                    fitting_advance + glyphs_by_code[ord(character)].advance
+                )
+                if candidate_advance > max_advance:
+                    break
+                fitting_end = index + 1
+                fitting_advance = candidate_advance
+                if character == " ":
+                    last_space = index
+            if fitting_end == 0:
+                character = remainder[0]
+                raise ValueError(
+                    f"glyph U+{ord(character):04X} advance "
+                    f"{glyphs_by_code[ord(character)].advance} exceeds specimen "
+                    f"maximum {max_advance}"
+                )
+            if last_space > 0:
+                lines.append(remainder[:last_space])
+                remainder = remainder[last_space + 1 :]
+            else:
+                lines.append(remainder[:fitting_end])
+                remainder = remainder[fitting_end:]
+        lines.append(remainder)
+    return lines
+
+
+def write_text_specimen(
+    font: BitmapFont,
+    text: str,
+    path: Path,
+    *,
+    max_advance: int,
+    scale: int = 2,
+    padding: int = 3,
+) -> dict[str, object]:
+    """Render wrapped Unicode text with the font's exact bitmap geometry.
+
+    ``max_advance`` and ``padding`` are measured in unscaled source pixels.
+    The line height is the CADR sheet convention: the font's character height
+    plus the default two-pixel VSP.  The RGB PNG canvas expands around the
+    logical text cells to retain rasters with negative bearings or ink
+    above/below the nominal line, then adds equal outer padding.  Returned
+    JSON-compatible metadata distinguishes the content extent, padded native
+    canvas, and final scaled PNG dimensions.
+    """
+
+    if max_advance < 1 or scale < 1 or padding < 0:
+        raise ValueError(
+            "max advance and scale must be positive; padding must be nonnegative"
+        )
+    if font.character_height < 1:
+        raise ValueError(f"font {font.name!r} has a non-positive character height")
+    if not text or not text.replace("\n", ""):
+        raise ValueError("text specimen must contain at least one character")
+
+    glyphs_by_code: dict[int, Glyph] = {}
+    for glyph in font.glyphs:
+        if glyph.code in glyphs_by_code:
+            raise ValueError(
+                f"font {font.name!r} has duplicate glyph code U+{glyph.code:04X}"
+            )
+        glyphs_by_code[glyph.code] = glyph
+    missing_codes = sorted(
+        {ord(character) for character in text if character != "\n"}
+        - glyphs_by_code.keys()
+    )
+    if missing_codes:
+        missing = ", ".join(f"U+{code:04X}" for code in missing_codes)
+        raise ValueError(f"font {font.name!r} lacks specimen characters: {missing}")
+
+    wrapped_lines = _wrapped_text_lines(text, glyphs_by_code, max_advance)
+    vsp = 2
+    line_height = font.character_height + vsp
+    nominal_height = (
+        font.character_height + (len(wrapped_lines) - 1) * line_height
+    )
+    minimum_x = 0
+    maximum_x = 0
+    minimum_y = 0
+    maximum_y = nominal_height
+    placements: list[tuple[Glyph, int, int]] = []
+    line_records: list[dict[str, object]] = []
+
+    for line_index, line in enumerate(wrapped_lines):
+        pen_x = 0
+        baseline = font.baseline + line_index * line_height
+        for character in line:
+            glyph = glyphs_by_code[ord(character)]
+            glyph_x = pen_x + glyph.x_offset
+            glyph_top = baseline - glyph.y_offset - len(glyph.rows)
+            placements.append((glyph, glyph_x, glyph_top))
+            minimum_x = min(minimum_x, pen_x, pen_x + glyph.advance, glyph_x)
+            maximum_x = max(
+                maximum_x,
+                pen_x,
+                pen_x + glyph.advance,
+                glyph_x + glyph.bitmap_width,
+            )
+            minimum_y = min(minimum_y, glyph_top)
+            maximum_y = max(maximum_y, glyph_top + len(glyph.rows))
+            pen_x += glyph.advance
+        minimum_x = min(minimum_x, pen_x)
+        maximum_x = max(maximum_x, pen_x)
+        line_records.append(
+            {
+                "index": line_index,
+                "text": line,
+                "advance": pen_x,
+                "baseline": baseline,
+            }
+        )
+
+    content_native_width = maximum_x - minimum_x
+    content_native_height = maximum_y - minimum_y
+    if content_native_width < 1 or content_native_height < 1:
+        raise ValueError("text specimen has no positive raster extent")
+    canvas_native_width = content_native_width + padding * 2
+    canvas_native_height = content_native_height + padding * 2
+    canvas = _Canvas(
+        canvas_native_width * scale,
+        canvas_native_height * scale,
+        (250, 250, 248),
+    )
+    for glyph, glyph_x, glyph_top in placements:
+        for row_number, row in enumerate(glyph.rows):
+            for column in range(glyph.bitmap_width):
+                if row & (1 << (glyph.bitmap_width - column - 1)):
+                    _draw_scaled_pixel(
+                        canvas,
+                        (padding + glyph_x - minimum_x + column) * scale,
+                        (padding + glyph_top - minimum_y + row_number) * scale,
+                        scale,
+                        (18, 20, 22),
+                    )
+
+    for record in line_records:
+        canvas_baseline = padding + int(record["baseline"]) - minimum_y
+        record["canvas_baseline"] = canvas_baseline
+        record["pixel_baseline"] = canvas_baseline * scale
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(canvas.png_bytes())
+    return {
+        "text": text,
+        "max_native_advance": max_advance,
+        "scale": scale,
+        "native_padding": padding,
+        "vsp": vsp,
+        "native_line_height": line_height,
+        "content_native_bounds": {
+            "left": minimum_x,
+            "top": minimum_y,
+            "right": maximum_x,
+            "bottom": maximum_y,
+        },
+        "content_native_width": content_native_width,
+        "content_native_height": content_native_height,
+        "canvas_native_width": canvas_native_width,
+        "canvas_native_height": canvas_native_height,
+        "width": canvas.width,
+        "height": canvas.height,
+        "line_count": len(line_records),
+        "lines": line_records,
+    }
+
+
 def write_sheet(
     font: BitmapFont,
     path: Path,

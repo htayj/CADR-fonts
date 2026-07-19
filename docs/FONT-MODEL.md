@@ -254,5 +254,14 @@ absent code—including X default-character or fallback substitution—is
 explicitly outside the conformance claim and is not treated as evidence of a
 CADR display difference.
 
+The Unicode Latin pangram sheets are presentation derivatives of that same
+geometry. Eligibility requires visible U+0041-U+005A plus a positive-advance
+U+0020 in the emitted Unicode BDF; raw character-slot occupancy is not enough.
+The renderer advances by each glyph's `DWIDTH`, applies its signed `BBX`
+bearing, retains ink outside nominal metrics, uses the single-font CADR
+`VSP = 2` line spacing when wrapping, and enlarges pixels only by an integer
+factor of two. It performs no fallback, kerning, tracking, antialiasing, or
+shape synthesis.
+
 The output syntax and `SWIDTH`/`DWIDTH` conversion follow the official
 [BDF 2.1 standard](https://www.x.org/releases/X11R7.0/doc/PDF/bdf.pdf).

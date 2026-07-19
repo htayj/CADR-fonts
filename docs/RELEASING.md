@@ -56,6 +56,10 @@ contain a second implementation of font selection, naming, or checksumming.
 - The 151 source and 49 runtime Unicode derivatives preserve those same 20,307
   bitmap, advance, bearing, and line-metric instances, yielding four profiles,
   400 BDFs, and 40,614 emitted glyph instances overall.
+- Unicode catalogs and release contents include exactly 118 source and 42
+  runtime Latin pangram PNGs. Eligibility, mixed/uppercase choice, wrapping,
+  bitmap bounds, dimensions, paths, and hashes must be recomputed without
+  missing-character fallback.
 - Exact reviewed normalized and BDF semantic-inventory digests for both
   profiles: all source slots, all 6,170 runtime slots, and every emitted
   source/runtime glyph geometry and line metric.
