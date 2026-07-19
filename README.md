@@ -10,9 +10,17 @@ BDF 2.1 fonts with complete X Logical Font Description (XLFD) names:
   the serialized `FONT` arrays that System 46 would draw when loaded: 47
   current logical fonts and two explicitly legacy compiled versions.
 
-The profiles are deliberately not collapsed. The source profile answers “what
-surviving authoring representations contain”; the runtime profile answers
-“what this System 46 snapshot would display for a defined character.”
+Each raw profile also has a separately named Unicode derivative. The raw BDFs
+retain CADR codes and `Misc-FontSpecific`; the derivatives re-encode the same
+glyphs under `ISO10646-1` using the reviewed standard-character map and fixed
+BMP Private Use Area allocation documented in [UNICODE.md](docs/UNICODE.md).
+The result is four installable profiles and 400 BDFs.
+
+The source and runtime identities are deliberately not collapsed. The source
+profiles answer “what surviving authoring representations contain”; the
+runtime profiles answer “what this System 46 snapshot would display for a
+defined character.” Unicode derivation changes addressing, not that boundary
+or any displayed geometry.
 
 The source witness is a pinned Git submodule. Generated files stay under the
 ignored `dist/` directory for now; a GitHub release workflow is intentionally
@@ -28,17 +36,20 @@ make compare-genera
 make audit-runtime-names
 ```
 
-`make check-external` builds both profiles under `dist/`, runs the unit and
+`make check-external` builds all four profiles under `dist/`, runs the unit and
 corpus checks, compiles every BDF to PCF with `bdftopcf`, independently indexes
-the result with `mkfontdir`, and uses a private Xvfb server for both alias-load
-and native rendering checks. For every character actually defined by an
-emitted BDF, the rendering gate compares raw eight-bit `XDrawString` framebuffer
-pixels and `XTextExtents` with an independent BDF renderer. No scaling or
-antialiasing is involved. It requires `bdftopcf`, `mkfontdir`, Xvfb, and Xlib;
-the build itself needs only Python 3.10 or newer and its standard library.
-`make reproducible` performs two isolated builds and compares every output
-byte. The reviewed build passes this gate for all 371 aliases across the two
-font paths and for every emitted glyph.
+the result with `mkfontdir`, and uses a private Xvfb server for alias-load and
+native rendering checks. For every character actually defined by an emitted
+BDF, the rendering gate compares framebuffer pixels, advances, and
+`XTextExtents` with an independent BDF renderer. Raw CADR encodings are drawn
+through eight-bit `XDrawString`; Unicode `ISO10646-1` encodings are drawn as BMP
+scalars through `XDrawString16` and must reproduce the corresponding raw glyph
+exactly. No scaling or antialiasing is involved. It requires `bdftopcf`,
+`mkfontdir`, Xvfb, and Xlib; the build itself needs only Python 3.10 or newer
+and its standard library. `make reproducible` performs two isolated builds and
+compares every output byte. The reviewed build passes this gate for 371 raw
+aliases and 371 Unicode aliases across the four font paths, 742 aliases total,
+and for every emitted glyph.
 
 When the sibling `../genera-emu` checkout is present, `make compare-genera`
 repeats the compatibility audit against its published BDF artifacts. It
@@ -69,8 +80,13 @@ The current reviewed result is:
   logical names;
 - 6,170 normalized runtime slots, of which 5,689 are installable BDF glyphs
   after omitting 481 zero-width, zero-advance, no-ink runtime placeholders;
-- 200 BDF artifacts containing 20,307 emitted glyphs across both profiles;
-- 272 source-path aliases and 99 runtime-path aliases, 371 in total.
+- 200 raw BDF artifacts containing 20,307 emitted glyphs across the source and
+  runtime profiles;
+- 200 Unicode derivative BDFs preserving those same 20,307 bitmap, advance,
+  bearing, and line-metric instances exactly;
+- 400 BDFs and 40,614 emitted glyph instances across all four profiles;
+- 272 source-path and 99 runtime-path aliases in the raw profiles, 371 total,
+  mirrored by 371 disjoint `cadr-unicode-*` aliases for 742 aliases overall.
 
 The earlier `genera-emu` extraction produced 150 artifacts. This repository
 corrects its AST raster-height model: `BUG` has a 32-row authored AST raster but
@@ -116,7 +132,15 @@ dist/
     sheets/               deterministic runtime PNG specimens
     catalog.json          runtime classification, metrics, and provenance
     runtime-source-manifest.json
-  BUILD-MANIFEST.json     two-profile counts, catalogs, and alias policies
+  unicode/
+    UNICODE-MAPPING.json  release copy of the reviewed mapping contract
+    source/
+      bdf/                Unicode source BDFs plus fonts.dir/fonts.alias
+      catalog.json        resolved source encodings and geometry digest
+    runtime/
+      bdf/                Unicode runtime BDFs plus fonts.dir/fonts.alias
+      catalog.json        resolved runtime encodings and geometry digest
+  BUILD-MANIFEST.json     four-profile counts, catalogs, and alias policies
   SOURCE-MANIFEST.json    closed authoring-source manifest
   LICENSE.source          upstream three-clause BSD license
   SHA256SUMS              digest of every other distributed file
@@ -137,6 +161,12 @@ such as `CM10`/`CPT-CM10`, `CM12`/`CPT-CM12`, and `CPTFON`/`CPTFONT` resolve to
 the same current resident font, while their exact source forms remain under
 `cadr-source-*`. Full XLFD names remain authoritative.
 
+The Unicode aliases preserve the same selection rules under the disjoint
+`cadr-unicode-source-*`, `cadr-unicode-runtime-*`,
+`cadr-unicode-runtime-legacy-*`, and `cadr-unicode-*` namespaces. See
+[the Unicode profile](docs/UNICODE.md) for the exact map, complete repertoire
+allocation, and X core usage.
+
 ## Metric and identity boundaries
 
 These are one-bit bitmap fonts, not vectors or outlines. The build does not
@@ -151,6 +181,15 @@ trace, scale, hint, or synthesize glyph shapes.
   advances and represented raster boxes.
 - Raw CADR codes are direct BDF encodings under `Misc-FontSpecific`. They are
   not labelled Unicode or ISO-8859.
+- Unicode derivatives retain the same bitmaps and metrics but use
+  `ISO10646-1`. Artifacts proven to follow the System 46 table use its explicit
+  Unicode map. Older Alto/SAIL and mixed text repertoires use hybrid maps that
+  keep proven ordinary characters at standard Unicode scalars while routing
+  divergent or undocumented slots to family PUA blocks. Twenty-eight fixed
+  128-code-point blocks are reserved from U+E000 through U+EDFF, including 17
+  whole-PUA families: the 16 specialty repertoires plus Alto Greek/math. This
+  is a documented project private agreement, not a Unicode assignment inferred
+  from bitmap resemblance.
 - Alto's zero-width, zero-advance slots with no set pixels remain in the
   lossless JSON but are omitted from BDF. Xorg's PCF renderer rejects a font
   containing such a glyph with `BadAlloc`; omission changes neither ink nor
@@ -168,11 +207,12 @@ font's metrics but cannot encode this sheet-level policy, so the independent
 render model tests it separately.
 
 The conformance claim is intentionally limited to native rendering of defined
-glyphs. What an X server substitutes for a code absent from a BDF is outside
-the project gate, as requested; no fallback behavior is presented as CADR
-behavior.
+glyphs in both raw and Unicode profiles. What an X server substitutes for a
+code absent from a BDF is outside the project gate, as requested; no fallback
+behavior is presented as CADR behavior.
 
-See [the font model](docs/FONT-MODEL.md) and
+See [the font model](docs/FONT-MODEL.md),
+[the Unicode profile](docs/UNICODE.md), and
 [the provenance chain](docs/PROVENANCE.md) for the evidence and exact
 transformations. The output follows the official
 [BDF 2.1 standard](https://www.x.org/releases/X11R7.0/doc/PDF/bdf.pdf) and

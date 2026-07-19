@@ -338,9 +338,11 @@ def check_build_manifest(
     runtime_aliases: dict[str, str],
 ) -> None:
     build = json.loads((output / "BUILD-MANIFEST.json").read_text(encoding="utf-8"))
-    require(build["schema_version"] == 1, "unsupported build manifest schema")
+    require(build["schema_version"] == 2, "unsupported build manifest schema")
     source_profile = build["profiles"]["authoring_source"]
     runtime_profile = build["profiles"]["system_46_runtime"]
+    unicode_source_profile = build["profiles"]["unicode_authoring_source"]
+    unicode_runtime_profile = build["profiles"]["unicode_system_46_runtime"]
     require(
         source_profile["catalog_sha256"] == sha256(output / "catalog.json"),
         "BUILD-MANIFEST source catalog hash is stale",
@@ -367,7 +369,25 @@ def check_build_manifest(
         == runtime_catalog["classification_counts"],
         "BUILD-MANIFEST runtime classifications are stale",
     )
-    require(build["total_artifact_count"] == 200, "combined artifact count changed")
+    require(build["raw_artifact_count"] == 200, "raw artifact count changed")
+    require(
+        build["unicode_derivative_artifact_count"] == 200,
+        "Unicode derivative artifact count changed",
+    )
+    require(
+        build["total_installable_artifact_count"] == 400,
+        "combined installable artifact count changed",
+    )
+    require(
+        unicode_source_profile["raw_profile"] == "authoring_source"
+        and unicode_source_profile["artifact_count"] == 151,
+        "Unicode source profile link changed",
+    )
+    require(
+        unicode_runtime_profile["raw_profile"] == "system_46_runtime"
+        and unicode_runtime_profile["artifact_count"] == 49,
+        "Unicode runtime profile link changed",
+    )
     require(
         "defined by each emitted BDF" in build["undefined_character_policy"],
         "missing-code exclusion disappeared from BUILD-MANIFEST",

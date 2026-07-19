@@ -11,6 +11,7 @@ test:
 check: dist test
 	$(PYTHON) scripts/check_dist.py
 	$(PYTHON) scripts/check_runtime_dist.py
+	$(PYTHON) scripts/check_unicode_dist.py
 	$(PYTHON) scripts/check_runtime_rendering.py --output dist
 
 check-runtime: dist

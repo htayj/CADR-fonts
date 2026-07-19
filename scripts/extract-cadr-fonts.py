@@ -1374,6 +1374,7 @@ def main() -> int:
                 "BUILD-MANIFEST.json",
                 "SHA256SUMS",
                 "runtime",
+                "unicode",
             },
         )
     except ValueError as error:

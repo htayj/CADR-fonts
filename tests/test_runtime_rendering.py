@@ -94,6 +94,33 @@ def write_fixture(directory: str, filename: str = "fixture.bdf", **kwargs) -> Pa
     return path
 
 
+def unicode_fixture_bdf(
+    *,
+    name: str = (
+        "-Misc-CADR Unicode Render Test-Medium-R-Normal-Unicode-5-50-72-72-"
+        "P-40-ISO10646-1"
+    ),
+) -> str:
+    return (
+        fixture_bdf(name=name)
+        .replace('ADD_STYLE_NAME ""', 'ADD_STYLE_NAME "Unicode"')
+        .replace('CHARSET_REGISTRY "Misc"', 'CHARSET_REGISTRY "ISO10646"')
+        .replace('CHARSET_ENCODING "FontSpecific"', 'CHARSET_ENCODING "1"')
+        .replace("DEFAULT_CHAR 0", "DEFAULT_CHAR 183")
+        .replace("ENCODING 0\n", "ENCODING 183\n")
+        .replace("ENCODING 65\n", "ENCODING 8592\n")
+        .replace("ENCODING 255\n", "ENCODING 57344\n")
+    )
+
+
+def write_unicode_fixture(
+    directory: str, filename: str = "unicode-fixture.bdf", **kwargs
+) -> Path:
+    path = Path(directory) / filename
+    path.write_text(unicode_fixture_bdf(**kwargs), encoding="ascii")
+    return path
+
+
 class BdfRenderingTests(unittest.TestCase):
     def test_raw_eight_bit_pixels_bearings_and_extents(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -121,9 +148,27 @@ class BdfRenderingTests(unittest.TestCase):
     def test_undefined_codes_are_excluded_from_probes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             font = rendering.parse_bdf(write_fixture(directory))
-        self.assertEqual(rendering.probe_strings(font), (bytes((0, 65, 255)),))
+        self.assertEqual(rendering.probe_strings(font), ((0, 65, 255),))
         with self.assertRaisesRegex(rendering.RenderCheckError, "undefined code 66"):
             rendering.render_defined_text(font, b"B")
+
+    def test_unicode_bmp_codepoints_are_measured_and_rendered_as_int_sequences(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            font = rendering.parse_bdf(write_unicode_fixture(directory))
+        data = (0x00B7, 0x2190, 0xE000)
+        self.assertTrue(font.is_iso10646)
+        self.assertEqual(rendering._x_character_width(font), 16)
+        self.assertEqual(rendering.probe_strings(font), (data,))
+        self.assertEqual(
+            rendering.measure_defined_text(font, data),
+            rendering.TextExtents(0, 11, 12, 4, 1),
+        )
+        self.assertEqual(
+            rendering.render_defined_text(font, data).pixels,
+            rendering.render_defined_text(font, list(data)).pixels,
+        )
 
     def test_cadr_default_vsp_and_mixed_font_baselines(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -145,15 +190,67 @@ class BdfRenderingTests(unittest.TestCase):
         self.assertEqual([run.baseline_y for run in layout.runs], [4, 4, 11])
         self.assertEqual([run.x for run in layout.runs], [0, 5, 0])
 
-    def test_parser_rejects_non_eight_bit_encoding(self) -> None:
+    def test_parser_accepts_bmp_boundary_and_rejects_non_scalar_encodings(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = write_fixture(directory)
             path.write_text(
-                path.read_text(encoding="ascii").replace("ENCODING 255", "ENCODING 256"),
+                path.read_text(encoding="ascii").replace(
+                    "ENCODING 255", "ENCODING 65535"
+                ),
                 encoding="ascii",
             )
-            with self.assertRaisesRegex(rendering.RenderCheckError, "not an 8-bit code"):
-                rendering.parse_bdf(path)
+            font = rendering.parse_bdf(path)
+            self.assertIn(0xFFFF, font.glyphs)
+
+            for encoding, message in (
+                (-1, "outside the Unicode BMP"),
+                (0x10000, "outside the Unicode BMP"),
+                (0xD800, "surrogate"),
+                (0xDFFF, "surrogate"),
+            ):
+                path.write_text(
+                    fixture_bdf().replace(
+                        "ENCODING 255", f"ENCODING {encoding}"
+                    ),
+                    encoding="ascii",
+                )
+                with self.subTest(encoding=encoding):
+                    with self.assertRaisesRegex(
+                        rendering.RenderCheckError, message
+                    ):
+                        rendering.parse_bdf(path)
+
+    def test_xchar2b_uses_big_endian_codepoint_bytes(self) -> None:
+        encoded = rendering._xchar2b_array((0x00B7, 0x2190, 0xE000, 0xFFFF))
+        self.assertEqual(
+            [(item.byte1, item.byte2) for item in encoded],
+            [(0x00, 0xB7), (0x21, 0x90), (0xE0, 0x00), (0xFF, 0xFF)],
+        )
+
+    def test_font_specific_profiles_retain_the_raw_eight_bit_x_path(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            font = rendering.parse_bdf(write_fixture(directory))
+        self.assertFalse(font.is_iso10646)
+        self.assertEqual(rendering._x_character_width(font), 8)
+
+    def test_discovery_is_closed_over_the_four_distribution_profiles(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            expected = []
+            for relative in (
+                Path("bdf/source.bdf"),
+                Path("runtime/bdf/runtime.bdf"),
+                Path("unicode/source/bdf/unicode-source.bdf"),
+                Path("unicode/runtime/bdf/unicode-runtime.bdf"),
+            ):
+                path = output / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.touch()
+                expected.append(path)
+            ignored = output / "other" / "bdf" / "unowned.bdf"
+            ignored.parent.mkdir(parents=True)
+            ignored.touch()
+            self.assertEqual(rendering.discover_bdfs(output), sorted(expected))
 
     def test_constant_bdf_metrics_select_computed_ink_extents(self) -> None:
         font = rendering.BdfFont(
@@ -182,8 +279,12 @@ class ExternalXRenderingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             source_directory = Path(directory) / "bdf"
             runtime_directory = Path(directory) / "runtime" / "bdf"
+            unicode_directory = (
+                Path(directory) / "unicode" / "source" / "bdf"
+            )
             source_directory.mkdir(parents=True)
             runtime_directory.mkdir(parents=True)
+            unicode_directory.mkdir(parents=True)
             source_name = (
                 "-Misc-CADR Source Test-Medium-R-Normal--5-50-72-72-P-40-"
                 "Misc-FontSpecific"
@@ -196,21 +297,34 @@ class ExternalXRenderingTests(unittest.TestCase):
             runtime = write_fixture(
                 str(runtime_directory), filename="runtime.bdf", name=runtime_name
             )
+            unicode_name = (
+                "-Misc-CADR Unicode Source Test-Medium-R-Normal-Unicode-5-50-"
+                "72-72-P-40-ISO10646-1"
+            )
+            unicode_source = write_unicode_fixture(
+                str(unicode_directory), name=unicode_name
+            )
             (source_directory / "fonts.alias").write_text(
                 f'cadr-source-test "{source_name}"\n', encoding="ascii"
             )
             (runtime_directory / "fonts.alias").write_text(
                 f'cadr-runtime-test "{runtime_name}"\n', encoding="ascii"
             )
-            result = rendering.validate_external([source, runtime])
+            (unicode_directory / "fonts.alias").write_text(
+                f'cadr-unicode-source-test "{unicode_name}"\n',
+                encoding="ascii",
+            )
+            result = rendering.validate_external(
+                [source, runtime, unicode_source]
+            )
         self.assertEqual(
             result,
             {
-                "font_count": 2,
-                "probe_count": 2,
-                "glyph_count": 6,
-                "font_path_count": 2,
-                "alias_count": 2,
+                "font_count": 3,
+                "probe_count": 3,
+                "glyph_count": 9,
+                "font_path_count": 3,
+                "alias_count": 3,
             },
         )
 

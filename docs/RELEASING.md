@@ -18,15 +18,15 @@ For tags matching `v*`, a future workflow should:
 3. run the repository's pinned-lineage inert QFASL decoder; no external parser
    checkout or executable target environment participates in the build;
 4. run `make check-external`, including the native defined-glyph framebuffer
-   gate for both source and runtime BDFs;
+   gate for the raw source/runtime profiles and both Unicode derivatives;
 5. run `make reproducible` in a clean environment;
 6. rebuild the intended smaller release profile if normalized JSON or specimen
    sheets are to be omitted;
 7. create a deterministic tar archive with sorted entries, numeric owner/group,
    and an mtime derived from `SOURCE_DATE_EPOCH`;
-8. publish the archive, `SHA256SUMS`, `BUILD-MANIFEST.json`, both profile
-   catalogs, both closed manifests, and `LICENSE.source` on the tag's GitHub
-   Release.
+8. publish the archive, `SHA256SUMS`, `BUILD-MANIFEST.json`, all four profile
+   catalogs, both closed raw manifests, `unicode/UNICODE-MAPPING.json`, and
+   `LICENSE.source` on the tag's GitHub Release.
 
 The workflow must call the same scripts as local development. It should not
 contain a second implementation of font selection, naming, or checksumming.
@@ -39,8 +39,6 @@ contain a second implementation of font selection, naming, or checksumming.
 - Versioning and whether a tag is allowed to change the pinned System 46 source
   revision.
 - Whether PCF files should be shipped or remain reproducible derived output.
-- Whether a later Unicode-mapped profile belongs in this repository; it must
-  remain distinct from the raw CADR code profile.
 
 ## Required release gates
 
@@ -53,28 +51,42 @@ contain a second implementation of font selection, naming, or checksumming.
 - The inert decoder reproduces every reviewed resident symbol, stream
   checkpoint, and serialized `FONT` object without evaluating compiled code.
 - Reviewed source corpus, spacing, partial-recovery, and extent-recovery
-  invariants, plus 151 source and 49 runtime BDF artifacts containing 20,307
-  emitted glyphs.
+  invariants, plus 151 source and 49 runtime raw BDF artifacts containing
+  20,307 emitted glyphs.
+- The 151 source and 49 runtime Unicode derivatives preserve those same 20,307
+  bitmap, advance, bearing, and line-metric instances, yielding four profiles,
+  400 BDFs, and 40,614 emitted glyph instances overall.
 - Exact reviewed normalized and BDF semantic-inventory digests for both
   profiles: all source slots, all 6,170 runtime slots, and every emitted
   source/runtime glyph geometry and line metric.
 - The 30 source-backed runtime comparisons remain exact, including the
   reviewed `ARROW-KST`, `BIGFNT-KST`, current `MEDFNT`, and runtime `MOUSE`
   distinctions; `N43XMS` and `NTOG` remain non-current legacy identities.
-- Unique, complete XLFD names and exact `fonts.dir`/`fonts.alias` indexes.
+- Unique, complete XLFD names and exact `fonts.dir`/`fonts.alias` indexes for
+  all four profiles. Unicode XLFDs must retain `ISO10646-1`, remain distinct
+  from raw `Misc-FontSpecific` XLFDs, and preserve raw spacing classifications.
 - Exact alias namespaces: 151 `cadr-source-*`, 47 `cadr-runtime-*`, two
   `cadr-runtime-legacy-*`, and collision-checked `cadr-*` current convenience
   names. Current runtime aliases must resolve to runtime-distinct XLFDs, not to
   a source font with an accidentally identical XLFD. The reviewed split is 272
-  aliases in the source index and 99 in the runtime index, 371 in total.
+  aliases in the source index and 99 in the runtime index, 371 raw aliases in
+  total. The corresponding disjoint `cadr-unicode-*` indexes must contain the
+  same 272/99 split, for 371 Unicode aliases and 742 aliases overall.
+- The closed mapping assigns every one of the 88 source logical names and all
+  49 runtime artifact names without a default. Its standard CADR map, reviewed
+  hybrid remaps, and 28 fixed 128-code-point BMP PUA reservations remain
+  exactly as documented in [UNICODE.md](UNICODE.md). The independently pinned
+  block registry and exact standard-repertoire whitelists must also pass.
 - All BDFs compile with `bdftopcf` and `mkfontdir` independently recovers the
   expected PCF-to-XLFD index.
 - Every generated alias loads in an isolated Xvfb server; the release image
   must install Xvfb rather than silently skipping this gate.
 - For every code defined by every source and runtime BDF, native raw-eight-bit
-  X drawing produces the independently predicted one-bit framebuffer,
-  advances, and text extents. Undefined-code/default-character substitution is
-  explicitly outside this gate.
+  `XDrawString` produces the independently predicted one-bit framebuffer,
+  advance, and text extents. Every Unicode derivative is also drawn as BMP
+  `XChar2b` values with `XDrawString16` and must reproduce its corresponding
+  raw artifact/code geometry exactly. Undefined-code/default-character
+  substitution is explicitly outside this gate.
 - The independent CADR layout model proves default `VSP = 2`, maximum
   font-map baseline, maximum font-map character height, and per-font baseline
   adjustment for mixed-font lines.

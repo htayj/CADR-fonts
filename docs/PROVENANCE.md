@@ -71,6 +71,51 @@ implements only the closed corpus's reviewed serialized-object subset and
 rejects all unsupported or executable operations. It never loads a QFASL,
 evaluates a form, or executes target code.
 
+## Unicode mapping evidence and policy boundary
+
+The Unicode profile is a derivative view of the raw source and runtime
+profiles. The pinned CADR
+[`char.18`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmdoc/char.18#L3-L40)
+is the primary System 46 evidence for the standard seven-bit printing codes;
+the keyboard table in
+[`kbd.123`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio/kbd.123#L288-L361)
+and reader names in
+[`rddefs.19`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio/rddefs.19#L68-L105)
+cross-check names and positions. The contemporary Stanford/ITS repertoire in
+[`RFC 734`](https://www.rfc-editor.org/rfc/rfc734.html), page 12, supplies an
+independent character-set description. RFC 734 predates Unicode, so the exact
+Unicode scalar choices are this project's documented resolution of those
+historical names, including raw `000` as U+22C5 DOT OPERATOR and raw `033` as
+U+25CA LOZENGE.
+
+The repertoire boundary is supported by the pinned font inventory, recovered
+bitmaps, runtime manifest, and direct application references where they
+survive. That evidence proves family identity and, for ARROW, MOUSE, TOG,
+SWFONT, and SHIP, application-sprite use. It does not prove complete
+raw-code-to-Unicode tables for the specialty repertoires.
+
+The ordinary-looking historical fonts also require an explicit boundary. The
+pinned [Alto loader](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fntcnv.28#L757-L802)
+copies each descriptor into array index `CH` for every code `000` through `177`
+without character-set translation, so retained Alto codes cannot be assumed to
+follow the later System 46 table. The source reader itself documents raw `137`
+as [“underline (old leftarrow)”](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio/fread.21#L78-L92).
+Reviewed hybrid maps keep proven ASCII positions at standard Unicode values,
+remap documented old-arrow positions, and use PUA only for the remaining
+divergent or undocumented slots.
+
+The resulting 28 reserved blocks from U+E000 through U+EDFF are a published
+**project PUA convention**, not an assignment recovered from CADR and not an
+assignment endorsed by Unicode. Bitmap resemblance and a suggestive family
+name are deliberately insufficient to infer a standardized character.
+
+[The Unicode profile](UNICODE.md) is the normative, versioned mapping table and
+records each family's evidence and uncertainty. Generated
+`dist/unicode/UNICODE-MAPPING.json` and the Unicode catalogs are reproducible
+expressions of that policy, not independent historical witnesses. The raw
+`Misc-FontSpecific` BDF encodings and raw catalogs remain unchanged and retain
+authority for archival CADR codes and geometry.
+
 ## Identity and alias contract
 
 Full XLFD names distinguish authored artifacts from current and legacy runtime
@@ -80,7 +125,7 @@ alias to an XLFD, not to a particular file. Current runtime XLFDs therefore use
 explicit `System 46 Legacy N43XMS` or `System 46 Legacy NTOG` add-style. Source
 XLFD add-styles retain source-variant identity such as `KST` and `AL AR1`.
 
-The source and runtime `fonts.alias` files are generated under these
+The raw source and runtime `fonts.alias` files are generated under these
 deterministic rules and installed together on the X font path:
 
 1. `cadr-source-<artifact>` always targets that exact one of the 151 source
@@ -96,10 +141,13 @@ deterministic rules and installed together on the X font path:
    `CM12`/`CPT-CM12`, and `CPTFON`/`CPTFONT`) retain both convenience spellings
    for the same current runtime object.
 
-These rules yield 171 unique convenience names and 371 aliases: 272 in the
+These rules yield 171 unique convenience names and 371 raw aliases: 272 in the
 source-path index and 99 in the runtime-path index, across the source,
-current-runtime, legacy-runtime, and convenience namespaces. Alias collisions
-with different XLFD targets are build errors.
+current-runtime, legacy-runtime, and convenience namespaces. The Unicode
+indexes mirror that 272/99 split under disjoint `cadr-unicode-*` names and
+target XLFDs whose add-style includes `Unicode` and whose registry/encoding is
+`ISO10646-1`. The four indexes therefore expose 742 aliases in total. Alias
+collisions with different XLFD targets are build errors.
 
 ## Decoder lineage
 
@@ -177,15 +225,17 @@ The remaining source-backed references match every source-represented glyph.
 The older `N43XMS` differs from current `43VXMS` in 69 glyphs, while older
 `NTOG` and current `TOG` are display-identical but serialization-distinct.
 
-Static comparison is followed by an independent native-X gate. It compiles
-both profiles to PCF, indexes them with `mkfontdir`, draws raw eight-bit probes
-through Xvfb/Xlib, compares the one-bit framebuffer with an independent BDF
-renderer, and checks advances and text extents. Every code defined in every
-emitted BDF is included exactly once. The reviewed result passes for all 200
-BDFs, all 20,307 emitted glyphs, and all 371 aliases across the two font paths.
-The same independent model tests the System 46 default of `VSP = 2`, maximum
-font-map baseline, maximum font-map character height, and per-font baseline
-adjustment.
+Static comparison is followed by an independent native-X gate. It compiles all
+four profiles to PCF and indexes them with `mkfontdir`. Raw eight-bit probes are
+drawn through Xvfb/Xlib with `XDrawString`; Unicode BMP probes use real
+`XChar2b` arrays with `XDrawString16`. The gate compares each one-bit
+framebuffer with an independent BDF renderer and checks advances and text
+extents. Every code defined in every emitted BDF is included exactly once, and
+each Unicode result must match its raw CADR-code counterpart. The reviewed
+result passes for all 400 BDFs, all 40,614 emitted glyph instances, and all 742
+aliases across the four font paths. The same independent model tests the
+System 46 default of `VSP = 2`, maximum font-map baseline, maximum font-map
+character height, and per-font baseline adjustment.
 
 Undefined codes are intentionally excluded. X default-character or fallback
 substitution for a code absent from a BDF is server policy, not recovered CADR

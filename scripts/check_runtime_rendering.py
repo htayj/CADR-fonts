@@ -2,10 +2,12 @@
 """Check native-size X core rendering against recovered CADR bitmap geometry.
 
 The pure-Python half of this checker parses BDF directly and produces the
-expected foreground pixels and text extents for raw 8-bit strings.  With
-``--external`` it compiles the BDFs to PCF, starts an isolated Xvfb, draws the
-same byte strings through Xlib, and compares both the framebuffer and
-``XTextExtents`` results.
+expected foreground pixels and text extents for sequences of integer BDF
+encodings.  With ``--external`` it compiles the BDFs to PCF, starts an isolated
+Xvfb, draws the same sequences through Xlib, and compares both the framebuffer
+and text-extents results.  Raw ``Misc-FontSpecific`` profiles retain their
+historical 8-bit ``XDrawString`` path; ``ISO10646-1`` derivatives use
+``XDrawString16`` and ``XTextExtents16``.
 
 Only codes that are explicitly present in a BDF are put in conformance probes.
 What X does for an absent code (default-character substitution, another
@@ -107,10 +109,19 @@ class BdfFont:
     descent: int
     spacing: str
     glyphs: dict[int, Glyph]
+    charset_registry: str = "Misc"
+    charset_encoding: str = "FontSpecific"
 
     @property
     def character_height(self) -> int:
         return self.ascent + self.descent
+
+    @property
+    def is_iso10646(self) -> bool:
+        return (
+            self.charset_registry.casefold(),
+            self.charset_encoding.casefold(),
+        ) == ("iso10646", "1")
 
 
 @dataclass(frozen=True)
@@ -131,7 +142,7 @@ class Raster:
 @dataclass(frozen=True)
 class PlacedRun:
     font: BdfFont
-    data: bytes
+    data: tuple[int, ...]
     x: int
     baseline_y: int
 
@@ -205,7 +216,14 @@ def parse_bdf(path: Path) -> BdfFont:
             f"{path}: secondary BDF encodings are outside the runtime check",
         )
         code = int(encoding_fields[0])
-        require(0 <= code <= 255, f"{path}: encoding {code} is not an 8-bit code")
+        require(
+            0 <= code <= 0xFFFF,
+            f"{path}: encoding {code} is outside the Unicode BMP",
+        )
+        require(
+            not 0xD800 <= code <= 0xDFFF,
+            f"{path}: encoding U+{code:04X} is a surrogate, not a Unicode scalar",
+        )
         require(code not in glyphs, f"{path}: duplicate encoding {code}")
         dwidth = tuple(map(int, glyph_one("DWIDTH ").split()))
         require(len(dwidth) == 2 and dwidth[1] == 0, f"{path}: non-horizontal DWIDTH")
@@ -250,13 +268,15 @@ def parse_bdf(path: Path) -> BdfFont:
         descent=descent,
         spacing=spacing,
         glyphs=glyphs,
+        charset_registry=properties.get("CHARSET_REGISTRY", ""),
+        charset_encoding=properties.get("CHARSET_ENCODING", ""),
     )
 
 
 def measure_defined_text(
-    font: BdfFont, data: bytes, *, metric_kind: str = "box"
+    font: BdfFont, data: Sequence[int], *, metric_kind: str = "box"
 ) -> TextExtents:
-    """Calculate box or set-pixel ink extents for explicitly defined bytes.
+    """Calculate box or set-pixel ink extents for defined code points.
 
     PCF can contain both the original BDF character boxes and separately
     computed ink metrics.  Depending on the font-wide accelerator choices,
@@ -274,7 +294,10 @@ def measure_defined_text(
     ascent: int | None = None
     descent: int | None = None
     for code in data:
-        require(code in font.glyphs, f"{font.path}: probe contains undefined code {code}")
+        require(
+            code in font.glyphs,
+            f"{font.path}: probe contains undefined code {code} (U+{code:04X})",
+        )
         glyph = font.glyphs[code]
         if metric_kind == "box":
             metric_left, metric_right = glyph.lbearing, glyph.rbearing
@@ -297,7 +320,7 @@ def measure_defined_text(
     )
 
 
-def expected_xtext_extents(font: BdfFont, data: bytes) -> TextExtents:
+def expected_xtext_extents(font: BdfFont, data: Sequence[int]) -> TextExtents:
     """Model the metrics exposed by the default ``bdftopcf`` output.
 
     When every BDF character metric is identical, PCF uses the compact
@@ -316,9 +339,13 @@ def expected_xtext_extents(font: BdfFont, data: bytes) -> TextExtents:
 
 
 def render_defined_text(
-    font: BdfFont, data: bytes, *, origin_x: int = 0, baseline_y: int = 0
+    font: BdfFont,
+    data: Sequence[int],
+    *,
+    origin_x: int = 0,
+    baseline_y: int = 0,
 ) -> Raster:
-    """Render explicitly defined bytes into a set of foreground coordinates."""
+    """Render explicitly defined code points into foreground coordinates."""
 
     extents = measure_defined_text(font, data)
     pixels: set[tuple[int, int]] = set()
@@ -348,7 +375,7 @@ def cadr_sheet_metrics(fonts: Sequence[BdfFont], *, vsp: int = 2) -> tuple[int, 
 
 
 def render_cadr_lines(
-    lines: Sequence[Sequence[tuple[BdfFont, bytes]]],
+    lines: Sequence[Sequence[tuple[BdfFont, Sequence[int]]]],
     *,
     font_map: Sequence[BdfFont] | None = None,
     vsp: int = 2,
@@ -365,9 +392,19 @@ def render_cadr_lines(
         x = origin_x
         baseline_y = origin_y + sheet_baseline + line_number * line_height
         for font, data in line:
-            raster = render_defined_text(font, data, origin_x=x, baseline_y=baseline_y)
+            codepoints = tuple(data)
+            raster = render_defined_text(
+                font, codepoints, origin_x=x, baseline_y=baseline_y
+            )
             pixels.update(raster.pixels)
-            placed.append(PlacedRun(font=font, data=data, x=x, baseline_y=baseline_y))
+            placed.append(
+                PlacedRun(
+                    font=font,
+                    data=codepoints,
+                    x=x,
+                    baseline_y=baseline_y,
+                )
+            )
             x += raster.extents.width
     return CadrLayout(
         pixels=frozenset(pixels),
@@ -377,12 +414,17 @@ def render_cadr_lines(
     )
 
 
-def probe_strings(font: BdfFont, *, maximum_bytes: int = 200) -> tuple[bytes, ...]:
-    """Make raw-byte probes containing every defined 8-bit code exactly once."""
+def probe_strings(
+    font: BdfFont, *, maximum_codepoints: int = 200
+) -> tuple[tuple[int, ...], ...]:
+    """Make probes containing every defined BDF encoding exactly once."""
 
-    require(maximum_bytes > 0, "maximum probe length must be positive")
-    codes = bytes(sorted(font.glyphs))
-    return tuple(codes[index : index + maximum_bytes] for index in range(0, len(codes), maximum_bytes))
+    require(maximum_codepoints > 0, "maximum probe length must be positive")
+    codes = tuple(sorted(font.glyphs))
+    return tuple(
+        codes[index : index + maximum_codepoints]
+        for index in range(0, len(codes), maximum_codepoints)
+    )
 
 
 class XCharStruct(ctypes.Structure):
@@ -393,6 +435,15 @@ class XCharStruct(ctypes.Structure):
         ("ascent", ctypes.c_short),
         ("descent", ctypes.c_short),
         ("attributes", ctypes.c_ushort),
+    ]
+
+
+class XChar2b(ctypes.Structure):
+    """The two-byte X core character representation, most-significant first."""
+
+    _fields_ = [
+        ("byte1", ctypes.c_ubyte),
+        ("byte2", ctypes.c_ubyte),
     ]
 
 
@@ -470,6 +521,24 @@ def _configure_xlib(library: str):
     x11.XFillRectangle.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_uint, ctypes.c_uint]
     x11.XDrawString.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_void_p, ctypes.c_int]
     x11.XTextExtents.argtypes = [ctypes.POINTER(XFontStruct), ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int), ctypes.POINTER(XCharStruct)]
+    x11.XDrawString16.argtypes = [
+        ctypes.c_void_p,
+        ctypes.c_ulong,
+        ctypes.c_void_p,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.POINTER(XChar2b),
+        ctypes.c_int,
+    ]
+    x11.XTextExtents16.argtypes = [
+        ctypes.POINTER(XFontStruct),
+        ctypes.POINTER(XChar2b),
+        ctypes.c_int,
+        ctypes.POINTER(ctypes.c_int),
+        ctypes.POINTER(ctypes.c_int),
+        ctypes.POINTER(ctypes.c_int),
+        ctypes.POINTER(XCharStruct),
+    ]
     x11.XGetImage.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int, ctypes.c_int, ctypes.c_uint, ctypes.c_uint, ctypes.c_ulong, ctypes.c_int]
     x11.XGetImage.restype = ctypes.c_void_p
     x11.XGetPixel.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
@@ -565,21 +634,75 @@ def isolated_xvfb(
         x11.XSetErrorHandler(previous_handler)
 
 
-def _x_text_extents(x11, font_pointer, data: bytes) -> tuple[TextExtents, int, int]:
+def _x_character_width(font: BdfFont) -> int:
+    """Select the reviewed X core API for one generated character-set profile."""
+
+    if font.is_iso10646:
+        return 16
+    require(
+        (
+            font.charset_registry.casefold(),
+            font.charset_encoding.casefold(),
+        )
+        == ("misc", "fontspecific"),
+        f"{font.path}: unsupported X core charset "
+        f"{font.charset_registry}-{font.charset_encoding}",
+    )
+    require(
+        all(code <= 0xFF for code in font.glyphs),
+        f"{font.path}: Misc-FontSpecific profile contains a non-8-bit encoding",
+    )
+    return 8
+
+
+def _xchar2b_array(data: Sequence[int]):
+    """Return an XChar2b array whose byte1 is the most-significant byte."""
+
+    array_type = XChar2b * len(data)
+    return array_type(
+        *(XChar2b((code >> 8) & 0xFF, code & 0xFF) for code in data)
+    )
+
+
+def _format_probe(font: BdfFont, data: Sequence[int]) -> str:
+    if font.is_iso10646:
+        return " ".join(f"U+{code:04X}" for code in data)
+    return " ".join(f"0x{code:02X}" for code in data)
+
+
+def _x_text_extents(
+    x11,
+    font_pointer,
+    font: BdfFont,
+    data: Sequence[int],
+) -> tuple[TextExtents, int, int]:
     direction = ctypes.c_int()
     font_ascent = ctypes.c_int()
     font_descent = ctypes.c_int()
     overall = XCharStruct()
-    buffer = ctypes.create_string_buffer(data, len(data) + 1)
-    x11.XTextExtents(
-        font_pointer,
-        ctypes.cast(buffer, ctypes.c_void_p),
-        len(data),
-        ctypes.byref(direction),
-        ctypes.byref(font_ascent),
-        ctypes.byref(font_descent),
-        ctypes.byref(overall),
-    )
+    if _x_character_width(font) == 16:
+        buffer16 = _xchar2b_array(data)
+        x11.XTextExtents16(
+            font_pointer,
+            buffer16,
+            len(data),
+            ctypes.byref(direction),
+            ctypes.byref(font_ascent),
+            ctypes.byref(font_descent),
+            ctypes.byref(overall),
+        )
+    else:
+        raw = bytes(data)
+        buffer8 = ctypes.create_string_buffer(raw, len(raw) + 1)
+        x11.XTextExtents(
+            font_pointer,
+            ctypes.cast(buffer8, ctypes.c_void_p),
+            len(raw),
+            ctypes.byref(direction),
+            ctypes.byref(font_ascent),
+            ctypes.byref(font_descent),
+            ctypes.byref(overall),
+        )
     require(direction.value == 0, "X reports a right-to-left core font")
     return (
         TextExtents(
@@ -594,7 +717,14 @@ def _x_text_extents(x11, font_pointer, data: bytes) -> tuple[TextExtents, int, i
     )
 
 
-def _x_draw_pixels(x11, display, font_pointer, data: bytes, expected: TextExtents) -> frozenset[tuple[int, int]]:
+def _x_draw_pixels(
+    x11,
+    display,
+    font_pointer,
+    font: BdfFont,
+    data: Sequence[int],
+    expected: TextExtents,
+) -> frozenset[tuple[int, int]]:
     margin = 3
     origin_x = margin - min(0, expected.lbearing)
     baseline_y = margin + max(0, expected.ascent)
@@ -611,16 +741,29 @@ def _x_draw_pixels(x11, display, font_pointer, data: bytes, expected: TextExtent
         x11.XFillRectangle(display, pixmap, gc, 0, 0, width, height)
         x11.XSetForeground(display, gc, 1)
         x11.XSetFont(display, gc, font_pointer.contents.fid)
-        buffer = ctypes.create_string_buffer(data, len(data) + 1)
-        x11.XDrawString(
-            display,
-            pixmap,
-            gc,
-            origin_x,
-            baseline_y,
-            ctypes.cast(buffer, ctypes.c_void_p),
-            len(data),
-        )
+        if _x_character_width(font) == 16:
+            buffer16 = _xchar2b_array(data)
+            x11.XDrawString16(
+                display,
+                pixmap,
+                gc,
+                origin_x,
+                baseline_y,
+                buffer16,
+                len(data),
+            )
+        else:
+            raw = bytes(data)
+            buffer8 = ctypes.create_string_buffer(raw, len(raw) + 1)
+            x11.XDrawString(
+                display,
+                pixmap,
+                gc,
+                origin_x,
+                baseline_y,
+                ctypes.cast(buffer8, ctypes.c_void_p),
+                len(raw),
+            )
         x11.XSync(display, 0)
         image = x11.XGetImage(display, pixmap, 0, 0, width, height, ALL_PLANES, Z_PIXMAP)
         require(bool(image), "XGetImage failed")
@@ -725,23 +868,32 @@ def validate_external(paths: Sequence[Path]) -> dict[str, int]:
                     for data in probe_strings(font):
                         expected_box_extents = measure_defined_text(font, data, metric_kind="box")
                         expected_extents = expected_xtext_extents(font, data)
-                        observed_extents, font_ascent, font_descent = _x_text_extents(x11, font_pointer, data)
+                        observed_extents, font_ascent, font_descent = (
+                            _x_text_extents(x11, font_pointer, font, data)
+                        )
                         require(
                             (font_ascent, font_descent) == (font.ascent, font.descent),
-                            f"{font.path}: XTextExtents line metrics differ from BDF",
+                            f"{font.path}: X text-extents line metrics differ from BDF",
                         )
                         require(
                             observed_extents == expected_extents,
-                            f"{font.path}: XTextExtents differs for defined codes {data.hex()}: "
+                            f"{font.path}: X text extents differ for defined codes "
+                            f"{_format_probe(font, data)}: "
                             f"expected {expected_extents}, got {observed_extents}",
                         )
                         expected_pixels = render_defined_text(font, data).pixels
                         observed_pixels = _x_draw_pixels(
-                            x11, display, font_pointer, data, expected_box_extents
+                            x11,
+                            display,
+                            font_pointer,
+                            font,
+                            data,
+                            expected_box_extents,
                         )
                         require(
                             observed_pixels == expected_pixels,
-                            f"{font.path}: X framebuffer differs for defined codes {data.hex()} "
+                            f"{font.path}: X framebuffer differs for defined codes "
+                            f"{_format_probe(font, data)} "
                             f"(missing {len(expected_pixels - observed_pixels)}, "
                             f"extra {len(observed_pixels - expected_pixels)})",
                         )
@@ -768,9 +920,21 @@ def validate_external(paths: Sequence[Path]) -> dict[str, int]:
 
 
 def discover_bdfs(output: Path) -> list[Path]:
-    """Find canonical and runtime-generated BDFs below a distribution root."""
+    """Find BDFs in the two raw and two Unicode profile directories."""
 
-    return sorted(path for path in output.rglob("*.bdf") if path.is_file())
+    profile_directories = (
+        output / "bdf",
+        output / "runtime" / "bdf",
+        output / "unicode" / "source" / "bdf",
+        output / "unicode" / "runtime" / "bdf",
+    )
+    return sorted(
+        path
+        for directory in profile_directories
+        if directory.is_dir()
+        for path in directory.glob("*.bdf")
+        if path.is_file()
+    )
 
 
 def main() -> int:
@@ -779,7 +943,10 @@ def main() -> int:
     parser.add_argument(
         "--external",
         action="store_true",
-        help="require BDF/PCF/Xvfb tools and compare X framebuffer pixels and XTextExtents",
+        help=(
+            "require BDF/PCF/Xvfb tools and compare X framebuffer pixels "
+            "and 8/16-bit text extents"
+        ),
     )
     args = parser.parse_args()
     paths = discover_bdfs(args.output.resolve())
@@ -794,7 +961,7 @@ def main() -> int:
                 render_defined_text(font, data)
         print(
             f"render model: {len(fonts)} fonts, {glyph_count} defined glyphs, "
-            f"{probe_count} raw 8-bit probes; undefined-code substitution excluded"
+            f"{probe_count} encoding probes; undefined-code substitution excluded"
         )
         if args.external:
             result = validate_external(paths)

@@ -12,18 +12,22 @@ import subprocess
 import sys
 
 from lisp_machine_fonts import safe_filename
+from build_unicode_fonts import build_unicode_distribution
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_REPOSITORY = ROOT / "sources" / "mit-cadr-system-software"
 SOURCE_MANIFEST = ROOT / "config" / "source-manifest.json"
 RUNTIME_SOURCE_MANIFEST = ROOT / "config" / "runtime-source-manifest.json"
+DEFAULT_UNICODE_MAPPING = ROOT / "config" / "unicode-mapping.json"
 EXTRACTOR = ROOT / "scripts" / "extract-cadr-fonts.py"
 RUNTIME_EXTRACTOR = ROOT / "scripts" / "extract-cadr-qfasl-fonts.py"
 GENERATOR_FILES = (
     "config/source-manifest.json",
     "config/runtime-source-manifest.json",
+    "config/unicode-mapping.json",
     "scripts/build.py",
+    "scripts/build_unicode_fonts.py",
     "scripts/extract-cadr-fonts.py",
     "scripts/extract-cadr-qfasl-fonts.py",
     "scripts/lisp_machine_fonts.py",
@@ -296,13 +300,18 @@ def write_build_manifest(
     runtime_catalog: dict[str, object],
     source_aliases: dict[str, str],
     runtime_aliases: dict[str, str],
+    unicode_result: dict[str, object],
 ) -> None:
-    """Record the two non-interchangeable artifact profiles in one index."""
+    """Record the raw profiles and their reviewed Unicode derivatives."""
 
     source_catalog_path = output / "catalog.json"
     runtime_catalog_path = output / "runtime" / "catalog.json"
+    unicode_source_catalog_path = output / "unicode" / "source" / "catalog.json"
+    unicode_runtime_catalog_path = output / "unicode" / "runtime" / "catalog.json"
+    unicode_source_catalog = unicode_result["source_catalog"]
+    unicode_runtime_catalog = unicode_result["runtime_catalog"]
     record = {
-        "schema_version": 1,
+        "schema_version": 2,
         "source_revision": source_catalog["source_repository"]["revision"],
         "profiles": {
             "authoring_source": {
@@ -330,13 +339,55 @@ def write_build_manifest(
                     "current System 46; legacy artifacts are explicit only"
                 ),
             },
+            "unicode_authoring_source": {
+                "catalog": "unicode/source/catalog.json",
+                "catalog_sha256": sha256(unicode_source_catalog_path),
+                "artifact_count": unicode_source_catalog["artifact_count"],
+                "emitted_glyph_count": unicode_source_catalog[
+                    "emitted_glyph_count"
+                ],
+                "standard_glyph_count": unicode_source_catalog[
+                    "standard_glyph_count"
+                ],
+                "private_use_glyph_count": unicode_source_catalog[
+                    "private_use_glyph_count"
+                ],
+                "alias_count": len(unicode_result["source_aliases"]),
+                "raw_profile": "authoring_source",
+            },
+            "unicode_system_46_runtime": {
+                "catalog": "unicode/runtime/catalog.json",
+                "catalog_sha256": sha256(unicode_runtime_catalog_path),
+                "artifact_count": unicode_runtime_catalog["artifact_count"],
+                "emitted_glyph_count": unicode_runtime_catalog[
+                    "emitted_glyph_count"
+                ],
+                "standard_glyph_count": unicode_runtime_catalog[
+                    "standard_glyph_count"
+                ],
+                "private_use_glyph_count": unicode_runtime_catalog[
+                    "private_use_glyph_count"
+                ],
+                "alias_count": len(unicode_result["runtime_aliases"]),
+                "raw_profile": "system_46_runtime",
+            },
         },
-        "total_artifact_count": (
+        "raw_artifact_count": (
             source_catalog["font_count"] + runtime_catalog["artifact_count"]
         ),
+        "unicode_derivative_artifact_count": (
+            unicode_source_catalog["artifact_count"]
+            + unicode_runtime_catalog["artifact_count"]
+        ),
+        "total_installable_artifact_count": (
+            source_catalog["font_count"]
+            + runtime_catalog["artifact_count"]
+            + unicode_source_catalog["artifact_count"]
+            + unicode_runtime_catalog["artifact_count"]
+        ),
         "undefined_character_policy": (
-            "not normalized across CADR and X; rendering conformance covers only "
-            "character codes defined by each emitted BDF"
+            "no glyph is synthesized in either raw or Unicode profiles; rendering "
+            "conformance covers only character codes defined by each emitted BDF"
         ),
     }
     (output / "BUILD-MANIFEST.json").write_text(
@@ -439,12 +490,14 @@ def main() -> int:
             json.dumps(runtime_catalog, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
+        unicode_result = build_unicode_distribution(output, DEFAULT_UNICODE_MAPPING)
         write_build_manifest(
             output,
             catalog,
             runtime_catalog,
             source_aliases,
             runtime_aliases,
+            unicode_result,
         )
         write_checksums(output)
     except (BuildError, OSError, subprocess.CalledProcessError, ValueError) as error:
@@ -457,7 +510,10 @@ def main() -> int:
                 "font_count": catalog["font_count"],
                 "runtime_artifact_count": runtime_catalog["artifact_count"],
                 "total_artifact_count": (
-                    catalog["font_count"] + runtime_catalog["artifact_count"]
+                    catalog["font_count"]
+                    + runtime_catalog["artifact_count"]
+                    + unicode_result["source_catalog"]["artifact_count"]
+                    + unicode_result["runtime_catalog"]["artifact_count"]
                 ),
                 "logical_font_count": catalog["logical_font_count"],
                 "runtime_logical_name_count": runtime_catalog[

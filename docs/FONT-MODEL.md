@@ -153,7 +153,10 @@ objects contain 6,170 normalized slots. Exactly 481 slots have zero width, zero
 advance, and no ink; they remain in runtime JSON but are omitted from BDF,
 leaving 5,689 installable runtime glyphs. No zero-width glyph with ink or
 nonzero advance is silently discarded. Together with the source profile's
-14,618 emitted glyphs, the 200 BDFs contain 20,307 glyphs.
+14,618 emitted glyphs, the two raw profiles contain 200 BDFs and 20,307 emitted
+glyphs. Their two Unicode derivatives contain another 200 BDFs and re-encode
+the same 20,307 glyph geometries exactly, for four profiles, 400 BDFs, and
+40,614 emitted glyph instances overall.
 
 ## CADR sheet-level vertical layout
 
@@ -180,9 +183,9 @@ each font's ascent/descent in BDF and tests the default VSP and mixed-baseline
 rules in an independent layout model; applications seeking CADR-like whole-line
 layout must apply that policy themselves.
 
-## XLFD profile
+## XLFD profiles
 
-Each BDF `FONT` has all fourteen XLFD fields:
+Each raw BDF `FONT` has all fourteen XLFD fields:
 
 ```text
 -Misc-MIT CADR HL10-Unknown-OT-Unknown--12-120-72-72-P-70-Misc-FontSpecific
@@ -196,7 +199,7 @@ Each BDF `FONT` has all fourteen XLFD fields:
 - `ADD_STYLE_NAME` distinguishes source variants (`KST`, `AL AR1`), current
   resident objects (`System 46 Runtime`), and the two explicitly named legacy
   compiled objects (`System 46 Legacy N43XMS` and `System 46 Legacy NTOG`).
-  This keeps all 200 full XLFD names collision-free.
+  This keeps all 200 raw full XLFD names collision-free.
 - Pixel size is the source character height.
 - Point size is ten times pixel size in decipoints at a packaging resolution of
   72 dpi. This is an interchange convention, not a historical display-DPI
@@ -212,7 +215,11 @@ reviewed source profile is 134 `P`, two `M` (`APL14` and its Alto variant), and
 variant; once its no-op slots are excluded, all emitted glyphs have the same
 advance and fit the cell. The newly preserved `BUG-KST` is also `C`. The
 runtime profile is independently classified as 37 `P`, five `M`, and seven
-`C`; combined, the 200 BDFs are 171 `P`, seven `M`, and 22 `C`.
+`C`; combined, the 200 raw BDFs are 171 `P`, seven `M`, and 22 `C`. Unicode
+derivation preserves each classification and adds `Unicode` to the XLFD
+`ADD_STYLE_NAME`, keeping all 200 derivative XLFDs distinct from their raw
+counterparts. It changes only the final registry and encoding fields to
+`ISO10646-1`.
 
 ## Character encoding boundary
 
@@ -224,14 +231,26 @@ protocol without falsely relabelling the repertoire. Normalized JSON retains
 the no-op Alto slots that the installable profile cannot emit.
 
 The per-font normalized JSON is the archival record of raw source codes,
-metrics, and rows. A future Unicode mapping, if desired, must be a separate,
-reviewed derivative rather than a silent change to this profile.
+metrics, and rows. The implemented Unicode profiles are separate, reviewed
+derivatives under `dist/unicode/`; they never replace or relabel this raw
+record. Proven System 46 text positions use an explicit
+historical-to-Unicode map. Older Alto/SAIL and mixed text repertoires retain
+standard Unicode for reviewed ordinary positions but route their divergent or
+undocumented positions into reserved family blocks. Specialty repertoires use
+their blocks throughout. The 28 fixed blocks from U+E000 through U+EDFF are a
+documented project private agreement and are never assigned from glyph shape
+alone. The normative map, family membership, and stability policy are in
+[the Unicode profile](UNICODE.md).
 
 The native X rendering gate intentionally constructs probes only from codes
 defined in each emitted BDF. Every defined raw eight-bit code is drawn through
-the X core protocol at 1x and compared pixel-for-pixel with an independent BDF
-renderer; advances and text extents are checked at the same time. Behavior for
-an absent code—including X default-character or fallback substitution—is
+the X core protocol at 1x with `XDrawString` and compared pixel-for-pixel with
+an independent BDF renderer; advances and text extents are checked at the same
+time. Each derivative advertises `ISO10646-1` and is independently loaded and
+drawn as 16-bit BMP values with `XDrawString16`; its pixels, advance, bearing,
+and extents must equal the corresponding raw artifact and CADR code. The four
+indexes expose 371 raw and 371 Unicode aliases, 742 in total. Behavior for an
+absent code—including X default-character or fallback substitution—is
 explicitly outside the conformance claim and is not treated as evidence of a
 CADR display difference.
 

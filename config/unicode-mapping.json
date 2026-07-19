@@ -1,0 +1,1640 @@
+{
+  "schema_version": 1,
+  "mapping_id": "mit-cadr-system-46-unicode-v1",
+  "unicode_version": "17.0.0",
+  "profile": "MIT CADR Unicode derivative encoding",
+  "policy": {
+    "assignment_closure": "Every source logical name and runtime artifact is explicitly assigned; an unknown name is an error.",
+    "source_code_domain": "Original CADR character codes 000 through 177 octal.",
+    "geometry": "Unicode derivation changes encoding metadata only; advances, bearings, baselines, and bitmap rows remain unchanged.",
+    "x_core_limit": "All assignments are BMP scalars because X core font requests and bdftopcf are limited to 16-bit character indices.",
+    "private_use_stability": "Published PUA assignments are append-only and must never be reused for another character identity."
+  },
+  "unicode_standard": {
+    "version": "17.0.0",
+    "ucd_url": "https://www.unicode.org/Public/17.0.0/ucd/UnicodeData.txt",
+    "names_list_url": "https://www.unicode.org/Public/17.0.0/ucd/NamesList.txt",
+    "private_use_specification_url": "https://www.unicode.org/versions/Unicode17.0.0/core-spec/chapter-23/",
+    "x_charset_registry": "ISO10646",
+    "x_charset_encoding": "1",
+    "xlfd_suffix": "iso10646-1"
+  },
+  "evidence": {
+    "pinned-cadr-character-table": {
+      "repository": "https://github.com/mietek/mit-cadr-system-software.git",
+      "revision": "8e978d7d1704096a63edd4386a3b8326a2e584af",
+      "path": "src/lmdoc/char.18",
+      "sha256": "ef0a1edaa12768e81a486ffd558daa24253e6bd56b5dcd18c8b2776a7cc4e771",
+      "url": "https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmdoc/char.18",
+      "finding": "Codes 000 through 177 octal are printing characters; 000-037 and 177 therefore cannot retain numerically equal Unicode C0 or DELETE values."
+    },
+    "rfc734-stanford-its-character-set": {
+      "title": "SUPDUP Protocol",
+      "date": "1977-10-07",
+      "url": "https://www.rfc-editor.org/rfc/rfc734.html",
+      "finding": "The historical table identifies the non-ASCII printing characters, including subset/superset, intersection/union, lozenge, logical operators, arrows, and integral."
+    },
+    "pinned-alto-font-loader": {
+      "repository": "https://github.com/mietek/mit-cadr-system-software.git",
+      "revision": "8e978d7d1704096a63edd4386a3b8326a2e584af",
+      "path": "src/lmio1/fntcnv.28",
+      "sha256": "ed1674d0e810f81e0207aba73a43d8420493d7364ce5a5149140d78f9e81cfce",
+      "url": "https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fntcnv.28",
+      "finding": "READ-AL-INTO-FONT-DESCRIPTOR stores each Alto character at its unchanged CH index from 000 through 177; it performs no System 46 character-table translation."
+    },
+    "pinned-old-leftarrow-reader": {
+      "repository": "https://github.com/mietek/mit-cadr-system-software.git",
+      "revision": "8e978d7d1704096a63edd4386a3b8326a2e584af",
+      "path": "src/lmio/fread.21",
+      "sha256": "9d5f54379be73acf4f6cc2f80530e00e3ed1c7249238ebd50cce3e32beb25046",
+      "url": "https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio/fread.21",
+      "finding": "The reader documents raw 137 as underline with the older left-arrow identity, corroborating the historic positional remap."
+    },
+    "unicode-17-ucd": {
+      "title": "Unicode Character Database 17.0.0",
+      "url": "https://www.unicode.org/Public/17.0.0/ucd/UnicodeData.txt",
+      "finding": "Supplies the authoritative scalar values and immutable Unicode character names recorded by the explicit mapping."
+    }
+  },
+  "bmp_private_use": {
+    "first": 57344,
+    "last": 63743,
+    "capacity": 6400,
+    "block_size": 128,
+    "allocation_formula": "unicode = first + (pua_block_index * block_size) + original_cadr_code"
+  },
+  "expected": {
+    "raw_source_artifact_count": 151,
+    "raw_runtime_artifact_count": 49,
+    "source_emitted_glyph_count": 14618,
+    "runtime_emitted_glyph_count": 5689,
+    "source_resolution_inventory_sha256": "55a68552c725d92381180a945f15440ad893c58949d7ec6b9f52d830440ec7eb",
+    "source_unicode_geometry_sha256": "97c27d6dded8ecba3383de5efaeef91e55ad4b8848dda61379875d8e789cb2c4",
+    "runtime_resolution_inventory_sha256": "0d05282e05ae76d5dcbe117787da8dfdb8f5820e46fd48d7a01c4c67c4b41a54",
+    "runtime_unicode_geometry_sha256": "5033bb1e5784cdbf5bb12265b0daee119eccfc5b02797970ca5535839e6e4a0e"
+  },
+  "repertoires": {
+    "standard-cadr": {
+      "mapping_kind": "explicit",
+      "label": "MIT CADR standard printing repertoire",
+      "evidence": [
+        "pinned-cadr-character-table",
+        "rfc734-stanford-its-character-set",
+        "unicode-17-ucd"
+      ],
+      "expected": {
+        "raw_source_artifact_count": 7,
+        "raw_runtime_artifact_count": 13,
+        "source_emitted_glyph_count": 752,
+        "runtime_emitted_glyph_count": 1500
+      },
+      "mappings": {
+        "100": {
+          "unicode": 64,
+          "unicode_hex": "U+0040",
+          "unicode_name": "COMMERCIAL AT",
+          "status": "identity",
+          "label": "COMMERCIAL AT"
+        },
+        "101": {
+          "unicode": 65,
+          "unicode_hex": "U+0041",
+          "unicode_name": "LATIN CAPITAL LETTER A",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER A"
+        },
+        "102": {
+          "unicode": 66,
+          "unicode_hex": "U+0042",
+          "unicode_name": "LATIN CAPITAL LETTER B",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER B"
+        },
+        "103": {
+          "unicode": 67,
+          "unicode_hex": "U+0043",
+          "unicode_name": "LATIN CAPITAL LETTER C",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER C"
+        },
+        "104": {
+          "unicode": 68,
+          "unicode_hex": "U+0044",
+          "unicode_name": "LATIN CAPITAL LETTER D",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER D"
+        },
+        "105": {
+          "unicode": 69,
+          "unicode_hex": "U+0045",
+          "unicode_name": "LATIN CAPITAL LETTER E",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER E"
+        },
+        "106": {
+          "unicode": 70,
+          "unicode_hex": "U+0046",
+          "unicode_name": "LATIN CAPITAL LETTER F",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER F"
+        },
+        "107": {
+          "unicode": 71,
+          "unicode_hex": "U+0047",
+          "unicode_name": "LATIN CAPITAL LETTER G",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER G"
+        },
+        "110": {
+          "unicode": 72,
+          "unicode_hex": "U+0048",
+          "unicode_name": "LATIN CAPITAL LETTER H",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER H"
+        },
+        "111": {
+          "unicode": 73,
+          "unicode_hex": "U+0049",
+          "unicode_name": "LATIN CAPITAL LETTER I",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER I"
+        },
+        "112": {
+          "unicode": 74,
+          "unicode_hex": "U+004A",
+          "unicode_name": "LATIN CAPITAL LETTER J",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER J"
+        },
+        "113": {
+          "unicode": 75,
+          "unicode_hex": "U+004B",
+          "unicode_name": "LATIN CAPITAL LETTER K",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER K"
+        },
+        "114": {
+          "unicode": 76,
+          "unicode_hex": "U+004C",
+          "unicode_name": "LATIN CAPITAL LETTER L",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER L"
+        },
+        "115": {
+          "unicode": 77,
+          "unicode_hex": "U+004D",
+          "unicode_name": "LATIN CAPITAL LETTER M",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER M"
+        },
+        "116": {
+          "unicode": 78,
+          "unicode_hex": "U+004E",
+          "unicode_name": "LATIN CAPITAL LETTER N",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER N"
+        },
+        "117": {
+          "unicode": 79,
+          "unicode_hex": "U+004F",
+          "unicode_name": "LATIN CAPITAL LETTER O",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER O"
+        },
+        "120": {
+          "unicode": 80,
+          "unicode_hex": "U+0050",
+          "unicode_name": "LATIN CAPITAL LETTER P",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER P"
+        },
+        "121": {
+          "unicode": 81,
+          "unicode_hex": "U+0051",
+          "unicode_name": "LATIN CAPITAL LETTER Q",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER Q"
+        },
+        "122": {
+          "unicode": 82,
+          "unicode_hex": "U+0052",
+          "unicode_name": "LATIN CAPITAL LETTER R",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER R"
+        },
+        "123": {
+          "unicode": 83,
+          "unicode_hex": "U+0053",
+          "unicode_name": "LATIN CAPITAL LETTER S",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER S"
+        },
+        "124": {
+          "unicode": 84,
+          "unicode_hex": "U+0054",
+          "unicode_name": "LATIN CAPITAL LETTER T",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER T"
+        },
+        "125": {
+          "unicode": 85,
+          "unicode_hex": "U+0055",
+          "unicode_name": "LATIN CAPITAL LETTER U",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER U"
+        },
+        "126": {
+          "unicode": 86,
+          "unicode_hex": "U+0056",
+          "unicode_name": "LATIN CAPITAL LETTER V",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER V"
+        },
+        "127": {
+          "unicode": 87,
+          "unicode_hex": "U+0057",
+          "unicode_name": "LATIN CAPITAL LETTER W",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER W"
+        },
+        "130": {
+          "unicode": 88,
+          "unicode_hex": "U+0058",
+          "unicode_name": "LATIN CAPITAL LETTER X",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER X"
+        },
+        "131": {
+          "unicode": 89,
+          "unicode_hex": "U+0059",
+          "unicode_name": "LATIN CAPITAL LETTER Y",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER Y"
+        },
+        "132": {
+          "unicode": 90,
+          "unicode_hex": "U+005A",
+          "unicode_name": "LATIN CAPITAL LETTER Z",
+          "status": "identity",
+          "label": "LATIN CAPITAL LETTER Z"
+        },
+        "133": {
+          "unicode": 91,
+          "unicode_hex": "U+005B",
+          "unicode_name": "LEFT SQUARE BRACKET",
+          "status": "identity",
+          "label": "LEFT SQUARE BRACKET"
+        },
+        "134": {
+          "unicode": 92,
+          "unicode_hex": "U+005C",
+          "unicode_name": "REVERSE SOLIDUS",
+          "status": "identity",
+          "label": "REVERSE SOLIDUS"
+        },
+        "135": {
+          "unicode": 93,
+          "unicode_hex": "U+005D",
+          "unicode_name": "RIGHT SQUARE BRACKET",
+          "status": "identity",
+          "label": "RIGHT SQUARE BRACKET"
+        },
+        "136": {
+          "unicode": 94,
+          "unicode_hex": "U+005E",
+          "unicode_name": "CIRCUMFLEX ACCENT",
+          "status": "identity",
+          "label": "CIRCUMFLEX ACCENT"
+        },
+        "137": {
+          "unicode": 95,
+          "unicode_hex": "U+005F",
+          "unicode_name": "LOW LINE",
+          "status": "identity",
+          "label": "LOW LINE"
+        },
+        "140": {
+          "unicode": 96,
+          "unicode_hex": "U+0060",
+          "unicode_name": "GRAVE ACCENT",
+          "status": "identity",
+          "label": "GRAVE ACCENT"
+        },
+        "141": {
+          "unicode": 97,
+          "unicode_hex": "U+0061",
+          "unicode_name": "LATIN SMALL LETTER A",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER A"
+        },
+        "142": {
+          "unicode": 98,
+          "unicode_hex": "U+0062",
+          "unicode_name": "LATIN SMALL LETTER B",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER B"
+        },
+        "143": {
+          "unicode": 99,
+          "unicode_hex": "U+0063",
+          "unicode_name": "LATIN SMALL LETTER C",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER C"
+        },
+        "144": {
+          "unicode": 100,
+          "unicode_hex": "U+0064",
+          "unicode_name": "LATIN SMALL LETTER D",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER D"
+        },
+        "145": {
+          "unicode": 101,
+          "unicode_hex": "U+0065",
+          "unicode_name": "LATIN SMALL LETTER E",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER E"
+        },
+        "146": {
+          "unicode": 102,
+          "unicode_hex": "U+0066",
+          "unicode_name": "LATIN SMALL LETTER F",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER F"
+        },
+        "147": {
+          "unicode": 103,
+          "unicode_hex": "U+0067",
+          "unicode_name": "LATIN SMALL LETTER G",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER G"
+        },
+        "150": {
+          "unicode": 104,
+          "unicode_hex": "U+0068",
+          "unicode_name": "LATIN SMALL LETTER H",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER H"
+        },
+        "151": {
+          "unicode": 105,
+          "unicode_hex": "U+0069",
+          "unicode_name": "LATIN SMALL LETTER I",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER I"
+        },
+        "152": {
+          "unicode": 106,
+          "unicode_hex": "U+006A",
+          "unicode_name": "LATIN SMALL LETTER J",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER J"
+        },
+        "153": {
+          "unicode": 107,
+          "unicode_hex": "U+006B",
+          "unicode_name": "LATIN SMALL LETTER K",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER K"
+        },
+        "154": {
+          "unicode": 108,
+          "unicode_hex": "U+006C",
+          "unicode_name": "LATIN SMALL LETTER L",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER L"
+        },
+        "155": {
+          "unicode": 109,
+          "unicode_hex": "U+006D",
+          "unicode_name": "LATIN SMALL LETTER M",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER M"
+        },
+        "156": {
+          "unicode": 110,
+          "unicode_hex": "U+006E",
+          "unicode_name": "LATIN SMALL LETTER N",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER N"
+        },
+        "157": {
+          "unicode": 111,
+          "unicode_hex": "U+006F",
+          "unicode_name": "LATIN SMALL LETTER O",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER O"
+        },
+        "160": {
+          "unicode": 112,
+          "unicode_hex": "U+0070",
+          "unicode_name": "LATIN SMALL LETTER P",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER P"
+        },
+        "161": {
+          "unicode": 113,
+          "unicode_hex": "U+0071",
+          "unicode_name": "LATIN SMALL LETTER Q",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER Q"
+        },
+        "162": {
+          "unicode": 114,
+          "unicode_hex": "U+0072",
+          "unicode_name": "LATIN SMALL LETTER R",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER R"
+        },
+        "163": {
+          "unicode": 115,
+          "unicode_hex": "U+0073",
+          "unicode_name": "LATIN SMALL LETTER S",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER S"
+        },
+        "164": {
+          "unicode": 116,
+          "unicode_hex": "U+0074",
+          "unicode_name": "LATIN SMALL LETTER T",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER T"
+        },
+        "165": {
+          "unicode": 117,
+          "unicode_hex": "U+0075",
+          "unicode_name": "LATIN SMALL LETTER U",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER U"
+        },
+        "166": {
+          "unicode": 118,
+          "unicode_hex": "U+0076",
+          "unicode_name": "LATIN SMALL LETTER V",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER V"
+        },
+        "167": {
+          "unicode": 119,
+          "unicode_hex": "U+0077",
+          "unicode_name": "LATIN SMALL LETTER W",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER W"
+        },
+        "170": {
+          "unicode": 120,
+          "unicode_hex": "U+0078",
+          "unicode_name": "LATIN SMALL LETTER X",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER X"
+        },
+        "171": {
+          "unicode": 121,
+          "unicode_hex": "U+0079",
+          "unicode_name": "LATIN SMALL LETTER Y",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER Y"
+        },
+        "172": {
+          "unicode": 122,
+          "unicode_hex": "U+007A",
+          "unicode_name": "LATIN SMALL LETTER Z",
+          "status": "identity",
+          "label": "LATIN SMALL LETTER Z"
+        },
+        "173": {
+          "unicode": 123,
+          "unicode_hex": "U+007B",
+          "unicode_name": "LEFT CURLY BRACKET",
+          "status": "identity",
+          "label": "LEFT CURLY BRACKET"
+        },
+        "174": {
+          "unicode": 124,
+          "unicode_hex": "U+007C",
+          "unicode_name": "VERTICAL LINE",
+          "status": "identity",
+          "label": "VERTICAL LINE"
+        },
+        "175": {
+          "unicode": 125,
+          "unicode_hex": "U+007D",
+          "unicode_name": "RIGHT CURLY BRACKET",
+          "status": "identity",
+          "label": "RIGHT CURLY BRACKET"
+        },
+        "176": {
+          "unicode": 126,
+          "unicode_hex": "U+007E",
+          "unicode_name": "TILDE",
+          "status": "identity",
+          "label": "TILDE"
+        },
+        "177": {
+          "unicode": 8747,
+          "unicode_hex": "U+222B",
+          "unicode_name": "INTEGRAL",
+          "status": "reviewed",
+          "label": "INTEGRAL"
+        },
+        "000": {
+          "unicode": 8901,
+          "unicode_hex": "U+22C5",
+          "unicode_name": "DOT OPERATOR",
+          "status": "reviewed",
+          "label": "CENTERED DOT"
+        },
+        "001": {
+          "unicode": 8595,
+          "unicode_hex": "U+2193",
+          "unicode_name": "DOWNWARDS ARROW",
+          "status": "reviewed",
+          "label": "DOWN ARROW"
+        },
+        "002": {
+          "unicode": 945,
+          "unicode_hex": "U+03B1",
+          "unicode_name": "GREEK SMALL LETTER ALPHA",
+          "status": "reviewed",
+          "label": "ALPHA"
+        },
+        "003": {
+          "unicode": 946,
+          "unicode_hex": "U+03B2",
+          "unicode_name": "GREEK SMALL LETTER BETA",
+          "status": "reviewed",
+          "label": "BETA"
+        },
+        "004": {
+          "unicode": 8743,
+          "unicode_hex": "U+2227",
+          "unicode_name": "LOGICAL AND",
+          "status": "reviewed",
+          "label": "LOGICAL AND"
+        },
+        "005": {
+          "unicode": 172,
+          "unicode_hex": "U+00AC",
+          "unicode_name": "NOT SIGN",
+          "status": "reviewed",
+          "label": "LOGICAL NOT"
+        },
+        "006": {
+          "unicode": 949,
+          "unicode_hex": "U+03B5",
+          "unicode_name": "GREEK SMALL LETTER EPSILON",
+          "status": "reviewed",
+          "label": "EPSILON"
+        },
+        "007": {
+          "unicode": 960,
+          "unicode_hex": "U+03C0",
+          "unicode_name": "GREEK SMALL LETTER PI",
+          "status": "reviewed",
+          "label": "PI"
+        },
+        "010": {
+          "unicode": 955,
+          "unicode_hex": "U+03BB",
+          "unicode_name": "GREEK SMALL LETTER LAMDA",
+          "status": "reviewed",
+          "label": "LAMBDA"
+        },
+        "011": {
+          "unicode": 947,
+          "unicode_hex": "U+03B3",
+          "unicode_name": "GREEK SMALL LETTER GAMMA",
+          "status": "reviewed",
+          "label": "GAMMA"
+        },
+        "012": {
+          "unicode": 948,
+          "unicode_hex": "U+03B4",
+          "unicode_name": "GREEK SMALL LETTER DELTA",
+          "status": "reviewed",
+          "label": "DELTA"
+        },
+        "013": {
+          "unicode": 8593,
+          "unicode_hex": "U+2191",
+          "unicode_name": "UPWARDS ARROW",
+          "status": "reviewed",
+          "label": "UP ARROW"
+        },
+        "014": {
+          "unicode": 177,
+          "unicode_hex": "U+00B1",
+          "unicode_name": "PLUS-MINUS SIGN",
+          "status": "reviewed",
+          "label": "PLUS-MINUS"
+        },
+        "015": {
+          "unicode": 8853,
+          "unicode_hex": "U+2295",
+          "unicode_name": "CIRCLED PLUS",
+          "status": "reviewed",
+          "label": "CIRCLE-PLUS"
+        },
+        "016": {
+          "unicode": 8734,
+          "unicode_hex": "U+221E",
+          "unicode_name": "INFINITY",
+          "status": "reviewed",
+          "label": "INFINITY"
+        },
+        "017": {
+          "unicode": 8706,
+          "unicode_hex": "U+2202",
+          "unicode_name": "PARTIAL DIFFERENTIAL",
+          "status": "reviewed",
+          "label": "PARTIAL DELTA"
+        },
+        "020": {
+          "unicode": 8834,
+          "unicode_hex": "U+2282",
+          "unicode_name": "SUBSET OF",
+          "status": "reviewed",
+          "label": "LEFT HORSESHOE"
+        },
+        "021": {
+          "unicode": 8835,
+          "unicode_hex": "U+2283",
+          "unicode_name": "SUPERSET OF",
+          "status": "reviewed",
+          "label": "RIGHT HORSESHOE"
+        },
+        "022": {
+          "unicode": 8745,
+          "unicode_hex": "U+2229",
+          "unicode_name": "INTERSECTION",
+          "status": "reviewed",
+          "label": "UP HORSESHOE"
+        },
+        "023": {
+          "unicode": 8746,
+          "unicode_hex": "U+222A",
+          "unicode_name": "UNION",
+          "status": "reviewed",
+          "label": "DOWN HORSESHOE"
+        },
+        "024": {
+          "unicode": 8704,
+          "unicode_hex": "U+2200",
+          "unicode_name": "FOR ALL",
+          "status": "reviewed",
+          "label": "UNIVERSAL QUANTIFIER"
+        },
+        "025": {
+          "unicode": 8707,
+          "unicode_hex": "U+2203",
+          "unicode_name": "THERE EXISTS",
+          "status": "reviewed",
+          "label": "EXISTENTIAL QUANTIFIER"
+        },
+        "026": {
+          "unicode": 8855,
+          "unicode_hex": "U+2297",
+          "unicode_name": "CIRCLED TIMES",
+          "status": "reviewed",
+          "label": "CIRCLE-X"
+        },
+        "027": {
+          "unicode": 8596,
+          "unicode_hex": "U+2194",
+          "unicode_name": "LEFT RIGHT ARROW",
+          "status": "reviewed",
+          "label": "DOUBLE ARROW"
+        },
+        "030": {
+          "unicode": 8592,
+          "unicode_hex": "U+2190",
+          "unicode_name": "LEFTWARDS ARROW",
+          "status": "reviewed",
+          "label": "LEFT ARROW"
+        },
+        "031": {
+          "unicode": 8594,
+          "unicode_hex": "U+2192",
+          "unicode_name": "RIGHTWARDS ARROW",
+          "status": "reviewed",
+          "label": "RIGHT ARROW"
+        },
+        "032": {
+          "unicode": 8800,
+          "unicode_hex": "U+2260",
+          "unicode_name": "NOT EQUAL TO",
+          "status": "reviewed",
+          "label": "NOT EQUALS"
+        },
+        "033": {
+          "unicode": 9674,
+          "unicode_hex": "U+25CA",
+          "unicode_name": "LOZENGE",
+          "status": "reviewed",
+          "label": "DIAMOND (ALTMODE)"
+        },
+        "034": {
+          "unicode": 8804,
+          "unicode_hex": "U+2264",
+          "unicode_name": "LESS-THAN OR EQUAL TO",
+          "status": "reviewed",
+          "label": "LESS THAN OR EQUAL"
+        },
+        "035": {
+          "unicode": 8805,
+          "unicode_hex": "U+2265",
+          "unicode_name": "GREATER-THAN OR EQUAL TO",
+          "status": "reviewed",
+          "label": "GREATER THAN OR EQUAL"
+        },
+        "036": {
+          "unicode": 8801,
+          "unicode_hex": "U+2261",
+          "unicode_name": "IDENTICAL TO",
+          "status": "reviewed",
+          "label": "EQUIVALENCE"
+        },
+        "037": {
+          "unicode": 8744,
+          "unicode_hex": "U+2228",
+          "unicode_name": "LOGICAL OR",
+          "status": "reviewed",
+          "label": "LOGICAL OR"
+        },
+        "040": {
+          "unicode": 32,
+          "unicode_hex": "U+0020",
+          "unicode_name": "SPACE",
+          "status": "identity",
+          "label": "SPACE"
+        },
+        "041": {
+          "unicode": 33,
+          "unicode_hex": "U+0021",
+          "unicode_name": "EXCLAMATION MARK",
+          "status": "identity",
+          "label": "EXCLAMATION MARK"
+        },
+        "042": {
+          "unicode": 34,
+          "unicode_hex": "U+0022",
+          "unicode_name": "QUOTATION MARK",
+          "status": "identity",
+          "label": "QUOTATION MARK"
+        },
+        "043": {
+          "unicode": 35,
+          "unicode_hex": "U+0023",
+          "unicode_name": "NUMBER SIGN",
+          "status": "identity",
+          "label": "NUMBER SIGN"
+        },
+        "044": {
+          "unicode": 36,
+          "unicode_hex": "U+0024",
+          "unicode_name": "DOLLAR SIGN",
+          "status": "identity",
+          "label": "DOLLAR SIGN"
+        },
+        "045": {
+          "unicode": 37,
+          "unicode_hex": "U+0025",
+          "unicode_name": "PERCENT SIGN",
+          "status": "identity",
+          "label": "PERCENT SIGN"
+        },
+        "046": {
+          "unicode": 38,
+          "unicode_hex": "U+0026",
+          "unicode_name": "AMPERSAND",
+          "status": "identity",
+          "label": "AMPERSAND"
+        },
+        "047": {
+          "unicode": 39,
+          "unicode_hex": "U+0027",
+          "unicode_name": "APOSTROPHE",
+          "status": "identity",
+          "label": "APOSTROPHE"
+        },
+        "050": {
+          "unicode": 40,
+          "unicode_hex": "U+0028",
+          "unicode_name": "LEFT PARENTHESIS",
+          "status": "identity",
+          "label": "LEFT PARENTHESIS"
+        },
+        "051": {
+          "unicode": 41,
+          "unicode_hex": "U+0029",
+          "unicode_name": "RIGHT PARENTHESIS",
+          "status": "identity",
+          "label": "RIGHT PARENTHESIS"
+        },
+        "052": {
+          "unicode": 42,
+          "unicode_hex": "U+002A",
+          "unicode_name": "ASTERISK",
+          "status": "identity",
+          "label": "ASTERISK"
+        },
+        "053": {
+          "unicode": 43,
+          "unicode_hex": "U+002B",
+          "unicode_name": "PLUS SIGN",
+          "status": "identity",
+          "label": "PLUS SIGN"
+        },
+        "054": {
+          "unicode": 44,
+          "unicode_hex": "U+002C",
+          "unicode_name": "COMMA",
+          "status": "identity",
+          "label": "COMMA"
+        },
+        "055": {
+          "unicode": 45,
+          "unicode_hex": "U+002D",
+          "unicode_name": "HYPHEN-MINUS",
+          "status": "identity",
+          "label": "HYPHEN-MINUS"
+        },
+        "056": {
+          "unicode": 46,
+          "unicode_hex": "U+002E",
+          "unicode_name": "FULL STOP",
+          "status": "identity",
+          "label": "FULL STOP"
+        },
+        "057": {
+          "unicode": 47,
+          "unicode_hex": "U+002F",
+          "unicode_name": "SOLIDUS",
+          "status": "identity",
+          "label": "SOLIDUS"
+        },
+        "060": {
+          "unicode": 48,
+          "unicode_hex": "U+0030",
+          "unicode_name": "DIGIT ZERO",
+          "status": "identity",
+          "label": "DIGIT ZERO"
+        },
+        "061": {
+          "unicode": 49,
+          "unicode_hex": "U+0031",
+          "unicode_name": "DIGIT ONE",
+          "status": "identity",
+          "label": "DIGIT ONE"
+        },
+        "062": {
+          "unicode": 50,
+          "unicode_hex": "U+0032",
+          "unicode_name": "DIGIT TWO",
+          "status": "identity",
+          "label": "DIGIT TWO"
+        },
+        "063": {
+          "unicode": 51,
+          "unicode_hex": "U+0033",
+          "unicode_name": "DIGIT THREE",
+          "status": "identity",
+          "label": "DIGIT THREE"
+        },
+        "064": {
+          "unicode": 52,
+          "unicode_hex": "U+0034",
+          "unicode_name": "DIGIT FOUR",
+          "status": "identity",
+          "label": "DIGIT FOUR"
+        },
+        "065": {
+          "unicode": 53,
+          "unicode_hex": "U+0035",
+          "unicode_name": "DIGIT FIVE",
+          "status": "identity",
+          "label": "DIGIT FIVE"
+        },
+        "066": {
+          "unicode": 54,
+          "unicode_hex": "U+0036",
+          "unicode_name": "DIGIT SIX",
+          "status": "identity",
+          "label": "DIGIT SIX"
+        },
+        "067": {
+          "unicode": 55,
+          "unicode_hex": "U+0037",
+          "unicode_name": "DIGIT SEVEN",
+          "status": "identity",
+          "label": "DIGIT SEVEN"
+        },
+        "070": {
+          "unicode": 56,
+          "unicode_hex": "U+0038",
+          "unicode_name": "DIGIT EIGHT",
+          "status": "identity",
+          "label": "DIGIT EIGHT"
+        },
+        "071": {
+          "unicode": 57,
+          "unicode_hex": "U+0039",
+          "unicode_name": "DIGIT NINE",
+          "status": "identity",
+          "label": "DIGIT NINE"
+        },
+        "072": {
+          "unicode": 58,
+          "unicode_hex": "U+003A",
+          "unicode_name": "COLON",
+          "status": "identity",
+          "label": "COLON"
+        },
+        "073": {
+          "unicode": 59,
+          "unicode_hex": "U+003B",
+          "unicode_name": "SEMICOLON",
+          "status": "identity",
+          "label": "SEMICOLON"
+        },
+        "074": {
+          "unicode": 60,
+          "unicode_hex": "U+003C",
+          "unicode_name": "LESS-THAN SIGN",
+          "status": "identity",
+          "label": "LESS-THAN SIGN"
+        },
+        "075": {
+          "unicode": 61,
+          "unicode_hex": "U+003D",
+          "unicode_name": "EQUALS SIGN",
+          "status": "identity",
+          "label": "EQUALS SIGN"
+        },
+        "076": {
+          "unicode": 62,
+          "unicode_hex": "U+003E",
+          "unicode_name": "GREATER-THAN SIGN",
+          "status": "identity",
+          "label": "GREATER-THAN SIGN"
+        },
+        "077": {
+          "unicode": 63,
+          "unicode_hex": "U+003F",
+          "unicode_name": "QUESTION MARK",
+          "status": "identity",
+          "label": "QUESTION MARK"
+        }
+      }
+    },
+    "apl14": {
+      "mapping_kind": "pua-block",
+      "label": "APL14 font-specific repertoire",
+      "pua_block_index": 0,
+      "label_prefix": "CADR-APL14",
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 184,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "arr10": {
+      "mapping_kind": "pua-block",
+      "label": "ARR10 font-specific repertoire",
+      "pua_block_index": 1,
+      "label_prefix": "CADR-ARR10",
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 133,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "arrow": {
+      "mapping_kind": "pua-block",
+      "label": "ARROW font-specific repertoire",
+      "pua_block_index": 2,
+      "label_prefix": "CADR-ARROW",
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 30,
+        "runtime_emitted_glyph_count": 16
+      }
+    },
+    "bug": {
+      "mapping_kind": "pua-block",
+      "label": "BUG font-specific repertoire",
+      "pua_block_index": 3,
+      "label_prefix": "CADR-BUG",
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 8,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "clargk": {
+      "mapping_kind": "pua-block",
+      "label": "CLARGK font-specific repertoire",
+      "pua_block_index": 4,
+      "label_prefix": "CADR-CLARGK",
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 196,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "cyr12": {
+      "mapping_kind": "pua-block",
+      "label": "CYR12 font-specific repertoire",
+      "pua_block_index": 5,
+      "label_prefix": "CADR-CYR12",
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 160,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "gates": {
+      "mapping_kind": "pua-block",
+      "label": "GATES font-specific repertoire",
+      "pua_block_index": 6,
+      "label_prefix": "CADR-GATES",
+      "expected": {
+        "raw_source_artifact_count": 4,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 280,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "math": {
+      "mapping_kind": "pua-block",
+      "label": "MATH font-specific repertoire",
+      "pua_block_index": 7,
+      "label_prefix": "CADR-MATH",
+      "expected": {
+        "raw_source_artifact_count": 6,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 564,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "musc10": {
+      "mapping_kind": "pua-block",
+      "label": "MUSC10 font-specific repertoire",
+      "pua_block_index": 8,
+      "label_prefix": "CADR-MUSC10",
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 228,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "plnk16": {
+      "mapping_kind": "pua-block",
+      "label": "PLNK16 font-specific repertoire",
+      "pua_block_index": 9,
+      "label_prefix": "CADR-PLNK16",
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 186,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "mouse": {
+      "mapping_kind": "pua-block",
+      "label": "MOUSE font-specific repertoire",
+      "pua_block_index": 10,
+      "label_prefix": "CADR-MOUSE",
+      "expected": {
+        "raw_source_artifact_count": 1,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 23,
+        "runtime_emitted_glyph_count": 128
+      }
+    },
+    "tog": {
+      "mapping_kind": "pua-block",
+      "label": "TOG font-specific repertoire",
+      "pua_block_index": 11,
+      "label_prefix": "CADR-TOG",
+      "expected": {
+        "raw_source_artifact_count": 1,
+        "raw_runtime_artifact_count": 2,
+        "source_emitted_glyph_count": 8,
+        "runtime_emitted_glyph_count": 256
+      }
+    },
+    "swfont": {
+      "mapping_kind": "pua-block",
+      "label": "SWFONT font-specific repertoire",
+      "pua_block_index": 12,
+      "label_prefix": "CADR-SWFONT",
+      "expected": {
+        "raw_source_artifact_count": 1,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 3,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "search": {
+      "mapping_kind": "pua-block",
+      "label": "SEARCH font-specific repertoire",
+      "pua_block_index": 13,
+      "label_prefix": "CADR-SEARCH",
+      "expected": {
+        "raw_source_artifact_count": 0,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 0,
+        "runtime_emitted_glyph_count": 10
+      }
+    },
+    "ship": {
+      "mapping_kind": "pua-block",
+      "label": "SHIP font-specific repertoire",
+      "pua_block_index": 14,
+      "label_prefix": "CADR-SHIP",
+      "expected": {
+        "raw_source_artifact_count": 0,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 0,
+        "runtime_emitted_glyph_count": 67
+      }
+    },
+    "s30chs": {
+      "mapping_kind": "pua-block",
+      "label": "S30CHS font-specific repertoire",
+      "pua_block_index": 15,
+      "label_prefix": "CADR-S30CHS",
+      "expected": {
+        "raw_source_artifact_count": 0,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 0,
+        "runtime_emitted_glyph_count": 128
+      }
+    },
+    "alto-latin": {
+      "mapping_kind": "derived",
+      "label": "Untranslated Alto Latin text repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-alto-font-loader", "pinned-old-leftarrow-reader"],
+      "pua_block_index": 16,
+      "label_prefix": "CADR-ALTO-LATIN",
+      "private_use_codes": ["000-027", "032-037", "177"],
+      "overrides": {
+        "030": {
+          "unicode": 95,
+          "unicode_hex": "U+005F",
+          "unicode_name": "LOW LINE",
+          "status": "reviewed-repertoire-remap",
+          "label": "LOW LINE"
+        },
+        "136": {
+          "unicode": 8593,
+          "unicode_hex": "U+2191",
+          "unicode_name": "UPWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "UPWARDS ARROW"
+        },
+        "137": {
+          "unicode": 8592,
+          "unicode_hex": "U+2190",
+          "unicode_name": "LEFTWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "LEFTWARDS ARROW"
+        }
+      },
+      "expected": {
+        "raw_source_artifact_count": 80,
+        "raw_runtime_artifact_count": 18,
+        "source_emitted_glyph_count": 7877,
+        "runtime_emitted_glyph_count": 2304
+      }
+    },
+    "alto-stanford": {
+      "mapping_kind": "derived",
+      "label": "Untranslated Alto Stanford display repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-alto-font-loader", "pinned-old-leftarrow-reader"],
+      "pua_block_index": 17,
+      "label_prefix": "CADR-ALTO-STANFORD",
+      "private_use_codes": ["000-037", "100", "140", "177"],
+      "overrides": {
+        "077": {
+          "unicode": 8594,
+          "unicode_hex": "U+2192",
+          "unicode_name": "RIGHTWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "RIGHTWARDS ARROW"
+        },
+        "136": {
+          "unicode": 8593,
+          "unicode_hex": "U+2191",
+          "unicode_name": "UPWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "UPWARDS ARROW"
+        },
+        "137": {
+          "unicode": 8592,
+          "unicode_hex": "U+2190",
+          "unicode_name": "LEFTWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "LEFTWARDS ARROW"
+        }
+      },
+      "expected": {
+        "raw_source_artifact_count": 16,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 1936,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "alto-greek": {
+      "mapping_kind": "pua-block",
+      "label": "Untranslated Alto Greek/math repertoire",
+      "evidence": ["pinned-alto-font-loader"],
+      "pua_block_index": 18,
+      "label_prefix": "CADR-ALTO-GREEK",
+      "expected": {
+        "raw_source_artifact_count": 4,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 378,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "cadr-solid-zero": {
+      "mapping_kind": "derived",
+      "label": "CADR text repertoire with solid raw 000",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table"],
+      "pua_block_index": 19,
+      "label_prefix": "CADR-SOLID-ZERO",
+      "private_use_codes": ["000"],
+      "expected": {
+        "raw_source_artifact_count": 3,
+        "raw_runtime_artifact_count": 2,
+        "source_emitted_glyph_count": 382,
+        "runtime_emitted_glyph_count": 256
+      }
+    },
+    "bigfnt": {
+      "mapping_kind": "derived",
+      "label": "BIGFNT display repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table", "pinned-old-leftarrow-reader"],
+      "pua_block_index": 20,
+      "label_prefix": "CADR-BIGFNT",
+      "private_use_codes": ["000", "136", "137", "177"],
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 226,
+        "runtime_emitted_glyph_count": 128
+      }
+    },
+    "cm": {
+      "mapping_kind": "derived",
+      "label": "CM text and symbol repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table", "pinned-old-leftarrow-reader"],
+      "pua_block_index": 21,
+      "label_prefix": "CADR-CM",
+      "private_use_codes": ["000-037", "177"],
+      "overrides": {
+        "136": {
+          "unicode": 8593,
+          "unicode_hex": "U+2191",
+          "unicode_name": "UPWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "UPWARDS ARROW"
+        },
+        "137": {
+          "unicode": 8592,
+          "unicode_hex": "U+2190",
+          "unicode_name": "LEFTWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "LEFTWARDS ARROW"
+        }
+      },
+      "expected": {
+        "raw_source_artifact_count": 2,
+        "raw_runtime_artifact_count": 2,
+        "source_emitted_glyph_count": 254,
+        "runtime_emitted_glyph_count": 256
+      }
+    },
+    "gls7x9": {
+      "mapping_kind": "derived",
+      "label": "GLS7X9 mixed text and symbol repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table"],
+      "pua_block_index": 22,
+      "label_prefix": "CADR-GLS7X9",
+      "private_use_codes": ["000-037", "177"],
+      "expected": {
+        "raw_source_artifact_count": 1,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 128,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "medfnt-legacy": {
+      "mapping_kind": "derived",
+      "label": "Authored MEDFNT old-arrow text repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table", "pinned-old-leftarrow-reader"],
+      "overrides": {
+        "030": {
+          "unicode": 95,
+          "unicode_hex": "U+005F",
+          "unicode_name": "LOW LINE",
+          "status": "reviewed-repertoire-remap",
+          "label": "LOW LINE"
+        },
+        "137": {
+          "unicode": 8592,
+          "unicode_hex": "U+2190",
+          "unicode_name": "LEFTWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "LEFTWARDS ARROW"
+        }
+      },
+      "expected": {
+        "raw_source_artifact_count": 1,
+        "raw_runtime_artifact_count": 0,
+        "source_emitted_glyph_count": 122,
+        "runtime_emitted_glyph_count": 0
+      }
+    },
+    "mets": {
+      "mapping_kind": "derived",
+      "label": "METS and NON text repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-alto-font-loader", "pinned-old-leftarrow-reader"],
+      "pua_block_index": 23,
+      "label_prefix": "CADR-METS",
+      "private_use_codes": ["000-027", "032-037", "177"],
+      "overrides": {
+        "030": {
+          "unicode": 95,
+          "unicode_hex": "U+005F",
+          "unicode_name": "LOW LINE",
+          "status": "reviewed-repertoire-remap",
+          "label": "LOW LINE"
+        },
+        "136": {
+          "unicode": 8593,
+          "unicode_hex": "U+2191",
+          "unicode_name": "UPWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "UPWARDS ARROW"
+        },
+        "137": {
+          "unicode": 8592,
+          "unicode_hex": "U+2190",
+          "unicode_name": "LEFTWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "LEFTWARDS ARROW"
+        }
+      },
+      "expected": {
+        "raw_source_artifact_count": 4,
+        "raw_runtime_artifact_count": 2,
+        "source_emitted_glyph_count": 385,
+        "runtime_emitted_glyph_count": 256
+      }
+    },
+    "sail": {
+      "mapping_kind": "derived",
+      "label": "SAIL text repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table", "pinned-old-leftarrow-reader"],
+      "pua_block_index": 24,
+      "label_prefix": "CADR-SAIL",
+      "private_use_codes": ["013", "177"],
+      "overrides": {
+        "030": {
+          "unicode": 95,
+          "unicode_hex": "U+005F",
+          "unicode_name": "LOW LINE",
+          "status": "reviewed-repertoire-remap",
+          "label": "LOW LINE"
+        },
+        "136": {
+          "unicode": 8593,
+          "unicode_hex": "U+2191",
+          "unicode_name": "UPWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "UPWARDS ARROW"
+        },
+        "137": {
+          "unicode": 8592,
+          "unicode_hex": "U+2190",
+          "unicode_name": "LEFTWARDS ARROW",
+          "status": "reviewed-repertoire-remap",
+          "label": "LEFTWARDS ARROW"
+        }
+      },
+      "expected": {
+        "raw_source_artifact_count": 1,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 122,
+        "runtime_emitted_glyph_count": 128
+      }
+    },
+    "vshd": {
+      "mapping_kind": "derived",
+      "label": "40VSHD partial shadow repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table"],
+      "pua_block_index": 25,
+      "label_prefix": "CADR-40VSHD",
+      "private_use_codes": ["032"],
+      "expected": {
+        "raw_source_artifact_count": 1,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 53,
+        "runtime_emitted_glyph_count": 53
+      }
+    },
+    "vr20": {
+      "mapping_kind": "derived",
+      "label": "20VR text repertoire with low duplicate alphabet",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table"],
+      "pua_block_index": 26,
+      "label_prefix": "CADR-20VR",
+      "private_use_codes": ["001-032"],
+      "expected": {
+        "raw_source_artifact_count": 0,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 0,
+        "runtime_emitted_glyph_count": 128
+      }
+    },
+    "germ35": {
+      "mapping_kind": "derived",
+      "label": "GERM35 German text repertoire",
+      "base_repertoire": "standard-cadr",
+      "evidence": ["pinned-cadr-character-table"],
+      "pua_block_index": 27,
+      "label_prefix": "CADR-GERM35",
+      "private_use_codes": ["000-037", "177"],
+      "expected": {
+        "raw_source_artifact_count": 0,
+        "raw_runtime_artifact_count": 1,
+        "source_emitted_glyph_count": 0,
+        "runtime_emitted_glyph_count": 75
+      }
+    }
+  },
+  "assignments": {
+    "source_logical_names": {
+      "13FG": "standard-cadr",
+      "13FGB": "standard-cadr",
+      "14FR3": "cadr-solid-zero",
+      "16FG": "standard-cadr",
+      "25FR3": "cadr-solid-zero",
+      "40VSHD": "vshd",
+      "43VXMS": "standard-cadr",
+      "5X5": "standard-cadr",
+      "APL14": "apl14",
+      "ARR10": "arr10",
+      "ARROW": "arrow",
+      "BIGFNT": "bigfnt",
+      "BLKF10": "alto-stanford",
+      "BUG": "bug",
+      "CHA": "alto-latin",
+      "CHAS": "alto-latin",
+      "CLAR": "alto-latin",
+      "CLAR12": "alto-latin",
+      "CLAR14": "alto-latin",
+      "CLARB": "alto-latin",
+      "CLARGK": "clargk",
+      "CLRE14": "alto-latin",
+      "CM10": "cm",
+      "CM12": "cm",
+      "CPTFON": "standard-cadr",
+      "CYR12": "cyr12",
+      "GACH10": "alto-latin",
+      "GACH12": "alto-latin",
+      "GACHA8": "alto-latin",
+      "GATES3": "gates",
+      "GATS3A": "gates",
+      "GLS7X9": "gls7x9",
+      "HAFONT": "standard-cadr",
+      "HIP10A": "alto-greek",
+      "HIPO10": "alto-greek",
+      "HL10": "alto-latin",
+      "HL10B": "alto-latin",
+      "HL12": "alto-latin",
+      "HL12B": "alto-latin",
+      "HL12I": "alto-latin",
+      "HL14": "alto-latin",
+      "HL18": "alto-latin",
+      "HL6": "alto-latin",
+      "HL7": "alto-latin",
+      "HL7B": "alto-latin",
+      "HL7BI": "alto-latin",
+      "HL7I": "alto-latin",
+      "HL8": "alto-latin",
+      "HL8B": "alto-latin",
+      "MAT10A": "math",
+      "MATH10": "math",
+      "MATH16": "math",
+      "MEDFNT": "medfnt-legacy",
+      "METS": "mets",
+      "METSI": "mets",
+      "MOUSE": "mouse",
+      "MUSC10": "musc10",
+      "NONM": "mets",
+      "NONS": "mets",
+      "PLNK16": "plnk16",
+      "PRNT10": "alto-latin",
+      "PRONTO": "alto-latin",
+      "PRT12B": "alto-latin",
+      "SAIL10": "sail",
+      "SMT10": "alto-stanford",
+      "SMT10A": "alto-stanford",
+      "SMT14": "alto-stanford",
+      "SMT14A": "alto-stanford",
+      "ST10": "alto-stanford",
+      "ST6": "alto-stanford",
+      "ST8": "alto-stanford",
+      "SWFONT": "swfont",
+      "TNTO14": "alto-latin",
+      "TNTOB": "alto-latin",
+      "TOG": "tog",
+      "TONTO": "alto-latin",
+      "TR10": "alto-latin",
+      "TR10B": "alto-latin",
+      "TR10I": "alto-latin",
+      "TR12": "alto-latin",
+      "TR12B": "alto-latin",
+      "TR12I": "alto-latin",
+      "TR14": "alto-latin",
+      "TR18": "alto-latin",
+      "TR8": "alto-latin",
+      "TR8B": "alto-latin",
+      "TR8I": "alto-latin",
+      "TVFONT": "cadr-solid-zero"
+    },
+    "runtime_artifacts": {
+      "13FGB": "standard-cadr",
+      "16FG": "standard-cadr",
+      "20VR": "vr20",
+      "25FR3": "cadr-solid-zero",
+      "31VR": "standard-cadr",
+      "40VR": "standard-cadr",
+      "40VSHD": "vshd",
+      "43VXMS": "standard-cadr",
+      "5X5": "standard-cadr",
+      "ARROW": "arrow",
+      "BIGFNT": "bigfnt",
+      "BIGVG": "standard-cadr",
+      "CPT-13FG": "standard-cadr",
+      "CPT-CM10": "cm",
+      "CPT-CM12": "cm",
+      "CPT-HL10": "alto-latin",
+      "CPT-HL10B": "alto-latin",
+      "CPT-TR10I": "alto-latin",
+      "CPTFONT": "standard-cadr",
+      "GERM35": "germ35",
+      "HL10": "alto-latin",
+      "HL10B": "alto-latin",
+      "HL12": "alto-latin",
+      "HL12B": "alto-latin",
+      "HL12BI": "alto-latin",
+      "HL12I": "alto-latin",
+      "HL6": "alto-latin",
+      "HL7": "alto-latin",
+      "MEDFNB": "standard-cadr",
+      "MEDFNT": "standard-cadr",
+      "METS": "mets",
+      "METSI": "mets",
+      "MOUSE": "mouse",
+      "N43XMS": "standard-cadr",
+      "NTOG": "tog",
+      "PRT12B": "alto-latin",
+      "S30CHS": "s30chs",
+      "S35GER": "standard-cadr",
+      "SAIL12": "sail",
+      "SEARCH": "search",
+      "SHIP": "ship",
+      "TOG": "tog",
+      "TR10I": "alto-latin",
+      "TR12B": "alto-latin",
+      "TR12B1": "alto-latin",
+      "TR8": "alto-latin",
+      "TR8B": "alto-latin",
+      "TR8I": "alto-latin",
+      "TVFONT": "cadr-solid-zero"
+    }
+  }
+}
