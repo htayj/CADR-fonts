@@ -1,0 +1,3 @@
+[submodule "sources/mit-cadr-system-software"]
+	path = sources/mit-cadr-system-software
+	url = https://github.com/mietek/mit-cadr-system-software.git

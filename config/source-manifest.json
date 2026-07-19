@@ -1,0 +1,313 @@
+{
+  "files": [
+    {
+      "byte_size": 16787,
+      "format": "ast",
+      "path": "13fg.ast",
+      "sha256": "ca9862dacf980d195670e493037f708aa191b9206bd029b965d7f69508ccfdaf"
+    },
+    {
+      "byte_size": 18689,
+      "format": "ast",
+      "path": "13fgb.ast",
+      "sha256": "21f7190172e8fc285b9c146281b3bc43d0c87415363108d38636691d564a74bb"
+    },
+    {
+      "byte_size": 4499,
+      "format": "kst",
+      "path": "14fr3.kst",
+      "sha256": "07651371c05dc2be73941fda1e8ac757dc5f661c58927ce13c45aee7a3429033"
+    },
+    {
+      "byte_size": 14569,
+      "format": "ast",
+      "path": "16fg.ast",
+      "sha256": "3ab40bd933495915ba6e2dd9c91064c009d27b5267e2eb02a10c47a75b91033f"
+    },
+    {
+      "byte_size": 34093,
+      "format": "ast",
+      "path": "25fr3.ast",
+      "sha256": "7084bbcda423adc3638c410bd601e7ea03d4d94645ba4ce9ef2b0a8f5290a116"
+    },
+    {
+      "byte_size": 39708,
+      "format": "ast",
+      "path": "40vshd.ast",
+      "sha256": "72dff637b1b77df924b82e0f04c49e4a261ffc9c5b86e956be72cef925789081"
+    },
+    {
+      "byte_size": 56708,
+      "format": "ast",
+      "path": "43vxms.ast",
+      "sha256": "3764088c5ed25e04a1f862ee98e7402951db40b69b0fd55a3232699fac3b12da"
+    },
+    {
+      "byte_size": 2185,
+      "format": "kst",
+      "path": "5x5.kst",
+      "sha256": "aa415fc59812fea4b49cd77c93b0ed0804b60b5060d03fa5d45eb49fab18aa0a"
+    },
+    {
+      "byte_size": 14391,
+      "format": "ast",
+      "path": "apl14.ast",
+      "sha256": "fb91ed69420a796778a4437fdc95ba0c32094c26d0fb48b55a535c0fc30f3932"
+    },
+    {
+      "byte_size": 219606,
+      "format": "archive",
+      "path": "ar1.1",
+      "sha256": "35b02ab6842c2df7268d22d9ad4a06ada3467679ee43a2f4f73886060e4ae496"
+    },
+    {
+      "byte_size": 1175808,
+      "format": "archive",
+      "path": "arc.ast's",
+      "sha256": "d31d16ea8c9932d38aac4b6170fbf73b711462993cf07f395f3f48880102810e"
+    },
+    {
+      "byte_size": 16306,
+      "format": "ast",
+      "path": "arr10.ast",
+      "sha256": "e4f50b2e556e3e4278c89cf852dcdc86617b82b60f2459a33d6b4aa0120b9705"
+    },
+    {
+      "byte_size": 1154,
+      "format": "kst",
+      "path": "arrow.kst",
+      "sha256": "0cf2ed1d635009785dec99b20996e4be593101a3aa2f5868ef46bd6a53b1755a"
+    },
+    {
+      "byte_size": 7214,
+      "format": "kst",
+      "path": "bigfnt.kst",
+      "sha256": "85083e717c9be2da5ce8cb97831acf534b3de6518ae682167f79e375abb0430e"
+    },
+    {
+      "byte_size": 733,
+      "format": "kst",
+      "path": "bug.kst",
+      "sha256": "ad3ed4d542d5058d44d77dc2102410fbc6b1169403f75f1840e4e94fc68b52b8"
+    },
+    {
+      "byte_size": 16366,
+      "format": "ast",
+      "path": "cm10.ast",
+      "sha256": "5abb50f541f0a7990beb512a7967c62d3ee06a9e9ed675cab66098ad91504dc7"
+    },
+    {
+      "byte_size": 17431,
+      "format": "ast",
+      "path": "cm12.ast",
+      "sha256": "0427b20b0d2886a998fffa1ce866d8460df74597956a7a7747d10421ba855e99"
+    },
+    {
+      "byte_size": 16819,
+      "format": "ast",
+      "path": "cptfon.ast",
+      "sha256": "296e846f674fc90bb94deea5da2f026071a3fda2a94089fe04cc825468a074f5"
+    },
+    {
+      "byte_size": 16283,
+      "format": "ast",
+      "path": "gls7x9.ast",
+      "sha256": "4ad836cc8fe9d5490ae05f0d58987ce94e2dd6dc0ec47ce289c8a847661bd9c8"
+    },
+    {
+      "byte_size": 3798,
+      "format": "kst",
+      "path": "hafont.kst",
+      "sha256": "2140a842713377afd76d78a216f7ccaf70709eef3f00e65747163073455a5221"
+    },
+    {
+      "byte_size": 1196,
+      "format": "kst",
+      "path": "mouse.kst",
+      "sha256": "e516cb7ce10e0ffca4f788ee58a0e8299d6d4ff83b19fb87eb114330820ed37b"
+    },
+    {
+      "byte_size": 15679,
+      "format": "ast",
+      "path": "sail10.ast",
+      "sha256": "36546150f4352b6766c857928a31bf8280e657dadb4fcfd4a2f62e4021e739bd"
+    },
+    {
+      "byte_size": 539,
+      "format": "ast",
+      "path": "swfont.ast",
+      "sha256": "cb4be0caaa8d71a69a12f623afb684ba5ff01bc9f2c99ffa1d0af11f2764941b"
+    },
+    {
+      "byte_size": 989,
+      "format": "kst",
+      "path": "tog.kst",
+      "sha256": "44698acfb7f03894903585cdcbfeccdc8d0d7e9b6ec067e9d94712933ed5a6dc"
+    },
+    {
+      "byte_size": 16950,
+      "format": "ast",
+      "path": "tonto.ast",
+      "sha256": "601073dd4b603618e972bb97531201baf52381ee06453a8f2ed5ef933166d0a5"
+    },
+    {
+      "byte_size": 2864,
+      "format": "al",
+      "path": "tr10.al",
+      "sha256": "81d9e6a7a5d0325da9bf63d7f65095cff5cbfe753f264d180162a9d5502b85e8"
+    },
+    {
+      "byte_size": 2893,
+      "format": "al",
+      "path": "tr10b.al",
+      "sha256": "a834ed1fafece6ccb3e12d78cf06ebc741626f0e3ac6fc955876b30b3c4932e8"
+    },
+    {
+      "byte_size": 3275,
+      "format": "al",
+      "path": "tr12.al",
+      "sha256": "ecdf57880fca43c13650190f72968e0787ba7fdd0448837f89d306ccefc7ffad"
+    },
+    {
+      "byte_size": 3284,
+      "format": "al",
+      "path": "tr12i.al",
+      "sha256": "783d567efe5fabdfa362583c553ce9a6737222f29e8d43c648ae123a2398b18a"
+    },
+    {
+      "byte_size": 3275,
+      "format": "al",
+      "path": "tr14.al",
+      "sha256": "ecdf57880fca43c13650190f72968e0787ba7fdd0448837f89d306ccefc7ffad"
+    },
+    {
+      "byte_size": 4353,
+      "format": "al",
+      "path": "tr18.al",
+      "sha256": "ba6b3e3c2fd55fa52d3f099a199cd384a33d30ded164e160fdda05900e42b1f3"
+    }
+  ],
+  "expected_output": {
+    "character_pointer_partial_recovery_count": 6,
+    "extent_recovery_font_count": 45,
+    "extent_recovery_glyph_count": 142,
+    "font_count": 151,
+    "logical_font_count": 88,
+    "rejected_source_count": 0,
+    "spacing_counts": {
+      "C": 15,
+      "M": 2,
+      "P": 134
+    },
+    "variant_count": 63
+  },
+  "license": {
+    "byte_size": 1516,
+    "path": "src/LICENSE",
+    "sha256": "05b8de7c86c946cc747ab71a9aaa7dd56e37365278b5585ab685156eaa90fb92",
+    "spdx": "BSD-3-Clause"
+  },
+  "reviewed_findings": {
+    "bdf_omitted_nonrendering_placeholders": {
+      "font_count": 62,
+      "slot_count": 1855
+    },
+    "bdf_semantic_inventory": {
+      "canonicalization": "artifact basename plus BDF SIZE, FONTBOUNDINGBOX, FONT_ASCENT, FONT_DESCENT, and each encoded glyph's DWIDTH, BBX, and decoded bitmap rows; font records sorted by artifact and JSON serialized with sorted keys and compact separators",
+      "sha256": "99efe95d8ef2d129360b3d647d6e59f396a41acb1425b891d1f474be72c33c3a"
+    },
+    "normalized_semantic_inventory": {
+      "canonicalization": "normalized JSON artifact basename, character height, raster height, baseline, and every source slot's code, bitmap width, advance, x/y offset, and decoded bitmap rows; font records sorted by artifact and JSON serialized with sorted keys and compact separators",
+      "sha256": "f9e31eb9c70c364cd0d8d6988261c8eb08ea1ab45937f64120abf47f7b0e22a4"
+    },
+    "ast_raster_heights": {
+      "APL14": {
+        "character_height": 15,
+        "raster_height": 14
+      },
+      "BUG": {
+        "character_height": 33,
+        "raster_height": 32
+      },
+      "GLS7X9": {
+        "character_height": 16,
+        "raster_height": 14
+      },
+      "SWFONT": {
+        "character_height": 32,
+        "raster_height": 22
+      }
+    },
+    "character_pointer_partial_recoveries": {
+      "CLARGK": [
+        3,
+        4
+      ],
+      "HIP10A": [
+        3,
+        4
+      ],
+      "PRNT10": [
+        1
+      ],
+      "PRONTO": [
+        3
+      ],
+      "PRT12B": [
+        1
+      ],
+      "SMT14A": [
+        3,
+        4
+      ]
+    },
+    "runtime_name_overrides": {
+      "CM10": "CPT-CM10",
+      "CM12": "CPT-CM12",
+      "CPTFON": "CPTFONT"
+    },
+    "runtime_name_qfasl_evidence": {
+      "CM10": {
+        "byte_size": 5137,
+        "decoded_pdp10_word_count": 1028,
+        "decoded_pdp10_word_sha256": "db1a4ac93e08dd74f308f79523e0b33faf73499cc61bd5b09312c800186ffa9e",
+        "decoded_qfasl_nibble_count": 2056,
+        "end_of_whack_count": 0,
+        "path": "src/lmfont/cm10.qfasl",
+        "runtime_name": "FONTS:CPT-CM10",
+        "sha256": "26bebabd739b71fc928492c22c9a2a72a8a4706cd2ab48a6bf3ee02d274ae8f8"
+      },
+      "CM12": {
+        "byte_size": 5760,
+        "decoded_pdp10_word_count": 1153,
+        "decoded_pdp10_word_sha256": "b049ca53e37fc38485144c1b7dbe0d8a65e1aa80bd1aa776d0f6cbfe0ae88299",
+        "decoded_qfasl_nibble_count": 2306,
+        "end_of_whack_count": 0,
+        "path": "src/lmfont/cm12.qfasl",
+        "runtime_name": "FONTS:CPT-CM12",
+        "sha256": "e8cb929dcc7198e415236e55332fdc04004e24ae7188da4ab2d08d37e4666c5c"
+      },
+      "CPTFON": {
+        "byte_size": 2180,
+        "decoded_pdp10_word_count": 436,
+        "decoded_pdp10_word_sha256": "333a3c07bb57cc99f12b7411b7dc13a76e0b0f657f96ddc66176fbfdaac813ed",
+        "decoded_qfasl_nibble_count": 872,
+        "end_of_whack_count": 0,
+        "path": "src/lmfont/cptfon.qfasl",
+        "runtime_name": "FONTS:CPTFONT",
+        "sha256": "4b235f0bb01d6d6837789b0df943ea24437c46329c0548597da6e5f352cd554a"
+      }
+    },
+    "runtime_name_qfasl_parser": {
+      "path": "scripts/extract-cadr-qfasl-fonts.py",
+      "repository": "https://github.com/htayj/lisp-machine-container-museum.git",
+      "revision": "d62ad48fbf879fb09c7bc17c49735116cc13e143",
+      "sha256": "184d886477086e583c660209de1265a2ce79dec5b813494858cefc6d014ace88",
+      "safety": "inert reviewed subset parser; never evaluates QFASL operations"
+    }
+  },
+  "repository": "https://github.com/mietek/mit-cadr-system-software.git",
+  "revision": "8e978d7d1704096a63edd4386a3b8326a2e584af",
+  "schema_version": 1,
+  "source_root": "src/lmfont"
+}
