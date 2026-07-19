@@ -363,7 +363,10 @@ def semantic_inventory_digest(inventory: list[dict[str, object]]) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def expected_aliases(catalog: dict[str, object]) -> dict[str, str]:
+def expected_aliases(
+    catalog: dict[str, object],
+    reserved_convenience_names: set[str] | frozenset[str] = frozenset(),
+) -> dict[str, str]:
     aliases: dict[str, str] = {}
 
     def add(alias: str, xlfd: str) -> None:
@@ -375,9 +378,10 @@ def expected_aliases(catalog: dict[str, object]) -> dict[str, str]:
 
     for record in catalog["fonts"]:
         xlfd = record["bdf"]["xlfd_name"]
-        add(f'cadr-{safe_filename(record["name"])}', xlfd)
-        if record["variant_of"] is None:
-            add(f'cadr-{safe_filename(record["runtime_name"])}', xlfd)
+        add(f'cadr-source-{safe_filename(record["name"])}', xlfd)
+        convenience_name = safe_filename(record["name"])
+        if convenience_name not in reserved_convenience_names:
+            add(f"cadr-{convenience_name}", xlfd)
     return aliases
 
 
@@ -400,7 +404,9 @@ def check_checksums(output: Path) -> None:
 
 
 def check_external_tools(
-    output: Path, catalog: dict[str, object]
+    output: Path,
+    catalog: dict[str, object],
+    reserved_convenience_names: set[str] | frozenset[str],
 ) -> dict[str, int | bool]:
     bdftopcf = shutil.which("bdftopcf")
     mkfontdir = shutil.which("mkfontdir")
@@ -529,7 +535,7 @@ def check_external_tools(
         require(server is not None, "cannot start an isolated validation Xvfb")
         require(display is not None, "cannot connect to validation Xvfb")
         require(display_number is not None, "validation Xvfb has no display number")
-        aliases = expected_aliases(catalog)
+        aliases = expected_aliases(catalog, reserved_convenience_names)
         try:
             for alias in sorted(aliases):
                 encoded_alias = alias.encode("ascii")
@@ -567,6 +573,14 @@ def main() -> int:
 
     try:
         catalog = json.loads((output / "catalog.json").read_text(encoding="utf-8"))
+        runtime_catalog = json.loads(
+            (output / "runtime" / "catalog.json").read_text(encoding="utf-8")
+        )
+        reserved_convenience_names = {
+            safe_filename(record["runtime_name"])
+            for record in runtime_catalog["font_artifacts"]
+            if record["classification"] != "legacy-compiled-version"
+        } | {"cm10", "cm12", "cptfon"}
         manifest = json.loads((ROOT / "config/source-manifest.json").read_text())
         require(
             (output / "SOURCE-MANIFEST.json").read_bytes()
@@ -727,11 +741,11 @@ def main() -> int:
             == [f"{name} {xlfd}" for name, xlfd in expected_fonts_dir],
             "fonts.dir mappings changed",
         )
-        aliases = expected_aliases(catalog)
+        aliases = expected_aliases(catalog, reserved_convenience_names)
         fonts_alias_lines = (output / "bdf" / "fonts.alias").read_text().splitlines()
         require(
             fonts_alias_lines
-            == ["! Stable convenience aliases; XLFD names remain authoritative."]
+            == ["! Source-profile aliases; XLFD names remain authoritative."]
             + [
                 f'{alias} "{aliases[alias]}"'
                 for alias in sorted(aliases)
@@ -745,7 +759,11 @@ def main() -> int:
                 f"stale generator hash for {generator['path']}",
             )
         external_result = (
-            check_external_tools(output, catalog) if args.external_tools else None
+            check_external_tools(
+                output, catalog, reserved_convenience_names
+            )
+            if args.external_tools
+            else None
         )
     except (CheckError, KeyError, OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.error(str(error))

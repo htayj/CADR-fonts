@@ -1371,7 +1371,9 @@ def main() -> int:
                 "catalog.json",
                 "LICENSE.source",
                 "SOURCE-MANIFEST.json",
+                "BUILD-MANIFEST.json",
                 "SHA256SUMS",
+                "runtime",
             },
         )
     except ValueError as error:

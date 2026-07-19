@@ -21,28 +21,85 @@ files, and six Alto files. It records every filename, byte length, and SHA-256.
 The build rejects a missing, dirty, wrong-revision, added, removed, or changed
 source witness before decoding anything.
 
-Compiled QFASL files are not font-shape inputs. Three pinned QFASLs are checked
-only as name evidence:
+## Runtime witness
 
-| Authored name | Resident binding | Evidence |
-| --- | --- | --- |
-| `CM10` | `FONTS:CPT-CM10` | `src/lmfont/cm10.qfasl`, SHA-256 `26bebabd...274ae8f8` |
-| `CM12` | `FONTS:CPT-CM12` | `src/lmfont/cm12.qfasl`, SHA-256 `e8cb929d...e4666c5c` |
-| `CPTFON` | `FONTS:CPTFONT` | `src/lmfont/cptfon.qfasl`, SHA-256 `4b235f0b...2cd554a` |
+Compiled QFASLs remain excluded from the **source profile**: they cannot erase
+or rename an authored AST, KST, Alto, or archive observation. They are now the
+shape inputs for a separate **System 46 runtime profile**.
 
-Their complete sizes and hashes are in the reviewed manifest. This keeps the
-authoring-source corpus separate from compiled-only fonts while preserving the
-known runtime names used in XLFD family names and aliases.
+`config/runtime-source-manifest.json` closes that profile over exactly the 49
+files ending in `.qfasl` under `src/lmfont`. For every input it records the
+filename, byte length, SHA-256, decoded PDP-10-word count and digest, decoded
+QFASL nibble count, complete-stream checkpoint, exact resident symbol, and one
+of three classifications:
 
-The manifest also pins the inert QFASL parser by repository, commit, path, and
-SHA-256, plus each witness's decoded PDP-10-word digest and fully consumed
-QFASL nibble count. With sibling `../genera-emu` present,
-`make audit-runtime-names` verifies those values and extracts the single
-serialized `FONT` binding from each file without evaluating compiled code. The
-pinned parser is
-[`extract-cadr-qfasl-fonts.py` at commit `d62ad48f`](https://github.com/htayj/lisp-machine-container-museum/blob/d62ad48fbf879fb09c7bc17c49735116cc13e143/scripts/extract-cadr-qfasl-fonts.py);
-its manifest hash prevents a different local parser from silently supplying
-the result.
+| Classification | Count | Meaning |
+| --- | ---: | --- |
+| `source-backed-current` | 30 | Current compiled object with a reviewed source-profile comparison. |
+| `compiled-only` | 17 | Current resident font with no selected authored representation. |
+| `legacy-compiled-version` | 2 | Older object whose resident name is also used by a current object. |
+
+The 17 compiled-only current names are `20VR`, `31VR`, `40VR`, `BIGVG`,
+`CPT-13FG`, `CPT-HL10`, `CPT-HL10B`, `CPT-TR10I`, `GERM35`, `HL12BI`,
+`MEDFNB`, `S30CHS`, `S35GER`, `SAIL12`, `SEARCH`, `SHIP`, and `TR12B1`.
+`N43XMS` and `NTOG` are the two legacy artifacts; they bind the already-current
+resident names `FONTS:43VXMS` and `FONTS:TOG`. Consequently, the 49 files
+represent 47 current runtime logical names plus two labelled older versions.
+
+`medfnt.oqfasl` is not one of those 49 current `.qfasl` inputs. It is a separate
+older witness (2,824 bytes, SHA-256
+`c0f3df33fab8d6d8de0112aee12bbd63794ddb2c240970778f307e689b06faec`)
+whose visible geometry matches the source-profile `MEDFNT`. Current
+`medfnt.qfasl` is the runtime authority for the profile.
+
+The exact serialized identity is preserved even where it is irregular. In
+particular, `mouse.qfasl` binds the unqualified symbol `MOUSE`; its leader name
+is also unqualified. `cm12.qfasl` binds `FONTS:CPT-CM12` but carries an
+unqualified `CPT-CM12` leader name, `germ35.qfasl` has an unqualified `GERM35`
+leader name, and `ship.qfasl` has no serialized leader name. These observations
+are manifest/catalog data, not normalized guesses. The source/runtime spelling
+pairs `CM10`/`CPT-CM10`, `CM12`/`CPT-CM12`, and `CPTFON`/`CPTFONT` are likewise
+kept explicit.
+
+The runtime decoder is the repository's
+`scripts/extract-cadr-qfasl-fonts.py`. It was ported from
+[`extract-cadr-qfasl-fonts.py` at commit `d62ad48f`](https://github.com/htayj/lisp-machine-container-museum/blob/d62ad48fbf879fb09c7bc17c49735116cc13e143/scripts/extract-cadr-qfasl-fonts.py),
+whose file SHA-256 is
+`184d886477086e583c660209de1265a2ce79dec5b813494858cefc6d014ace88`.
+The runtime manifest pins that ancestor as lineage evidence. The local decoder
+implements only the closed corpus's reviewed serialized-object subset and
+rejects all unsupported or executable operations. It never loads a QFASL,
+evaluates a form, or executes target code.
+
+## Identity and alias contract
+
+Full XLFD names distinguish authored artifacts from current and legacy runtime
+objects; alias prefixes alone are insufficient because an X server resolves an
+alias to an XLFD, not to a particular file. Current runtime XLFDs therefore use
+`System 46 Runtime` as their add-style, while legacy runtime XLFDs carry their
+explicit `System 46 Legacy N43XMS` or `System 46 Legacy NTOG` add-style. Source
+XLFD add-styles retain source-variant identity such as `KST` and `AL AR1`.
+
+The source and runtime `fonts.alias` files are generated under these
+deterministic rules and installed together on the X font path:
+
+1. `cadr-source-<artifact>` always targets that exact one of the 151 source
+   artifacts.
+2. `cadr-runtime-<runtime-name>` targets the current compiled object for each
+   of the 47 current runtime logical names.
+3. `cadr-runtime-legacy-n43xms` and `cadr-runtime-legacy-ntog` target only the
+   labelled older objects; neither may claim a current or unqualified alias.
+4. `cadr-<runtime-name>` is the current convenience alias and wins an
+   intentional collision with a source artifact of the same name.
+5. An otherwise unclaimed `cadr-<source-artifact>` remains a source convenience
+   alias. Authored/runtime spelling pairs (`CM10`/`CPT-CM10`,
+   `CM12`/`CPT-CM12`, and `CPTFON`/`CPTFONT`) retain both convenience spellings
+   for the same current runtime object.
+
+These rules yield 171 unique convenience names and 371 aliases: 272 in the
+source-path index and 99 in the runtime-path index, across the source,
+current-runtime, legacy-runtime, and convenience namespaces. Alias collisions
+with different XLFD targets are build errors.
 
 ## Decoder lineage
 
@@ -54,14 +111,16 @@ closed input manifest, source revision checks, historical AST raster-height
 handling, runtime-name evidence, complete XLFD profiles, direct font-specific
 encodings, X indexes, checksums, and standalone tests.
 
-The later QFASL parser named above is used only by the optional runtime-name
-evidence audit. It is not part of the font-shape generator and is never needed
-to build the AST/KST/Alto distribution.
+The later QFASL decoder named above is now the required generator for the
+separate runtime profile. It does not participate in AST/KST/Alto source
+selection, and the source decoder does not participate in QFASL reconstruction.
+Their catalogs and semantic oracles remain independent before the top-level
+build combines their X indexes and checksums.
 
 Every generated catalog records SHA-256 hashes for the generator files that
 affect decoded output. No build timestamp or absolute source path is stored.
 
-The source manifest also commits two semantic-inventory SHA-256 values. The
+The source manifest commits two semantic-inventory SHA-256 values. The
 normalized oracle contains every artifact's source line/raster metrics and
 every slot's code, advance, bearing, raster width, and rows—including all
 JSON-only no-op slots. The installable oracle independently contains BDF line
@@ -72,6 +131,15 @@ validate one another circularly or move omitted slots while preserving only
 aggregate counts. The current oracles were accepted only after the
 150-artifact legacy geometry comparison below and separate review of the added
 `BUG-KST` representation.
+
+The runtime manifest commits a second pair. Its normalized oracle covers all
+49 objects and all 6,170 resident slots, including 481 JSON-only zero-width,
+zero-advance, no-ink placeholders; its BDF oracle covers the exact line metrics
+and geometry of all 5,689 emitted runtime glyphs. The reviewed SHA-256 values
+are `6f20481c016147ca0b74dca1253f4ce71b371a02f3db19a3dd3f1bff00e0081c`
+for normalized runtime geometry and
+`f7ae074cb314c443bdf7b9f04531a1e85a1234784945af1f760bf2d3b25776dc`
+for runtime BDF geometry.
 
 ## Legacy compatibility audit
 
@@ -89,6 +157,40 @@ removed artifacts, and exactly one added artifact: `bug-kst.bdf`. Run
 `make compare-genera` with the sibling checkout present to repeat the audit, or
 pass `--legacy` to the script to name another copy of the old BDF directory.
 
+## Runtime display audit
+
+The 30 source-backed current QFASLs are compared with their reviewed source
+references in display coordinates: source character advance, signed x bearing,
+baseline, and every set pixel. Transparent compiler storage padding is
+reported separately and does not count as an on-screen difference. The
+reviewed exceptional mappings are:
+
+- `ARROW` uses `ARROW-KST`, which includes visible `003` and `006`;
+- `BIGFNT` uses `BIGFNT-KST`, which fixes canonical code `155` and includes
+  visible `000`, `006`, `022`, `023`, `033`, and `036`;
+- current `MEDFNT` differs from the older/source-backed form in 57 existing
+  visible glyphs and makes `000`, `011`, `012`, `014`, `015`, and `177`
+  visible;
+- runtime `MOUSE` adds visible `034`, `035`, and `036`.
+
+The remaining source-backed references match every source-represented glyph.
+The older `N43XMS` differs from current `43VXMS` in 69 glyphs, while older
+`NTOG` and current `TOG` are display-identical but serialization-distinct.
+
+Static comparison is followed by an independent native-X gate. It compiles
+both profiles to PCF, indexes them with `mkfontdir`, draws raw eight-bit probes
+through Xvfb/Xlib, compares the one-bit framebuffer with an independent BDF
+renderer, and checks advances and text extents. Every code defined in every
+emitted BDF is included exactly once. The reviewed result passes for all 200
+BDFs, all 20,307 emitted glyphs, and all 371 aliases across the two font paths.
+The same independent model tests the System 46 default of `VSP = 2`, maximum
+font-map baseline, maximum font-map character height, and per-font baseline
+adjustment.
+
+Undefined codes are intentionally excluded. X default-character or fallback
+substitution for a code absent from a BDF is server policy, not recovered CADR
+behavior, and the user explicitly excluded it from this correction's scope.
+
 ## Format evidence
 
 The decoder follows the pinned historical implementations and contemporary
@@ -98,6 +200,9 @@ format descriptions:
 - KST: [`FNTCNV` KST reader](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fntcnv.28#L331-L382).
 - Alto: [`FNTCNV` Alto reader](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/fntcnv.28#L747-L819).
 - Runtime positioning: [`SHEET-TYO` in `shwarm.162`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmwin/shwarm.162#L354-L388).
+- Default VSP: [`SHEET :INIT` in `sheet.383`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmwin/sheet.383#L397-L426).
+- Mixed-font baseline and line height: [`SHEET-NEW-FONT-MAP` in `sheet.383`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmwin/sheet.383#L507-L539).
+- Per-font baseline adjustment: [`SHEET-SET-FONT` in `shwarm.162`](https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmwin/shwarm.162#L80-L83).
 
 The archived host files use Alan Bawden's evacuated PDP-10 representation, so
 the first stage reconstructs 36-bit words before parsing any visible text or
@@ -105,10 +210,16 @@ raster data.
 
 ## Selection and recovery boundary
 
-Selection precedence is `arc.ast's`, standalone AST, KST, `ar1.1`, standalone
-Alto, then optional CLDFNT. CLDFNT is excluded by default because TVFONT has an
-AST representation. QFASL/OQFASL/UNFASL inputs are excluded from this
-source-backed build.
+Source-profile selection precedence is `arc.ast's`, standalone AST, KST,
+`ar1.1`, standalone Alto, then optional CLDFNT. CLDFNT is excluded by default
+because TVFONT has an AST representation. QFASL/OQFASL/UNFASL inputs are
+excluded from that source profile.
+
+Runtime-profile selection is separately closed over exactly the 49 `.qfasl`
+files in its manifest. It excludes `medfnt.oqfasl`, all `.unfasl` files, load
+bands, heaps, and licensed Symbolics material. The two profiles share the same
+pinned public System 46 tree and BSD-3-Clause license but not an input-selection
+rule.
 
 Semantically equal representations are recorded as alternates. Divergent
 metrics, raster storage, or pixels receive explicit variants such as `-KST` or
@@ -117,6 +228,8 @@ pointers, and observed out-of-declared-extent pixels are preserved rather than
 clipped. Both recovery classes remain explicit in the catalog and validation
 manifest.
 
-The source-only boundary currently covers 88 authored logical names. It is not
-a claim to recover every compiled font in System 46 or every CADR font ever
-made.
+The source boundary covers 88 authored logical names and 151 representations.
+The runtime boundary covers all 49 font QFASLs present in this pinned
+`src/lmfont` snapshot, classified as 47 current logical fonts and two older
+versions. Neither is a claim to recover every CADR font ever made or fonts from
+another system release.

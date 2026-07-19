@@ -1,8 +1,18 @@
 # CADR fonts
 
-This repository reproducibly recovers the public MIT CADR System 46 bitmap-font
-sources as inspectable JSON and PNG specimens plus installable BDF 2.1 fonts
-with complete X Logical Font Description (XLFD) names.
+This repository reproducibly recovers two complementary public MIT CADR System
+46 bitmap-font profiles as inspectable JSON and PNG specimens plus installable
+BDF 2.1 fonts with complete X Logical Font Description (XLFD) names:
+
+- the **source profile** preserves 151 authored AST, KST, Alto, and archive
+  representations, including meaningful source variants;
+- the **runtime profile** inertly decompiles all 49 reviewed font QFASLs into
+  the serialized `FONT` arrays that System 46 would draw when loaded: 47
+  current logical fonts and two explicitly legacy compiled versions.
+
+The profiles are deliberately not collapsed. The source profile answers “what
+surviving authoring representations contain”; the runtime profile answers
+“what this System 46 snapshot would display for a defined character.”
 
 The source witness is a pinned Git submodule. Generated files stay under the
 ignored `dist/` directory for now; a GitHub release workflow is intentionally
@@ -18,12 +28,17 @@ make compare-genera
 make audit-runtime-names
 ```
 
-`make check-external` builds `dist/`, runs the unit and corpus checks, compiles
-all BDFs to PCF with `bdftopcf`, independently indexes them with `mkfontdir`,
-and loads every generated alias in a private Xvfb server. It requires those
-three X11 tools; the build itself needs only Python 3.10 or newer and its
-standard library. `make reproducible` performs two isolated builds and compares
-every output byte.
+`make check-external` builds both profiles under `dist/`, runs the unit and
+corpus checks, compiles every BDF to PCF with `bdftopcf`, independently indexes
+the result with `mkfontdir`, and uses a private Xvfb server for both alias-load
+and native rendering checks. For every character actually defined by an
+emitted BDF, the rendering gate compares raw eight-bit `XDrawString` framebuffer
+pixels and `XTextExtents` with an independent BDF renderer. No scaling or
+antialiasing is involved. It requires `bdftopcf`, `mkfontdir`, Xvfb, and Xlib;
+the build itself needs only Python 3.10 or newer and its standard library.
+`make reproducible` performs two isolated builds and compares every output
+byte. The reviewed build passes this gate for all 371 aliases across the two
+font paths and for every emitted glyph.
 
 When the sibling `../genera-emu` checkout is present, `make compare-genera`
 repeats the compatibility audit against its published BDF artifacts. It
@@ -32,21 +47,30 @@ baseline-relative set pixel after normalizing the zero-width no-op slots
 described below, while deliberately ignoring transparent storage padding and
 the new XLFD metadata.
 
-`make audit-runtime-names` uses the separately pinned, inert QFASL parser from
-that sibling checkout to reproduce the three `FONTS:` bindings used as runtime
-family/alias evidence. Neither optional lineage audit is needed to build from
-the source submodule; both make the migration and naming review repeatable.
+The runtime build uses the repository's strict, non-evaluating QFASL decoder.
+It accepts only the serialized-object operations observed in the closed
+49-file manifest, rejects every unsupported operation, and never executes Lisp
+forms or target-machine code. `make audit-runtime-names` remains an optional
+lineage cross-check against the separately pinned ancestor in the sibling
+checkout; it is not a source of unpinned build data.
 
 The current reviewed result is:
 
-- 151 BDFs from 88 authored logical names;
+- 151 source BDFs from 88 authored logical names;
 - 63 preserved source-representation variants;
 - 134 proportional, 15 character-cell, and two monospace XLFD classifications;
 - 1,855 zero-width, zero-advance, no-ink Alto slots retained in JSON and
   omitted from 62 installable BDFs;
 - six explicitly partial Alto pointer recoveries;
 - 45 Alto fonts with 142 glyphs whose observed pixels exceed declared extents;
-- zero rejected selected sources.
+- zero rejected selected sources;
+- 49 runtime BDFs: 30 current source-backed objects, 17 compiled-only current
+  fonts, and two legacy compiled versions representing 47 current runtime
+  logical names;
+- 6,170 normalized runtime slots, of which 5,689 are installable BDF glyphs
+  after omitting 481 zero-width, zero-advance, no-ink runtime placeholders;
+- 200 BDF artifacts containing 20,307 emitted glyphs across both profiles;
+- 272 source-path aliases and 99 runtime-path aliases, 371 in total.
 
 The earlier `genera-emu` extraction produced 150 artifacts. This repository
 corrects its AST raster-height model: `BUG` has a 32-row authored AST raster but
@@ -61,21 +85,57 @@ one over the installable BDF line metrics and emitted glyph geometry. This
 prevents a deterministic decoder regression from blessing its own changed JSON
 and BDF output.
 
+The runtime profile has its own pair of reviewed semantic oracles over all
+6,170 decoded `FONT` slots and all 5,689 installable runtime glyphs. The 30
+source-backed QFASLs are also compared with the source profile. Most resident
+fonts preserve the surviving authored display geometry, but four distinctions
+matter for actual screen output:
+
+- resident `ARROW` includes visible codes octal `003` and `006`; the source
+  `ARROW-KST` variant matches it;
+- resident `BIGFNT` is matched by `BIGFNT-KST`; the source-profile canonical
+  differs at `155` and lacks six visible runtime codes;
+- current `MEDFNT` changes 57 previously visible glyphs and makes six formerly
+  blank slots visible relative to the surviving older/source-backed form;
+- resident `MOUSE` adds visible codes `034` through `036`.
+
+The runtime profile carries those resident shapes directly rather than
+silently rewriting the source artifacts.
+
 ## What is in `dist/`
 
 ```text
 dist/
-  bdf/                 BDF fonts, fonts.dir, and fonts.alias
-  json/                lossless normalized source metrics and bitmap rows
-  sheets/              deterministic octal-labelled PNG specimens
-  catalog.json         artifact, recovery, metric, XLFD, and generator records
-  SOURCE-MANIFEST.json closed source filename/size/SHA-256 manifest
-  LICENSE.source       upstream three-clause BSD license
-  SHA256SUMS            digest of every other distributed file
+  bdf/                    source BDFs plus source fonts.dir/fonts.alias
+  json/                   lossless normalized source metrics and bitmap rows
+  sheets/                 deterministic source PNG specimens
+  catalog.json            source artifact/recovery/XLFD catalog
+  runtime/
+    bdf/                  49 runtime BDFs plus runtime fonts.dir/fonts.alias
+    json/                 all normalized resident FONT slots
+    sheets/               deterministic runtime PNG specimens
+    catalog.json          runtime classification, metrics, and provenance
+    runtime-source-manifest.json
+  BUILD-MANIFEST.json     two-profile counts, catalogs, and alias policies
+  SOURCE-MANIFEST.json    closed authoring-source manifest
+  LICENSE.source          upstream three-clause BSD license
+  SHA256SUMS              digest of every other distributed file
 ```
 
-Convenience aliases are `cadr-<artifact-name>`; for example, `cadr-hl10` and
-`cadr-tvfont`. The full XLFD names remain authoritative.
+Aliases make the profile boundary explicit:
+
+- `cadr-source-<artifact>` always selects that exact authored artifact;
+- `cadr-runtime-<runtime-name>` selects the current System 46 resident object;
+- `cadr-runtime-legacy-n43xms` and `cadr-runtime-legacy-ntog` select the two
+  older compiled objects and are never current defaults;
+- `cadr-<name>` is a convenience alias for the current runtime font when that
+  name is resident, otherwise for the unambiguous source artifact.
+
+Current runtime names win intentional collisions such as `cadr-arrow`; the
+source form remains available as `cadr-source-arrow`. Compatibility spellings
+such as `CM10`/`CPT-CM10`, `CM12`/`CPT-CM12`, and `CPTFON`/`CPTFONT` resolve to
+the same current resident font, while their exact source forms remain under
+`cadr-source-*`. Full XLFD names remain authoritative.
 
 ## Metric and identity boundaries
 
@@ -99,6 +159,18 @@ trace, scale, hint, or synthesize glyph shapes.
   physical DPI. XLFD uses `Unknown-OT-Unknown`, while 72 dpi is documented as
   an interchange convention that preserves one source pixel as one nominal
   point.
+
+System 46 sheet layout adds two pixels of vertical spacing by default. For a
+mixed-font map, the sheet baseline is the greatest font baseline and the line
+height is the greatest character height plus that two-pixel VSP; changing font
+adds the difference between the sheet and font baselines. BDF preserves each
+font's metrics but cannot encode this sheet-level policy, so the independent
+render model tests it separately.
+
+The conformance claim is intentionally limited to native rendering of defined
+glyphs. What an X server substitutes for a code absent from a BDF is outside
+the project gate, as requested; no fallback behavior is presented as CADR
+behavior.
 
 See [the font model](docs/FONT-MODEL.md) and
 [the provenance chain](docs/PROVENANCE.md) for the evidence and exact

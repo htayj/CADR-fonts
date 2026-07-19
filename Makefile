@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: dist test check check-external reproducible compare-genera audit-runtime-names clean
+.PHONY: dist test check check-runtime check-external reproducible compare-genera audit-runtime-names clean
 
 dist:
 	$(PYTHON) scripts/build.py
@@ -10,9 +10,16 @@ test:
 
 check: dist test
 	$(PYTHON) scripts/check_dist.py
+	$(PYTHON) scripts/check_runtime_dist.py
+	$(PYTHON) scripts/check_runtime_rendering.py --output dist
+
+check-runtime: dist
+	$(PYTHON) scripts/check_runtime_dist.py
+	$(PYTHON) scripts/check_runtime_rendering.py --output dist
 
 check-external: check
 	$(PYTHON) scripts/check_dist.py --external-tools
+	$(PYTHON) scripts/check_runtime_rendering.py --output dist --external
 
 reproducible:
 	$(PYTHON) scripts/check_reproducibility.py

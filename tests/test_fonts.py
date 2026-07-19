@@ -304,10 +304,69 @@ class XIndexTests(unittest.TestCase):
             builder.write_x_indexes(output, catalog)
             self.assertEqual(
                 (output / "bdf" / "fonts.alias").read_text(encoding="ascii"),
-                "! Stable convenience aliases; XLFD names remain authoritative.\n"
+                "! Source-profile aliases; XLFD names remain authoritative.\n"
                 f'cadr-demo "{xlfd}"\n'
-                f'cadr-demo-runtime "{xlfd}"\n',
+                f'cadr-source-demo "{xlfd}"\n',
             )
+
+    def test_runtime_names_reserve_unqualified_source_aliases(self) -> None:
+        xlfd = "-Misc-MIT CADR Demo-Unknown-OT-Unknown--12-120-72-72-P-70-Misc-FontSpecific"
+        catalog = {
+            "fonts": [
+                {
+                    "name": "Demo",
+                    "runtime_name": "Demo",
+                    "variant_of": None,
+                    "outputs": {"bdf": "bdf/demo.bdf"},
+                    "bdf": {"xlfd_name": xlfd},
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "bdf").mkdir()
+            builder.write_x_indexes(
+                output, catalog, reserved_convenience_names={"demo"}
+            )
+            self.assertEqual(
+                (output / "bdf" / "fonts.alias").read_text(encoding="ascii"),
+                "! Source-profile aliases; XLFD names remain authoritative.\n"
+                f'cadr-source-demo "{xlfd}"\n',
+            )
+
+    def test_runtime_aliases_keep_legacy_explicit(self) -> None:
+        current_xlfd = "-Misc-MIT CADR Demo-Unknown-OT-Unknown--12-120-72-72-P-70-Misc-FontSpecific"
+        legacy_xlfd = "-Misc-MIT CADR Demo-Unknown-OT-Unknown-Legacy Old-12-120-72-72-P-70-Misc-FontSpecific"
+        catalog = {
+            "font_artifacts": [
+                {
+                    "artifact_name": "DEMO",
+                    "runtime_name": "DEMO",
+                    "classification": "compiled-only",
+                    "outputs": {"bdf": "bdf/demo.bdf"},
+                    "bdf_profile": {"xlfd_name": current_xlfd},
+                },
+                {
+                    "artifact_name": "OLD-DEMO",
+                    "runtime_name": "DEMO",
+                    "classification": "legacy-compiled-version",
+                    "outputs": {"bdf": "bdf/old-demo.bdf"},
+                    "bdf_profile": {"xlfd_name": legacy_xlfd},
+                },
+            ]
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "bdf").mkdir()
+            aliases = builder.write_runtime_x_indexes(
+                output, catalog, compatibility_aliases={}
+            )
+            self.assertEqual(aliases["cadr-demo"], current_xlfd)
+            self.assertEqual(aliases["cadr-runtime-demo"], current_xlfd)
+            self.assertEqual(
+                aliases["cadr-runtime-legacy-old-demo"], legacy_xlfd
+            )
+            self.assertNotIn("cadr-old-demo", aliases)
 
     def test_colliding_aliases_with_different_targets_are_rejected(self) -> None:
         catalog = {
