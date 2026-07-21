@@ -10,6 +10,13 @@ import json
 from pathlib import Path
 
 from check_runtime_rendering import BdfFont, Glyph, parse_bdf
+from check_font_identities import (
+    IdentityCheckError,
+    check_bdf_profile,
+    check_catalog_record,
+    expected_runtime_record,
+    load_distributed_mapping,
+)
 from lisp_machine_fonts import safe_filename
 
 
@@ -405,6 +412,7 @@ def check_build_manifest(
 
 def check_runtime_distribution(output: Path) -> dict[str, object]:
     runtime_root = output / "runtime"
+    font_identities = load_distributed_mapping(output)
     manifest = json.loads(RUNTIME_MANIFEST.read_text(encoding="utf-8"))
     copied_manifest = runtime_root / "runtime-source-manifest.json"
     require(
@@ -536,22 +544,13 @@ def check_runtime_distribution(output: Path) -> dict[str, object]:
             font.character_height == record["character_height"],
             f"{artifact_name}: character-height drift",
         )
-        expected_style = (
-            f"System 46 Legacy {artifact_name}"
-            if record["classification"] == "legacy-compiled-version"
-            else "System 46 Runtime"
+        logical_identity = check_catalog_record(
+            record,
+            expected_runtime_record(font_identities, record),
+            context=f"runtime/{artifact_name}",
         )
-        require(profile["add_style_name"] == expected_style, f"{artifact_name}: runtime XLFD style drift")
-        require(profile["foundry"] == "Misc", f"{artifact_name}: inferred runtime foundry")
-        require(
-            profile["family_name"]
-            == f'MIT CADR {record["runtime_name"]}'.replace("-", " "),
-            f"{artifact_name}: runtime family drift",
-        )
-        require(
-            (profile["weight_name"], profile["slant"], profile["setwidth_name"])
-            == ("Unknown", "OT", "Unknown"),
-            f"{artifact_name}: inferred typography",
+        check_bdf_profile(
+            profile, logical_identity, context=f"runtime/{artifact_name}"
         )
         require(
             (profile["resolution_x"], profile["resolution_y"])
@@ -682,7 +681,13 @@ def main() -> int:
     args = parser.parse_args()
     try:
         result = check_runtime_distribution(args.output.resolve())
-    except (KeyError, OSError, RuntimeDistError, ValueError) as error:
+    except (
+        IdentityCheckError,
+        KeyError,
+        OSError,
+        RuntimeDistError,
+        ValueError,
+    ) as error:
         parser.error(str(error))
     print(json.dumps({"status": "ok", **result}, indent=2, sort_keys=True))
     return 0

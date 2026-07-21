@@ -45,7 +45,165 @@ def load_json(path: Path) -> dict[str, object]:
     return value
 
 
-def artifact_inventory(distribution: Path) -> tuple[list[dict[str, object]], str]:
+def _mapping_provenance(
+    unicode_catalogs: dict[str, dict[str, object]],
+) -> dict[str, str]:
+    """Require both Unicode profiles to name the same reviewed identity map."""
+
+    values: dict[str, tuple[object, object]] = {
+        profile: (
+            catalog.get("font_identity_mapping_id"),
+            catalog.get("font_identity_mapping_sha256"),
+        )
+        for profile, catalog in unicode_catalogs.items()
+    }
+    source = values.get("source")
+    runtime = values.get("runtime")
+    if source is None or runtime is None or source != runtime:
+        raise GalleryError(
+            "Unicode source/runtime font-identity mapping provenance differs"
+        )
+    mapping_id, mapping_sha256 = source
+    if not isinstance(mapping_id, str) or not mapping_id:
+        raise GalleryError("Unicode catalogs lack a font-identity mapping ID")
+    if not (
+        isinstance(mapping_sha256, str)
+        and len(mapping_sha256) == 64
+        and all(character in "0123456789abcdef" for character in mapping_sha256)
+    ):
+        raise GalleryError("Unicode catalogs lack a valid font-identity mapping SHA-256")
+    return {"id": mapping_id, "sha256": mapping_sha256}
+
+
+def _validated_logical_identity(
+    value: object,
+    *,
+    profile: str,
+    artifact_name: str,
+) -> dict[str, object]:
+    """Validate the identity fields needed by the public gallery contract."""
+
+    if not isinstance(value, dict):
+        raise GalleryError(f"{profile}/{artifact_name}: logical identity is missing")
+    status = value.get("mapping_status")
+    if status not in {"mapped", "role-mapped", "unmapped"}:
+        raise GalleryError(
+            f"{profile}/{artifact_name}: invalid logical mapping status {status!r}"
+        )
+    logical_name = value.get("logical_name")
+    if logical_name is not None and (
+        not isinstance(logical_name, str) or not logical_name
+    ):
+        raise GalleryError(f"{profile}/{artifact_name}: invalid logical selector")
+    if status == "mapped" and not isinstance(logical_name, str):
+        raise GalleryError(f"{profile}/{artifact_name}: mapped identity lacks a selector")
+    if status == "unmapped" and logical_name is not None:
+        raise GalleryError(f"{profile}/{artifact_name}: unmapped identity has a selector")
+
+    typography = value.get("typographic")
+    if not isinstance(typography, dict):
+        raise GalleryError(f"{profile}/{artifact_name}: logical typography is missing")
+    family_name = typography.get("family_name")
+    if not isinstance(family_name, str) or not family_name:
+        raise GalleryError(f"{profile}/{artifact_name}: desktop family name is missing")
+
+    return value
+
+
+def _validated_representation(
+    value: object,
+    *,
+    profile: str,
+    artifact_name: str,
+) -> dict[str, object]:
+    """Validate the sibling physical-representation record."""
+
+    representation = value
+    if not isinstance(representation, dict):
+        raise GalleryError(f"{profile}/{artifact_name}: representation is missing")
+    if (
+        representation.get("profile") != profile
+        or representation.get("artifact_name") != artifact_name
+    ):
+        raise GalleryError(
+            f"{profile}/{artifact_name}: representation physical identity differs"
+        )
+    style_name = representation.get("style_name")
+    if not isinstance(style_name, str):
+        raise GalleryError(f"{profile}/{artifact_name}: representation style is invalid")
+    if profile == "runtime" and representation.get("classification") not in {
+        "source-backed-current",
+        "compiled-only",
+        "legacy-compiled-version",
+    }:
+        raise GalleryError(
+            f"{profile}/{artifact_name}: representation classification is invalid"
+        )
+    return representation
+
+
+def logical_identity_label(identity: dict[str, object]) -> str:
+    """Describe the reviewed selector without replacing physical identity."""
+
+    status = identity.get("mapping_status")
+    logical_name = identity.get("logical_name")
+    typography = identity.get("typographic")
+    if not isinstance(typography, dict):
+        raise GalleryError("logical identity lacks typography")
+    family_name = typography.get("family_name")
+    if not isinstance(family_name, str) or not family_name:
+        raise GalleryError("logical identity lacks a desktop family")
+    if status == "unmapped":
+        return f"{family_name} (unmapped)"
+    if status == "role-mapped":
+        parts: list[str] = []
+        if logical_name is not None:
+            if not isinstance(logical_name, str) or not logical_name:
+                raise GalleryError("role-mapped identity has an invalid selector")
+            primary = identity.get("primary")
+            if not isinstance(primary, dict):
+                raise GalleryError("role-mapped selector lacks primary metadata")
+            character_set = primary.get("character_set")
+            if not isinstance(character_set, str) or not character_set:
+                raise GalleryError("role-mapped selector lacks a character set")
+            parts.append(f"{logical_name} [{character_set}]")
+        parts.append(f"{family_name} (role-mapped)")
+        return " · ".join(parts)
+    if status != "mapped" or not isinstance(logical_name, str) or not logical_name:
+        raise GalleryError("mapped logical identity lacks a selector")
+    return logical_name
+
+
+def representation_label(representation: dict[str, object]) -> str:
+    """Describe the authored/current/legacy representation on its own line."""
+
+    profile = representation.get("profile")
+    style_name = representation.get("style_name")
+    if not isinstance(style_name, str):
+        raise GalleryError("representation style is invalid")
+    if profile == "source":
+        return "Authored source" + (f" · {style_name}" if style_name else "")
+    if profile != "runtime":
+        raise GalleryError(f"invalid representation profile {profile!r}")
+    classification = representation.get("classification")
+    classification_labels = {
+        "source-backed-current": "source-backed current object",
+        "compiled-only": "compiled-only current object",
+        "legacy-compiled-version": "legacy compiled version",
+    }
+    try:
+        classification_label = classification_labels[classification]
+    except KeyError as error:
+        raise GalleryError(
+            f"invalid runtime representation classification {classification!r}"
+        ) from error
+    base = style_name or "System 46 runtime"
+    return f"{base} · {classification_label}"
+
+
+def artifact_inventory(
+    distribution: Path,
+) -> tuple[list[dict[str, object]], str, dict[str, str]]:
     """Resolve specimens directly from the normal generated distribution."""
 
     build_manifest = load_json(distribution / "BUILD-MANIFEST.json")
@@ -60,6 +218,7 @@ def artifact_inventory(distribution: Path) -> tuple[list[dict[str, object]], str
         profile: load_json(distribution / "unicode" / profile / "catalog.json")
         for profile in ("source", "runtime")
     }
+    identity_mapping = _mapping_provenance(unicode_catalogs)
     raw_records = {
         "source": {
             str(record["name"]): record
@@ -85,6 +244,40 @@ def artifact_inventory(distribution: Path) -> tuple[list[dict[str, object]], str
             raw_record = raw_records[profile].get(name)
             if raw_record is None:
                 raise GalleryError(f"{profile}/{name}: raw catalog record missing")
+            logical_identity = _validated_logical_identity(
+                record.get("logical_identity"),
+                profile=profile,
+                artifact_name=name,
+            )
+            representation = _validated_representation(
+                record.get("representation"),
+                profile=profile,
+                artifact_name=name,
+            )
+            if raw_record.get("logical_identity") != logical_identity:
+                raise GalleryError(
+                    f"{profile}/{name}: raw and Unicode logical identities differ"
+                )
+            if raw_record.get("representation") != representation:
+                raise GalleryError(
+                    f"{profile}/{name}: raw and Unicode representations differ"
+                )
+            label_key = "logical_name" if profile == "source" else "runtime_name"
+            if record.get(label_key) != raw_record.get(label_key):
+                raise GalleryError(
+                    f"{profile}/{name}: raw and Unicode {label_key} values differ"
+                )
+            if representation.get(label_key) != record.get(label_key):
+                raise GalleryError(
+                    f"{profile}/{name}: representation {label_key} differs"
+                )
+            if profile == "runtime" and (
+                record.get("classification") != raw_record.get("classification")
+                or representation.get("classification") != record.get("classification")
+            ):
+                raise GalleryError(
+                    f"{profile}/{name}: runtime classification metadata differs"
+                )
 
             unicode_bdf = unicode_root / str(record["unicode_bdf"])
             if sha256_file(unicode_bdf) != record["unicode_bdf_sha256"]:
@@ -116,6 +309,7 @@ def artifact_inventory(distribution: Path) -> tuple[list[dict[str, object]], str
                     "profile": profile,
                     "name": name,
                     "record": record,
+                    "raw_record": raw_record,
                     "specimen_kind": specimen_kind,
                     "specimen_path": specimen,
                 }
@@ -128,11 +322,46 @@ def artifact_inventory(distribution: Path) -> tuple[list[dict[str, object]], str
     source_revision = build_manifest.get("source_revision")
     if not isinstance(source_revision, str):
         raise GalleryError("BUILD-MANIFEST source revision is missing")
-    return artifacts, source_revision
+    return artifacts, source_revision, identity_mapping
+
+
+def specimen_manifest_record(
+    artifact: dict[str, object],
+    *,
+    relative: str,
+    specimen_sha256: str,
+) -> dict[str, object]:
+    """Build one additive manifest record without collapsing its artifact key."""
+
+    profile = str(artifact["profile"])
+    record_data = artifact["record"]
+    raw_record = artifact["raw_record"]
+    label_key = "logical_name" if profile == "source" else "runtime_name"
+    logical_identity = record_data["logical_identity"]
+    record: dict[str, object] = {
+        "content_class": artifact["content_class"],
+        "profile": profile,
+        "artifact_name": artifact["name"],
+        label_key: record_data[label_key],
+        "logical_identity": logical_identity,
+        "representation": record_data["representation"],
+        "specimen_kind": artifact["specimen_kind"],
+        "path": relative,
+        "sha256": specimen_sha256,
+    }
+    if profile == "source":
+        record["variant_of"] = raw_record.get("variant_of")
+    else:
+        record["classification"] = record_data["classification"]
+    if artifact["specimen_kind"] == "unicode-pangram":
+        record["text"] = record_data["pangram_specimen"]["text"]
+    return record
 
 
 def build_gallery(distribution: Path) -> tuple[dict[str, bytes], bytes, bytes]:
-    artifacts, source_revision = artifact_inventory(distribution.resolve())
+    artifacts, source_revision, identity_mapping = artifact_inventory(
+        distribution.resolve()
+    )
     project_license = ROOT / "LICENSE"
     tracked_license = ROOT / "LICENSE.source"
     generated_license = distribution / "LICENSE.source"
@@ -167,21 +396,13 @@ def build_gallery(distribution: Path) -> tuple[dict[str, bytes], bytes, bytes]:
                 f"generated specimen is not PNG: {artifact['specimen_path']}"
             )
         image_files[relative] = data
-        profile = str(artifact["profile"])
-        record_data = artifact["record"]
-        label_key = "logical_name" if profile == "source" else "runtime_name"
-        record: dict[str, object] = {
-            "content_class": artifact["content_class"],
-            "profile": profile,
-            "artifact_name": artifact["name"],
-            label_key: record_data[label_key],
-            "specimen_kind": artifact["specimen_kind"],
-            "path": relative,
-            "sha256": sha256_bytes(data),
-        }
-        if artifact["specimen_kind"] == "unicode-pangram":
-            record["text"] = record_data["pangram_specimen"]["text"]
-        records.append(record)
+        records.append(
+            specimen_manifest_record(
+                artifact,
+                relative=relative,
+                specimen_sha256=sha256_bytes(data),
+            )
+        )
 
     counts = {
         content_class: {
@@ -203,6 +424,8 @@ def build_gallery(distribution: Path) -> tuple[dict[str, bytes], bytes, bytes]:
     manifest = {
         "schema_version": 1,
         "source_revision": source_revision,
+        "font_identity_mapping_id": identity_mapping["id"],
+        "font_identity_mapping_sha256": identity_mapping["sha256"],
         "project_license": {
             "path": "LICENSE",
             "sha256": PROJECT_LICENSE_SHA256,
@@ -249,6 +472,9 @@ def build_gallery(distribution: Path) -> tuple[dict[str, bytes], bytes, bytes]:
         "visible emitted Unicode glyph is a Basic Latin letter; `symbols` is the",
         "closed complement. See [the Unicode mapping](docs/UNICODE.md) and",
         "[font model](docs/FONT-MODEL.md).",
+        "Artifact names remain the physical source/runtime identities. Each entry",
+        "shows its reviewed logical selector separately from its authored, current",
+        "runtime, or legacy runtime representation.",
         "",
     ]
     for content_class, title in (("latin", "Latin fonts"), ("symbols", "Symbols and drawing fonts")):
@@ -268,9 +494,15 @@ def build_gallery(distribution: Path) -> tuple[dict[str, bytes], bytes, bytes]:
                 artifact_name = str(record["artifact_name"])
                 suffix = "" if identity == artifact_name else f" — `{identity}`"
                 path = f"specimens/{record['path']}"
+                logical_label = logical_identity_label(record["logical_identity"])
+                physical_label = representation_label(record["representation"])
                 lines.extend(
                     [
                         f"#### `{artifact_name}`{suffix}",
+                        "",
+                        f"**Logical selector:** `{logical_label}`",
+                        "",
+                        f"**Representation:** `{physical_label}`",
                         "",
                         f"![{artifact_name} {content_class} {profile} specimen]({path})",
                         "",

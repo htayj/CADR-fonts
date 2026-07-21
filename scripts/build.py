@@ -13,6 +13,12 @@ import sys
 
 from lisp_machine_fonts import safe_filename
 from build_unicode_fonts import build_unicode_distribution
+from font_identities import (
+    DEFAULT_FONT_IDENTITIES,
+    load_font_identities,
+    validate_assignment_closure,
+    verify_desktop_identity_uniqueness,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,16 +26,19 @@ SOURCE_REPOSITORY = ROOT / "sources" / "mit-cadr-system-software"
 SOURCE_MANIFEST = ROOT / "config" / "source-manifest.json"
 RUNTIME_SOURCE_MANIFEST = ROOT / "config" / "runtime-source-manifest.json"
 DEFAULT_UNICODE_MAPPING = ROOT / "config" / "unicode-mapping.json"
+FONT_IDENTITIES = DEFAULT_FONT_IDENTITIES
 EXTRACTOR = ROOT / "scripts" / "extract-cadr-fonts.py"
 RUNTIME_EXTRACTOR = ROOT / "scripts" / "extract-cadr-qfasl-fonts.py"
 GENERATOR_FILES = (
     "config/source-manifest.json",
     "config/runtime-source-manifest.json",
     "config/unicode-mapping.json",
+    "config/font-identities.json",
     "scripts/build.py",
     "scripts/build_unicode_fonts.py",
     "scripts/extract-cadr-fonts.py",
     "scripts/extract-cadr-qfasl-fonts.py",
+    "scripts/font_identities.py",
     "scripts/lisp_machine_fonts.py",
 )
 RUNTIME_COMPATIBILITY_ALIASES = {
@@ -318,6 +327,7 @@ def write_build_manifest(
     source_aliases: dict[str, str],
     runtime_aliases: dict[str, str],
     unicode_result: dict[str, object],
+    font_identities: dict[str, object],
 ) -> None:
     """Record the raw profiles and their reviewed Unicode derivatives."""
 
@@ -330,6 +340,19 @@ def write_build_manifest(
     record = {
         "schema_version": 2,
         "source_revision": source_catalog["source_repository"]["revision"],
+        "font_identities": {
+            "id": font_identities["mapping_id"],
+            "sha256": sha256(output / "FONT-IDENTITIES.json"),
+            "logical_identity_count": font_identities["expected"][
+                "logical_identity_count"
+            ],
+            "source_logical_name_count": font_identities["expected"][
+                "source_logical_name_count"
+            ],
+            "runtime_artifact_count": font_identities["expected"][
+                "runtime_artifact_count"
+            ],
+        },
         "profiles": {
             "authoring_source": {
                 "catalog": "catalog.json",
@@ -464,10 +487,17 @@ def main() -> int:
     output = args.output.resolve()
 
     try:
+        source_repository = args.source_repository.resolve()
         manifest, source_root = load_and_verify_source(
-            args.source_repository.resolve(),
+            source_repository,
             allow_source_snapshot=args.allow_source_snapshot,
         )
+        font_identities = load_font_identities(
+            FONT_IDENTITIES,
+            source_repository=source_repository,
+        )
+        if font_identities["source"]["revision"] != manifest["revision"]:
+            raise BuildError("font identities are pinned to another CADR revision")
         command = [
             sys.executable,
             str(EXTRACTOR),
@@ -476,6 +506,8 @@ def main() -> int:
             str(output),
             "--clean",
             "--strict",
+            "--font-identities",
+            str(FONT_IDENTITIES),
         ]
         if args.omit_json:
             command.append("--omit-json")
@@ -491,6 +523,8 @@ def main() -> int:
             str(runtime_output),
             "--manifest",
             str(RUNTIME_SOURCE_MANIFEST),
+            "--font-identities",
+            str(FONT_IDENTITIES),
             "--clean",
         ]
         if args.omit_json:
@@ -500,6 +534,37 @@ def main() -> int:
         runtime_catalog = json.loads(
             runtime_catalog_path.read_text(encoding="utf-8")
         )
+        validate_assignment_closure(
+            font_identities,
+            source_logical_names={
+                str(record["logical_name"]) for record in catalog["fonts"]
+            },
+            runtime_artifacts=(
+                (str(record["artifact_name"]), str(record["runtime_name"]))
+                for record in runtime_catalog["font_artifacts"]
+            ),
+        )
+        desktop_identity_count = verify_desktop_identity_uniqueness(
+            [
+                (
+                    f"source/{record['name']}",
+                    record["logical_identity"],
+                )
+                for record in catalog["fonts"]
+            ]
+            + [
+                (
+                    f"runtime/{record['artifact_name']}",
+                    record["logical_identity"],
+                )
+                for record in runtime_catalog["font_artifacts"]
+            ]
+        )
+        if desktop_identity_count != 200:
+            raise BuildError(
+                f"desktop identity inventory has {desktop_identity_count} artifacts"
+            )
+        shutil.copyfile(FONT_IDENTITIES, output / "FONT-IDENTITIES.json")
 
         current_runtime_names = {
             safe_filename(record["runtime_name"])
@@ -542,6 +607,7 @@ def main() -> int:
             source_aliases,
             runtime_aliases,
             unicode_result,
+            font_identities,
         )
         write_checksums(output)
     except (BuildError, OSError, subprocess.CalledProcessError, ValueError) as error:

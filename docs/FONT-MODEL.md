@@ -209,27 +209,66 @@ each font's ascent/descent in BDF and tests the default VSP and mixed-baseline
 rules in an independent layout model; applications seeking CADR-like whole-line
 layout must apply that policy themselves.
 
+## Physical representations and logical fonts
+
+The distribution records three related identities without substituting one for
+another:
+
+- **Physical identity** is the profile plus artifact name. All 151 authored
+  representations and all 49 runtime objects remain independently addressable,
+  even when they implement the same logical font.
+- **Logical identity** is the reviewed family, face, nominal design/name size,
+  and character-set selector recorded in `config/font-identities.json`. This is
+  what lets desktop clients group related strikes and select bold or italic
+  faces correctly.
+- **Representation identity** records an authored variant such as `KST` or
+  `AL-AR1`, a current `System 46 Runtime` object, or a labelled legacy object.
+  It remains structured catalog data and is also composed into the XLFD
+  add-style where needed to keep physical artifacts distinct.
+
+Logical identity is additive. It never renames a source artifact, changes a
+resident symbol, merges a legacy object into a current object, or changes a
+bitmap. For example, `HL8` and `HL14` both resolve to the desktop family
+`MIT CADR Helvetica`, medium roman normal-width, but retain nominal sizes 8 and
+14 and remain separate physical strikes. Face suffixes are resolved by the
+reviewed map: `HL12B` is bold roman, `HL12I` is medium italic, and runtime-only
+`HL12BI` is bold italic. The build does not parse those suffixes to invent
+typography.
+
+Nominal design/name size and recovered raster size are also deliberately
+separate. The source `HL8` selector is `HELVETICA/ROMAN/8`, but its recovered
+character height is 12 pixels; `HL14` is nominally 14 and measures 15 pixels.
+`HL8B` remains nominally 8 while measuring 11 pixels. Catalog
+`logical_identity` records both `nominal_design_size` and
+`measured_pixel_size`. The measured value controls BDF geometry and XLFD pixel
+size; the nominal value describes the historical logical selection and never
+causes scaling.
+
 ## XLFD profiles
 
 Each raw BDF `FONT` has all fourteen XLFD fields:
 
 ```text
--Misc-MIT CADR HL10-Unknown-OT-Unknown--12-120-72-72-P-70-Misc-FontSpecific
+-MIT-MIT CADR Helvetica-Medium-R-Normal-10 Point Strike-12-120-72-72-P-70-Misc-FontSpecific
 ```
 
-- `Misc` is the conservative X foundry/charset namespace.
-- Family is `MIT CADR <proven runtime name>` where runtime evidence exists,
-  otherwise `MIT CADR <authored logical name>`.
-- Weight, slant, and setwidth remain `Unknown`, `OT`, and `Unknown`. Opaque
-  historical filename suffixes are not treated as authoritative typography.
-- `ADD_STYLE_NAME` distinguishes source variants (`KST`, `AL AR1`), current
-  resident objects (`System 46 Runtime`), and the two explicitly named legacy
-  compiled objects (`System 46 Legacy N43XMS` and `System 46 Legacy NTOG`).
-  This keeps all 200 raw full XLFD names collision-free.
+- Foundry is `MIT`; raw character-set identity remains
+  `Misc-FontSpecific` in the final two fields.
+- Family, weight, slant, and set width come from the closed reviewed logical
+  mapping. Thus the related `HL*` strikes use `MIT CADR Helvetica`, while `B`,
+  `I`, and `BI` faces expose `Bold`, `I`, or both in the corresponding fields.
+  Unsupported typography is not inferred from an opaque name.
+- `ADD_STYLE_NAME` composes any desktop strike disambiguator with physical
+  representation identity. Examples include `10 Point Strike`, source
+  variants such as `KST` or the XLFD-safe spelling `AL AR1`, current resident
+  objects (`System 46 Runtime`), and the two labelled legacy objects
+  (`System 46 Legacy N43XMS` and `System 46 Legacy NTOG`). This keeps all 200
+  raw full XLFD names collision-free without pretending they are 200 unrelated
+  families.
 - Pixel size is the source character height.
-- Point size is ten times pixel size in decipoints at a packaging resolution of
-  72 dpi. This is an interchange convention, not a historical display-DPI
-  claim.
+- Point size is ten times that measured pixel size in decipoints at a packaging
+  resolution of 72 dpi. It is not the logical nominal design size. This is an
+  interchange convention, not a historical display-DPI claim.
 - `AVERAGE_WIDTH` is the rounded arithmetic mean of absolute advances in tenths
   of pixels, as XLFD specifies.
 
@@ -244,8 +283,9 @@ runtime profile is independently classified as 37 `P`, five `M`, and seven
 `C`; combined, the 200 raw BDFs are 171 `P`, seven `M`, and 22 `C`. Unicode
 derivation preserves each classification and adds `Unicode` to the XLFD
 `ADD_STYLE_NAME`, keeping all 200 derivative XLFDs distinct from their raw
-counterparts. It changes only the final registry and encoding fields to
-`ISO10646-1`.
+counterparts. Beyond that explicit representation qualifier, it changes the
+final registry and encoding fields to `ISO10646-1` while retaining the logical
+family and face.
 
 ## Character encoding boundary
 

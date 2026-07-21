@@ -996,6 +996,8 @@ def _write_catalog(
     raw_catalog_display: str,
     mapping_copy: Path,
     mapping_id: str,
+    font_identity_mapping_id: str,
+    font_identity_mapping_sha256: str,
     unicode_version: str,
     artifacts: list[dict[str, object]],
     aliases: dict[str, str],
@@ -1006,6 +1008,8 @@ def _write_catalog(
         "schema_version": 1,
         "profile": profile,
         "mapping_id": mapping_id,
+        "font_identity_mapping_id": font_identity_mapping_id,
+        "font_identity_mapping_sha256": font_identity_mapping_sha256,
         "unicode_version": unicode_version,
         "charset_registry": "ISO10646",
         "charset_encoding": "1",
@@ -1096,6 +1100,19 @@ def build_unicode_distribution(
     manifest = load_mapping(mapping_path)
     source_catalog = json.loads(source_catalog_path.read_text(encoding="utf-8"))
     runtime_catalog = json.loads(runtime_catalog_path.read_text(encoding="utf-8"))
+    font_identities_path = output / "FONT-IDENTITIES.json"
+    require(font_identities_path.is_file(), "font-identity mapping is missing")
+    font_identities = json.loads(font_identities_path.read_text(encoding="utf-8"))
+    require(
+        font_identities.get("schema_version") == 1,
+        "unsupported font-identity mapping schema",
+    )
+    font_identity_mapping_id = font_identities.get("mapping_id")
+    require(
+        isinstance(font_identity_mapping_id, str) and font_identity_mapping_id,
+        "font-identity mapping ID is missing",
+    )
+    font_identity_mapping_sha256 = sha256(font_identities_path)
     validate_evidence_contract(manifest, source_catalog["source_repository"])
     _validate_assignment_closure(manifest, source_catalog, runtime_catalog)
 
@@ -1138,6 +1155,9 @@ def build_unicode_distribution(
         artifact = {
             "artifact_name": raw_record["name"],
             "logical_name": raw_record["logical_name"],
+            "variant_of": raw_record["variant_of"],
+            "logical_identity": raw_record["logical_identity"],
+            "representation": raw_record["representation"],
             "repertoire": repertoire,
             "raw_bdf": f"../../{raw_relative.as_posix()}",
             "raw_bdf_sha256": sha256(raw_path),
@@ -1214,6 +1234,8 @@ def build_unicode_distribution(
             "artifact_name": raw_record["artifact_name"],
             "runtime_name": raw_record["runtime_name"],
             "classification": raw_record["classification"],
+            "logical_identity": raw_record["logical_identity"],
+            "representation": raw_record["representation"],
             "repertoire": repertoire,
             "raw_bdf": f"../../{raw_relative.as_posix()}",
             "raw_bdf_sha256": sha256(raw_path),
@@ -1300,6 +1322,8 @@ def build_unicode_distribution(
         raw_catalog_display="../../catalog.json",
         mapping_copy=mapping_copy,
         mapping_id=mapping_id,
+        font_identity_mapping_id=font_identity_mapping_id,
+        font_identity_mapping_sha256=font_identity_mapping_sha256,
         unicode_version=unicode_version,
         artifacts=source_artifacts,
         aliases=source_aliases,
@@ -1313,6 +1337,8 @@ def build_unicode_distribution(
         raw_catalog_display="../../runtime/catalog.json",
         mapping_copy=mapping_copy,
         mapping_id=mapping_id,
+        font_identity_mapping_id=font_identity_mapping_id,
+        font_identity_mapping_sha256=font_identity_mapping_sha256,
         unicode_version=unicode_version,
         artifacts=runtime_artifacts,
         aliases=runtime_aliases,

@@ -3,6 +3,7 @@
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages xorg)
   #:use-module (guix build-system gnu)
+  #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module (guix packages)
@@ -79,8 +80,11 @@
              (string=? relative "src/lmdoc")
              (string=? relative "src/lmdoc/char.18")
              (string=? relative "src/lmio1")
+             (string=? relative "src/lmio1/dplt.63")
              (string=? relative "src/lmio1/fcmp.66")
              (string=? relative "src/lmio1/fntcnv.28")
+             (string=? relative "src/lmio1/press.46")
+             (string=? relative "src/lmio1/rfontw.43")
              (string=? relative "src/lmio")
              (string=? relative "src/lmio/fread.21")
              (string=? relative "src/lmio/tv.347")
@@ -90,7 +94,7 @@
 
 (define %cadr-source-snapshot
   ;; The generator needs src/LICENSE, src/lmfont, and the pinned source files
-  ;; that close the Unicode mapping and GERM35 raster-order evidence hashes.
+  ;; that close the logical-font, Unicode, and GERM35 evidence hashes.
   ;; Restricting the snapshot to those tracked witnesses avoids putting the
   ;; unrelated CADR system tree in every package derivation.
   (local-file %cadr-source-checkout
@@ -100,6 +104,21 @@
 
 (define %local-version
   "0+git.local")
+
+(define fonttosfnt-1.2.5
+  (let ((version "1.2.5"))
+    (package
+      (inherit fonttosfnt)
+      (version version)
+      (source
+       (origin
+         (method url-fetch)
+         (uri (string-append
+               "https://xorg.freedesktop.org/releases/individual/app/"
+               "fonttosfnt-" version ".tar.xz"))
+         (sha256
+          (base32
+           "13liwl2ngcrz7nn8lp5skdyqxn6h215gs9hb52m0hg3mx1k1w99f")))))))
 
 ;; Commit time of the pinned mit-cadr-system-software revision
 ;; 8e978d7d1704096a63edd4386a3b8326a2e584af.  Keeping this fixed makes the OTB
@@ -234,7 +253,7 @@
                                (= (length runtime-otbs)
                                   #$runtime-count))
                     (error "installed CADR font profile counts changed")))))))))
-    (native-inputs (list fonttosfnt python python-fonttools))
+    (native-inputs (list fonttosfnt-1.2.5 python python-fonttools))
     (synopsis synopsis)
     (description description)
     (home-page "https://github.com/htayj/CADR-fonts")

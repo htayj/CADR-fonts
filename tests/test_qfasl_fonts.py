@@ -390,6 +390,7 @@ class RuntimeDecodeTests(unittest.TestCase):
             output = Path(directory) / "runtime"
             catalog = qfasl.write_runtime_distribution(
                 self.decoded,
+                font_identities=qfasl.load_font_identities(),
                 manifest=self.manifest,
                 manifest_path=MANIFEST,
                 source=SOURCE,
@@ -414,13 +415,26 @@ class RuntimeDecodeTests(unittest.TestCase):
                 len({profile["xlfd_name"] for profile in profiles.values()}),
                 49,
             )
-            self.assertIn("MIT CADR CPTFONT", profiles["CPTFONT"]["xlfd_name"])
+            self.assertIn("MIT CADR Fixed", profiles["CPTFONT"]["xlfd_name"])
             self.assertEqual(
                 profiles["CPTFONT"]["add_style_name"], "System 46 Runtime"
             )
             self.assertEqual(
                 profiles["N43XMS"]["add_style_name"],
                 "System 46 Legacy N43XMS",
+            )
+            records = {
+                record["artifact_name"]: record
+                for record in catalog["font_artifacts"]
+            }
+            self.assertEqual(
+                records["CPTFONT"]["logical_identity"]["typographic"]["family_name"],
+                "MIT CADR Fixed",
+            )
+            self.assertNotIn("representation", records["CPTFONT"]["logical_identity"])
+            self.assertEqual(
+                records["CPTFONT"]["representation"]["style_name"],
+                "System 46 Runtime",
             )
             self.assertEqual(
                 catalog["display_layout_policy"][

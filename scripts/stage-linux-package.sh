@@ -150,6 +150,7 @@ for required in \
     LICENSE.source \
     RELEASE-MANIFEST.json \
     SHA256SUMS \
+    metadata/FONT-IDENTITIES.json \
     metadata/SOURCE-MANIFEST.json \
     metadata/runtime-source-manifest.json \
     metadata/UNICODE-MAPPING.json; do
@@ -159,6 +160,7 @@ done
 (cd "$payload" && sha256sum -c SHA256SUMS >/dev/null) || fail "internal release checksums failed"
 
 python3 - "$payload/RELEASE-MANIFEST.json" "$group" "$raw_version" "$expected_root" <<'PY'
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -191,6 +193,53 @@ for key, expected_path in expected_licenses.items():
         "spdx": record.get("spdx"),
     } != {"path": expected_path, "spdx": "BSD-3-Clause"}:
         raise SystemExit(f"release {key} license record differs: {record!r}")
+
+metadata = manifest.get("metadata")
+expected_metadata = {
+    "FONT-IDENTITIES.json",
+    "SOURCE-MANIFEST.json",
+    "runtime-source-manifest.json",
+    "UNICODE-MAPPING.json",
+}
+if not isinstance(metadata, dict) or set(metadata) != expected_metadata:
+    raise SystemExit(f"release metadata manifest differs: {metadata!r}")
+source_distribution = manifest.get("source_distribution")
+if not isinstance(source_distribution, dict):
+    raise SystemExit("release source-distribution provenance is missing")
+identity_provenance = source_distribution.get("font_identities")
+if not isinstance(identity_provenance, dict) or not identity_provenance.get("id"):
+    raise SystemExit("release font-identity provenance is missing")
+identities_path = path.parent / "metadata" / "FONT-IDENTITIES.json"
+identities_bytes = identities_path.read_bytes()
+identities = json.loads(identities_bytes)
+identity_digest = hashlib.sha256(identities_bytes).hexdigest()
+if identity_provenance != {
+    "path": "FONT-IDENTITIES.json",
+    "id": identities.get("mapping_id"),
+    "sha256": identity_digest,
+}:
+    raise SystemExit("release font-identity provenance differs")
+for name, record in metadata.items():
+    metadata_path = path.parent / "metadata" / name
+    if not isinstance(record, dict) or record != {
+        "path": f"metadata/{name}",
+        "sha256": hashlib.sha256(metadata_path.read_bytes()).hexdigest(),
+    }:
+        raise SystemExit(f"release metadata provenance differs for {name}")
+for artifact in manifest.get("artifacts", []):
+    if not isinstance(artifact, dict):
+        raise SystemExit("release artifact record is malformed")
+    logical_identity = artifact.get("logical_identity")
+    representation = artifact.get("representation")
+    if not isinstance(logical_identity, dict) or not isinstance(representation, dict):
+        raise SystemExit("release artifact identity is missing")
+    if "representation" in logical_identity:
+        raise SystemExit("release artifact representation is nested in logical identity")
+    if (
+        representation.get("profile") != artifact.get("profile")
+        or representation.get("artifact_name") != artifact.get("artifact_name")
+    ):
+        raise SystemExit("release artifact representation identity differs")
 PY
 
 case "$group" in

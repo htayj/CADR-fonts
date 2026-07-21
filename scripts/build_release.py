@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTENT_CLASSES = ("latin", "symbols")
 LATIN_CODES = frozenset((*range(0x41, 0x5B), *range(0x61, 0x7B)))
 VERSION_PATTERN = re.compile(r"^[A-Za-z0-9._+~-]+$")
+EXPECTED_FONTTOSFNT_VERSION = "fonttosfnt 1.2.5"
 
 # These are release boundaries, not values used to choose artifacts.  Selection
 # is recomputed from the emitted ISO10646 BDFs before these reviewed counts are
@@ -285,8 +286,37 @@ def write_filtered_indexes(
 
 def _artifact_inventory(distribution: Path) -> tuple[list[Artifact], dict[str, object]]:
     build_manifest_path = distribution / "BUILD-MANIFEST.json"
+    identities_path = distribution / "FONT-IDENTITIES.json"
     build_manifest = _load_json(build_manifest_path)
+    identities = _load_json(identities_path)
     require(build_manifest.get("schema_version") == 2, "unsupported BUILD-MANIFEST schema")
+    require(identities.get("schema_version") == 1, "unsupported font-identity schema")
+    identity_mapping_id = identities.get("mapping_id")
+    require(
+        isinstance(identity_mapping_id, str) and identity_mapping_id,
+        "font-identity mapping ID is missing",
+    )
+    build_identity_provenance = build_manifest.get("font_identities")
+    require(
+        isinstance(build_identity_provenance, dict),
+        "build manifest font-identity provenance is missing",
+    )
+    require(
+        build_identity_provenance.get("id") == identity_mapping_id
+        and build_identity_provenance.get("sha256") == sha256(identities_path),
+        "build manifest font-identity provenance differs",
+    )
+    identity_assignments = identities.get("assignments")
+    require(
+        isinstance(identity_assignments, dict),
+        "font-identity assignments are missing",
+    )
+    source_assignments = identity_assignments.get("source_logical_names")
+    runtime_assignments = identity_assignments.get("runtime_artifacts")
+    require(
+        isinstance(source_assignments, dict) and isinstance(runtime_assignments, dict),
+        "font-identity physical assignments are missing",
+    )
 
     source_raw_catalog = _load_json(distribution / "catalog.json")
     runtime_raw_catalog = _load_json(distribution / "runtime" / "catalog.json")
@@ -322,6 +352,53 @@ def _artifact_inventory(distribution: Path) -> tuple[list[Artifact], dict[str, o
             seen.add(identity)
             require(name in raw_records[profile], f"{profile}/{name}: raw record missing")
             raw_record = raw_records[profile][name]
+            logical_identity = record.get("logical_identity")
+            representation = record.get("representation")
+            require(
+                isinstance(logical_identity, dict),
+                f"{profile}/{name}: Unicode logical identity missing",
+            )
+            require(
+                isinstance(representation, dict),
+                f"{profile}/{name}: Unicode representation missing",
+            )
+            require(
+                "representation" not in logical_identity,
+                f"{profile}/{name}: representation is nested in logical identity",
+            )
+            require(
+                raw_record.get("logical_identity") == logical_identity,
+                f"{profile}/{name}: raw/Unicode logical identity drift",
+            )
+            require(
+                raw_record.get("representation") == representation,
+                f"{profile}/{name}: raw/Unicode representation drift",
+            )
+            require(
+                representation.get("profile") == profile
+                and representation.get("artifact_name") == name,
+                f"{profile}/{name}: representation physical identity differs",
+            )
+            if profile == "source":
+                logical_name = str(record["logical_name"])
+                require(
+                    representation.get("logical_name") == logical_name,
+                    f"{profile}/{name}: representation logical name differs",
+                )
+                assigned_logical_id = source_assignments.get(logical_name)
+            else:
+                runtime_name = str(record["runtime_name"])
+                classification = str(record["classification"])
+                require(
+                    representation.get("runtime_name") == runtime_name
+                    and representation.get("classification") == classification,
+                    f"{profile}/{name}: representation runtime identity differs",
+                )
+                assigned_logical_id = runtime_assignments.get(name)
+            require(
+                assigned_logical_id == logical_identity.get("logical_id"),
+                f"{profile}/{name}: configured logical assignment differs",
+            )
             raw_filename = Path(str(record["raw_bdf"])).name
             unicode_filename = Path(str(record["unicode_bdf"])).name
             require(raw_filename == unicode_filename, f"{profile}/{name}: BDF basename drift")
@@ -437,6 +514,11 @@ def _artifact_inventory(distribution: Path) -> tuple[list[Artifact], dict[str, o
                 ),
             },
         },
+        "font_identities": {
+            "path": "FONT-IDENTITIES.json",
+            "id": identity_mapping_id,
+            "sha256": sha256(identities_path),
+        },
         "source_revision": build_manifest["source_revision"],
     }
     return artifacts, provenance
@@ -511,17 +593,15 @@ def _fonttosfnt_version(executable: str) -> str:
             text=True,
         )
     except OSError as error:
-        raise ReleaseError(f"cannot run {resolved} --version: {error}") from error
-    except subprocess.CalledProcessError:
-        # X.Org fonttosfnt releases before 1.2.5 do not implement --version.
-        # Preserve an exact, reproducible tool identity instead of either
-        # rejecting those releases or recording their locale-sensitive usage
-        # message as a version string.
-        return f"fonttosfnt executable sha256:{sha256(Path(resolved).resolve())}"
+        raise ReleaseError(f"cannot run {resolved}: {error}") from error
+    except subprocess.CalledProcessError as error:
+        raise ReleaseError(f"cannot identify fonttosfnt version: {error}") from error
     version = (process.stdout or process.stderr).strip()
-    if version:
-        return version
-    return f"fonttosfnt executable sha256:{sha256(Path(resolved).resolve())}"
+    require(
+        version == EXPECTED_FONTTOSFNT_VERSION,
+        f"unsupported fonttosfnt: expected {EXPECTED_FONTTOSFNT_VERSION!r}, got {version!r}",
+    )
+    return version
 
 
 def _convert_otb(source: Path, destination: Path, executable: str, epoch: int) -> None:
@@ -609,6 +689,8 @@ def _artifact_manifest_record(
         identity["classification"] = artifact.record["classification"]
     return {
         **identity,
+        "logical_identity": artifact.record["logical_identity"],
+        "representation": artifact.record["representation"],
         "repertoire": artifact.record["repertoire"],
         "glyph_count": artifact.record["glyph_count"],
         "standard_glyph_count": artifact.record["standard_glyph_count"],
@@ -719,6 +801,7 @@ def _build_one(
         _copy(ROOT / "LICENSE", release_root / "LICENSE.project")
         _copy(distribution / "LICENSE.source", release_root / "LICENSE.source")
         metadata_sources = {
+            "FONT-IDENTITIES.json": distribution / "FONT-IDENTITIES.json",
             "SOURCE-MANIFEST.json": distribution / "SOURCE-MANIFEST.json",
             "runtime-source-manifest.json": distribution
             / "runtime"
@@ -822,7 +905,7 @@ def _build_one(
                 "unicode_alias_count": alias_counts["unicode"][profile],
             }
         artifact_count = len(selected)
-        total_file_count = 4 * artifact_count + 16
+        total_file_count = 4 * artifact_count + 17
         release_manifest = {
             "schema_version": 1,
             "name": package_name,
@@ -854,6 +937,7 @@ def _build_one(
             "source_distribution": {
                 "build_manifest": provenance["build_manifest"],
                 "catalogs": provenance["catalogs"],
+                "font_identities": provenance["font_identities"],
             },
             "licenses": {
                 "project": {

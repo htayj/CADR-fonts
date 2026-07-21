@@ -23,6 +23,12 @@ import re
 import shutil
 import sys
 
+from font_identities import (
+    DEFAULT_FONT_IDENTITIES,
+    bdf_profile_arguments,
+    load_font_identities,
+    resolve_font_identity,
+)
 from lisp_machine_fonts import (
     BitmapFont,
     Glyph,
@@ -1159,6 +1165,12 @@ def main() -> int:
     parser.add_argument("--sheet-columns", type=positive_integer, default=16)
     parser.add_argument("--sheet-scale", type=positive_integer, default=2)
     parser.add_argument(
+        "--font-identities",
+        type=Path,
+        default=DEFAULT_FONT_IDENTITIES,
+        help="closed reviewed logical-font identity mapping",
+    )
+    parser.add_argument(
         "--clean",
         action="store_true",
         help=(
@@ -1178,6 +1190,13 @@ def main() -> int:
 
     if not args.source.is_dir():
         parser.error(f"not a directory: {args.source}")
+    try:
+        font_identities = load_font_identities(
+            args.font_identities.resolve(),
+            source_repository=args.source.resolve().parents[1],
+        )
+    except ValueError as error:
+        parser.error(str(error))
     selected_formats = set(args.format or ["arc", "ast", "kst", "al"])
     selected_suffixes = {f".{name}" for name in selected_formats - {"arc"}}
     requested_names = {name.casefold() for name in args.font or []}
@@ -1272,12 +1291,17 @@ def main() -> int:
                 metadata=font.metadata
                 | {"logical_name": logical_name, "variant_source_format": variant},
             )
-        profile = bdf_profile(
-            font,
-            foundry="Misc",
-            family_name=f"MIT CADR {runtime_name}",
-            add_style_name=variant,
+        logical_identity = resolve_font_identity(
+            font_identities,
+            profile="source",
+            physical_assignment=logical_name,
+            artifact_name=font.name,
+            measured_pixel_size=font.character_height,
+            representation_style=variant,
+            logical_name=logical_name,
         )
+        representation = logical_identity.pop("representation")
+        profile = bdf_profile(font, **bdf_profile_arguments(logical_identity))
         outputs = write_font_outputs(
             font,
             args.output,
@@ -1313,6 +1337,8 @@ def main() -> int:
                 "character_height": font.character_height,
                 "raster_height": font.raster_height,
                 "baseline": font.baseline,
+                "logical_identity": logical_identity,
+                "representation": representation,
                 "bdf": profile,
                 "outputs": outputs,
                 "observations": (
@@ -1377,6 +1403,7 @@ def main() -> int:
                 "unicode",
                 "release",
                 "packages",
+                "FONT-IDENTITIES.json",
             },
         )
     except ValueError as error:
@@ -1457,7 +1484,10 @@ def main() -> int:
             "spacing": "derived under XLFD P/M/C escapement definitions",
             "tracking": "none; all selected AST/KST column-position-adjustment values are zero",
             "resolution": "72 dpi interchange convention; the historical sources specify pixels, not physical resolution",
-            "typographic_fields": "Unknown/OT/Unknown unless separately evidenced; no inference from opaque source names",
+            "typographic_fields": (
+                "reviewed logical family, weight, slant, and set width from the "
+                "closed font-identity mapping; no build-time inference from names"
+            ),
         },
         "fonts": records,
         "rejected_sources": failures,

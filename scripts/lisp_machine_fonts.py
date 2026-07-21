@@ -205,6 +205,7 @@ def bdf_profile(
     resolution_y: int = 72,
     charset_registry: str = "Misc",
     charset_encoding: str = "FontSpecific",
+    typographic_classification_policy: str | None = None,
 ) -> dict[str, object]:
     """Build the complete XLFD/BDF metadata for one recovered bitmap font.
 
@@ -289,7 +290,8 @@ def bdf_profile(
         "resolution_policy": (
             "72 dpi interchange convention; source specifies pixels, not physical resolution"
         ),
-        "typographic_classification_policy": (
+        "typographic_classification_policy": typographic_classification_policy
+        or (
             "Unknown/OT/Unknown because the source carries no authoritative "
             "weight, slant, or setwidth metadata"
         ),

@@ -16,6 +16,9 @@ Gallery grouping is content-derived: a font is Latin when at least one
 visible emitted Unicode glyph is a Basic Latin letter; `symbols` is the
 closed complement. See [the Unicode mapping](docs/UNICODE.md) and
 [font model](docs/FONT-MODEL.md).
+Artifact names remain the physical source/runtime identities. Each entry
+shows its reviewed logical selector separately from its authored, current
+runtime, or legacy runtime representation.
 
 ## Latin fonts (160)
 
@@ -23,473 +26,945 @@ closed complement. See [the Unicode mapping](docs/UNICODE.md) and
 
 #### `13FG`
 
+**Logical selector:** `FIXED-GOTHIC/ROMAN/13`
+
+**Representation:** `Authored source`
+
 ![13FG latin source specimen](specimens/latin/source/13fg.png)
 
 #### `13FGB`
+
+**Logical selector:** `FIXED-GOTHIC/BOLD/13`
+
+**Representation:** `Authored source`
 
 ![13FGB latin source specimen](specimens/latin/source/13fgb.png)
 
 #### `14FR3`
 
+**Logical selector:** `FR3/ROMAN/14`
+
+**Representation:** `Authored source`
+
 ![14FR3 latin source specimen](specimens/latin/source/14fr3.png)
 
 #### `16FG`
+
+**Logical selector:** `FIXED-GOTHIC/ROMAN/16`
+
+**Representation:** `Authored source`
 
 ![16FG latin source specimen](specimens/latin/source/16fg.png)
 
 #### `25FR3`
 
+**Logical selector:** `FR3/ROMAN/25`
+
+**Representation:** `Authored source`
+
 ![25FR3 latin source specimen](specimens/latin/source/25fr3.png)
 
 #### `40VSHD`
+
+**Logical selector:** `VR/SHADOW/40 [STANDARD] · MIT CADR VR Shadow (role-mapped)`
+
+**Representation:** `Authored source`
 
 ![40VSHD latin source specimen](specimens/latin/source/40vshd.png)
 
 #### `43VXMS`
 
+**Logical selector:** `XMS-43/ROMAN/43 [XMS] · MIT CADR 43VXMS (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![43VXMS latin source specimen](specimens/latin/source/43vxms.png)
 
 #### `5X5`
+
+**Logical selector:** `FIX/UPPERCASE/5`
+
+**Representation:** `Authored source`
 
 ![5X5 latin source specimen](specimens/latin/source/5x5.png)
 
 #### `BIGFNT`
 
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![BIGFNT latin source specimen](specimens/latin/source/bigfnt.png)
 
 #### `BIGFNT-KST` — `BIGFNT`
+
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `Authored source · KST`
 
 ![BIGFNT-KST latin source specimen](specimens/latin/source/bigfnt-kst.png)
 
 #### `BLKF10`
 
+**Logical selector:** `MIT CADR BLKF10 (unmapped)`
+
+**Representation:** `Authored source`
+
 ![BLKF10 latin source specimen](specimens/latin/source/blkf10.png)
 
 #### `BLKF10-AL-AR1` — `BLKF10`
+
+**Logical selector:** `MIT CADR BLKF10 (unmapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![BLKF10-AL-AR1 latin source specimen](specimens/latin/source/blkf10-al-ar1.png)
 
 #### `CHA`
 
+**Logical selector:** `CHA/ROMAN/Default`
+
+**Representation:** `Authored source`
+
 ![CHA latin source specimen](specimens/latin/source/cha.png)
 
 #### `CHA-AL-AR1` — `CHA`
+
+**Logical selector:** `CHA/ROMAN/Default`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![CHA-AL-AR1 latin source specimen](specimens/latin/source/cha-al-ar1.png)
 
 #### `CHAS`
 
+**Logical selector:** `CHA/S-VARIANT/Default`
+
+**Representation:** `Authored source`
+
 ![CHAS latin source specimen](specimens/latin/source/chas.png)
 
 #### `CHAS-AL-AR1` — `CHAS`
+
+**Logical selector:** `CHA/S-VARIANT/Default`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![CHAS-AL-AR1 latin source specimen](specimens/latin/source/chas-al-ar1.png)
 
 #### `CLAR`
 
+**Logical selector:** `CLAR/ROMAN/Default`
+
+**Representation:** `Authored source`
+
 ![CLAR latin source specimen](specimens/latin/source/clar.png)
 
 #### `CLAR-AL-AR1` — `CLAR`
+
+**Logical selector:** `CLAR/ROMAN/Default`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![CLAR-AL-AR1 latin source specimen](specimens/latin/source/clar-al-ar1.png)
 
 #### `CLAR12`
 
+**Logical selector:** `CLAR/ROMAN/12`
+
+**Representation:** `Authored source`
+
 ![CLAR12 latin source specimen](specimens/latin/source/clar12.png)
 
 #### `CLAR12-AL-AR1` — `CLAR12`
+
+**Logical selector:** `CLAR/ROMAN/12`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![CLAR12-AL-AR1 latin source specimen](specimens/latin/source/clar12-al-ar1.png)
 
 #### `CLAR14`
 
+**Logical selector:** `CLAR/ROMAN/14`
+
+**Representation:** `Authored source`
+
 ![CLAR14 latin source specimen](specimens/latin/source/clar14.png)
 
 #### `CLAR14-AL-AR1` — `CLAR14`
+
+**Logical selector:** `CLAR/ROMAN/14`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![CLAR14-AL-AR1 latin source specimen](specimens/latin/source/clar14-al-ar1.png)
 
 #### `CLARB`
 
+**Logical selector:** `CLAR/BOLD/Default`
+
+**Representation:** `Authored source`
+
 ![CLARB latin source specimen](specimens/latin/source/clarb.png)
 
 #### `CLARB-AL-AR1` — `CLARB`
+
+**Logical selector:** `CLAR/BOLD/Default`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![CLARB-AL-AR1 latin source specimen](specimens/latin/source/clarb-al-ar1.png)
 
 #### `CLRE14`
 
+**Logical selector:** `CLAR/E-VARIANT/14`
+
+**Representation:** `Authored source`
+
 ![CLRE14 latin source specimen](specimens/latin/source/clre14.png)
 
 #### `CM10`
+
+**Logical selector:** `COMPUTER-MODERN/ROMAN/10`
+
+**Representation:** `Authored source`
 
 ![CM10 latin source specimen](specimens/latin/source/cm10.png)
 
 #### `CM12`
 
+**Logical selector:** `COMPUTER-MODERN/ROMAN/12`
+
+**Representation:** `Authored source`
+
 ![CM12 latin source specimen](specimens/latin/source/cm12.png)
 
 #### `CPTFON`
+
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `Authored source`
 
 ![CPTFON latin source specimen](specimens/latin/source/cptfon.png)
 
 #### `GACH10`
 
+**Logical selector:** `GACHA/ROMAN/10`
+
+**Representation:** `Authored source`
+
 ![GACH10 latin source specimen](specimens/latin/source/gach10.png)
 
 #### `GACH10-AL-AR1` — `GACH10`
+
+**Logical selector:** `GACHA/ROMAN/10`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![GACH10-AL-AR1 latin source specimen](specimens/latin/source/gach10-al-ar1.png)
 
 #### `GACH12`
 
+**Logical selector:** `GACHA/ROMAN/12`
+
+**Representation:** `Authored source`
+
 ![GACH12 latin source specimen](specimens/latin/source/gach12.png)
 
 #### `GACH12-AL-AR1` — `GACH12`
+
+**Logical selector:** `GACHA/ROMAN/12`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![GACH12-AL-AR1 latin source specimen](specimens/latin/source/gach12-al-ar1.png)
 
 #### `GACHA8`
 
+**Logical selector:** `GACHA/ROMAN/8`
+
+**Representation:** `Authored source`
+
 ![GACHA8 latin source specimen](specimens/latin/source/gacha8.png)
 
 #### `GACHA8-AL-AR1` — `GACHA8`
+
+**Logical selector:** `GACHA/ROMAN/8`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![GACHA8-AL-AR1 latin source specimen](specimens/latin/source/gacha8-al-ar1.png)
 
 #### `GLS7X9`
 
+**Logical selector:** `GLS/ROMAN/7x9 [GLS] · MIT CADR GLS 7x9 (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![GLS7X9 latin source specimen](specimens/latin/source/gls7x9.png)
 
 #### `HAFONT`
+
+**Logical selector:** `MIT CADR HAFONT (unmapped)`
+
+**Representation:** `Authored source`
 
 ![HAFONT latin source specimen](specimens/latin/source/hafont.png)
 
 #### `HL10`
 
+**Logical selector:** `HELVETICA/ROMAN/10`
+
+**Representation:** `Authored source`
+
 ![HL10 latin source specimen](specimens/latin/source/hl10.png)
 
 #### `HL10-AL-AR1` — `HL10`
+
+**Logical selector:** `HELVETICA/ROMAN/10`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL10-AL-AR1 latin source specimen](specimens/latin/source/hl10-al-ar1.png)
 
 #### `HL10B`
 
+**Logical selector:** `HELVETICA/BOLD/10`
+
+**Representation:** `Authored source`
+
 ![HL10B latin source specimen](specimens/latin/source/hl10b.png)
 
 #### `HL10B-AL-AR1` — `HL10B`
+
+**Logical selector:** `HELVETICA/BOLD/10`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL10B-AL-AR1 latin source specimen](specimens/latin/source/hl10b-al-ar1.png)
 
 #### `HL12`
 
+**Logical selector:** `HELVETICA/ROMAN/12`
+
+**Representation:** `Authored source`
+
 ![HL12 latin source specimen](specimens/latin/source/hl12.png)
 
 #### `HL12-AL-AR1` — `HL12`
+
+**Logical selector:** `HELVETICA/ROMAN/12`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL12-AL-AR1 latin source specimen](specimens/latin/source/hl12-al-ar1.png)
 
 #### `HL12B`
 
+**Logical selector:** `HELVETICA/BOLD/12`
+
+**Representation:** `Authored source`
+
 ![HL12B latin source specimen](specimens/latin/source/hl12b.png)
 
 #### `HL12B-AL-AR1` — `HL12B`
+
+**Logical selector:** `HELVETICA/BOLD/12`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL12B-AL-AR1 latin source specimen](specimens/latin/source/hl12b-al-ar1.png)
 
 #### `HL12I`
 
+**Logical selector:** `HELVETICA/ITALIC/12`
+
+**Representation:** `Authored source`
+
 ![HL12I latin source specimen](specimens/latin/source/hl12i.png)
 
 #### `HL12I-AL-AR1` — `HL12I`
+
+**Logical selector:** `HELVETICA/ITALIC/12`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL12I-AL-AR1 latin source specimen](specimens/latin/source/hl12i-al-ar1.png)
 
 #### `HL14`
 
+**Logical selector:** `HELVETICA/ROMAN/14`
+
+**Representation:** `Authored source`
+
 ![HL14 latin source specimen](specimens/latin/source/hl14.png)
 
 #### `HL14-AL-AR1` — `HL14`
+
+**Logical selector:** `HELVETICA/ROMAN/14`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL14-AL-AR1 latin source specimen](specimens/latin/source/hl14-al-ar1.png)
 
 #### `HL18`
 
+**Logical selector:** `HELVETICA/ROMAN/18`
+
+**Representation:** `Authored source`
+
 ![HL18 latin source specimen](specimens/latin/source/hl18.png)
 
 #### `HL18-AL-AR1` — `HL18`
+
+**Logical selector:** `HELVETICA/ROMAN/18`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL18-AL-AR1 latin source specimen](specimens/latin/source/hl18-al-ar1.png)
 
 #### `HL6`
 
+**Logical selector:** `HELVETICA/ROMAN/6`
+
+**Representation:** `Authored source`
+
 ![HL6 latin source specimen](specimens/latin/source/hl6.png)
 
 #### `HL6-AL-AR1` — `HL6`
+
+**Logical selector:** `HELVETICA/ROMAN/6`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL6-AL-AR1 latin source specimen](specimens/latin/source/hl6-al-ar1.png)
 
 #### `HL7`
 
+**Logical selector:** `HELVETICA/ROMAN/7`
+
+**Representation:** `Authored source`
+
 ![HL7 latin source specimen](specimens/latin/source/hl7.png)
 
 #### `HL7-AL-AR1` — `HL7`
+
+**Logical selector:** `HELVETICA/ROMAN/7`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL7-AL-AR1 latin source specimen](specimens/latin/source/hl7-al-ar1.png)
 
 #### `HL7B`
 
+**Logical selector:** `HELVETICA/BOLD/7`
+
+**Representation:** `Authored source`
+
 ![HL7B latin source specimen](specimens/latin/source/hl7b.png)
 
 #### `HL7B-AL-AR1` — `HL7B`
+
+**Logical selector:** `HELVETICA/BOLD/7`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL7B-AL-AR1 latin source specimen](specimens/latin/source/hl7b-al-ar1.png)
 
 #### `HL7BI`
 
+**Logical selector:** `HELVETICA/BOLD-ITALIC/7`
+
+**Representation:** `Authored source`
+
 ![HL7BI latin source specimen](specimens/latin/source/hl7bi.png)
 
 #### `HL7BI-AL-AR1` — `HL7BI`
+
+**Logical selector:** `HELVETICA/BOLD-ITALIC/7`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL7BI-AL-AR1 latin source specimen](specimens/latin/source/hl7bi-al-ar1.png)
 
 #### `HL7I`
 
+**Logical selector:** `HELVETICA/ITALIC/7`
+
+**Representation:** `Authored source`
+
 ![HL7I latin source specimen](specimens/latin/source/hl7i.png)
 
 #### `HL7I-AL-AR1` — `HL7I`
+
+**Logical selector:** `HELVETICA/ITALIC/7`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL7I-AL-AR1 latin source specimen](specimens/latin/source/hl7i-al-ar1.png)
 
 #### `HL8`
 
+**Logical selector:** `HELVETICA/ROMAN/8`
+
+**Representation:** `Authored source`
+
 ![HL8 latin source specimen](specimens/latin/source/hl8.png)
 
 #### `HL8-AL-AR1` — `HL8`
+
+**Logical selector:** `HELVETICA/ROMAN/8`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL8-AL-AR1 latin source specimen](specimens/latin/source/hl8-al-ar1.png)
 
 #### `HL8B`
 
+**Logical selector:** `HELVETICA/BOLD/8`
+
+**Representation:** `Authored source`
+
 ![HL8B latin source specimen](specimens/latin/source/hl8b.png)
 
 #### `HL8B-AL-AR1` — `HL8B`
+
+**Logical selector:** `HELVETICA/BOLD/8`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HL8B-AL-AR1 latin source specimen](specimens/latin/source/hl8b-al-ar1.png)
 
 #### `MEDFNT`
 
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![MEDFNT latin source specimen](specimens/latin/source/medfnt.png)
 
 #### `METS`
+
+**Logical selector:** `METS/ROMAN/Default`
+
+**Representation:** `Authored source`
 
 ![METS latin source specimen](specimens/latin/source/mets.png)
 
 #### `METSI`
 
+**Logical selector:** `METS/ITALIC/Default`
+
+**Representation:** `Authored source`
+
 ![METSI latin source specimen](specimens/latin/source/metsi.png)
 
 #### `NONM`
+
+**Logical selector:** `NON/ROMAN/Medium`
+
+**Representation:** `Authored source`
 
 ![NONM latin source specimen](specimens/latin/source/nonm.png)
 
 #### `NONS`
 
+**Logical selector:** `NON/ROMAN/Small`
+
+**Representation:** `Authored source`
+
 ![NONS latin source specimen](specimens/latin/source/nons.png)
 
 #### `PRNT10`
+
+**Logical selector:** `PRINT/ROMAN/10`
+
+**Representation:** `Authored source`
 
 ![PRNT10 latin source specimen](specimens/latin/source/prnt10.png)
 
 #### `PRNT10-AL-AR1` — `PRNT10`
 
+**Logical selector:** `PRINT/ROMAN/10`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![PRNT10-AL-AR1 latin source specimen](specimens/latin/source/prnt10-al-ar1.png)
 
 #### `PRONTO`
+
+**Logical selector:** `MIT CADR PRONTO (unmapped)`
+
+**Representation:** `Authored source`
 
 ![PRONTO latin source specimen](specimens/latin/source/pronto.png)
 
 #### `PRT12B`
 
+**Logical selector:** `PRINT/BOLD/12`
+
+**Representation:** `Authored source`
+
 ![PRT12B latin source specimen](specimens/latin/source/prt12b.png)
 
 #### `PRT12B-AL-AR1` — `PRT12B`
+
+**Logical selector:** `PRINT/BOLD/12`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![PRT12B-AL-AR1 latin source specimen](specimens/latin/source/prt12b-al-ar1.png)
 
 #### `SAIL10`
 
+**Logical selector:** `SAIL/ROMAN/10`
+
+**Representation:** `Authored source`
+
 ![SAIL10 latin source specimen](specimens/latin/source/sail10.png)
 
 #### `SMT10`
+
+**Logical selector:** `SMT/ROMAN/10`
+
+**Representation:** `Authored source`
 
 ![SMT10 latin source specimen](specimens/latin/source/smt10.png)
 
 #### `SMT10-AL-AR1` — `SMT10`
 
+**Logical selector:** `SMT/ROMAN/10`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![SMT10-AL-AR1 latin source specimen](specimens/latin/source/smt10-al-ar1.png)
 
 #### `SMT10A`
+
+**Logical selector:** `SMT/ALTERNATE-A/10`
+
+**Representation:** `Authored source`
 
 ![SMT10A latin source specimen](specimens/latin/source/smt10a.png)
 
 #### `SMT10A-AL-AR1` — `SMT10A`
 
+**Logical selector:** `SMT/ALTERNATE-A/10`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![SMT10A-AL-AR1 latin source specimen](specimens/latin/source/smt10a-al-ar1.png)
 
 #### `SMT14`
+
+**Logical selector:** `SMT/ROMAN/14`
+
+**Representation:** `Authored source`
 
 ![SMT14 latin source specimen](specimens/latin/source/smt14.png)
 
 #### `SMT14-AL-AR1` — `SMT14`
 
+**Logical selector:** `SMT/ROMAN/14`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![SMT14-AL-AR1 latin source specimen](specimens/latin/source/smt14-al-ar1.png)
 
 #### `SMT14A`
+
+**Logical selector:** `SMT/ALTERNATE-A/14`
+
+**Representation:** `Authored source`
 
 ![SMT14A latin source specimen](specimens/latin/source/smt14a.png)
 
 #### `SMT14A-AL-AR1` — `SMT14A`
 
+**Logical selector:** `SMT/ALTERNATE-A/14`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![SMT14A-AL-AR1 latin source specimen](specimens/latin/source/smt14a-al-ar1.png)
 
 #### `ST10`
+
+**Logical selector:** `ST/ROMAN/10`
+
+**Representation:** `Authored source`
 
 ![ST10 latin source specimen](specimens/latin/source/st10.png)
 
 #### `ST10-AL-AR1` — `ST10`
 
+**Logical selector:** `ST/ROMAN/10`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![ST10-AL-AR1 latin source specimen](specimens/latin/source/st10-al-ar1.png)
 
 #### `ST6`
+
+**Logical selector:** `ST/ROMAN/6`
+
+**Representation:** `Authored source`
 
 ![ST6 latin source specimen](specimens/latin/source/st6.png)
 
 #### `ST6-AL-AR1` — `ST6`
 
+**Logical selector:** `ST/ROMAN/6`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![ST6-AL-AR1 latin source specimen](specimens/latin/source/st6-al-ar1.png)
 
 #### `ST8`
+
+**Logical selector:** `ST/ROMAN/8`
+
+**Representation:** `Authored source`
 
 ![ST8 latin source specimen](specimens/latin/source/st8.png)
 
 #### `ST8-AL-AR1` — `ST8`
 
+**Logical selector:** `ST/ROMAN/8`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![ST8-AL-AR1 latin source specimen](specimens/latin/source/st8-al-ar1.png)
 
 #### `TNTO14`
+
+**Logical selector:** `TONTO/ROMAN/14`
+
+**Representation:** `Authored source`
 
 ![TNTO14 latin source specimen](specimens/latin/source/tnto14.png)
 
 #### `TNTO14-AL-AR1` — `TNTO14`
 
+**Logical selector:** `TONTO/ROMAN/14`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TNTO14-AL-AR1 latin source specimen](specimens/latin/source/tnto14-al-ar1.png)
 
 #### `TNTOB`
+
+**Logical selector:** `TONTO/BOLD/Default`
+
+**Representation:** `Authored source`
 
 ![TNTOB latin source specimen](specimens/latin/source/tntob.png)
 
 #### `TNTOB-AL-AR1` — `TNTOB`
 
+**Logical selector:** `TONTO/BOLD/Default`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TNTOB-AL-AR1 latin source specimen](specimens/latin/source/tntob-al-ar1.png)
 
 #### `TONTO`
+
+**Logical selector:** `TONTO/ROMAN/Default`
+
+**Representation:** `Authored source`
 
 ![TONTO latin source specimen](specimens/latin/source/tonto.png)
 
 #### `TONTO-AL-AR1` — `TONTO`
 
+**Logical selector:** `TONTO/ROMAN/Default`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TONTO-AL-AR1 latin source specimen](specimens/latin/source/tonto-al-ar1.png)
 
 #### `TR10`
+
+**Logical selector:** `TIMES-ROMAN/ROMAN/10`
+
+**Representation:** `Authored source`
 
 ![TR10 latin source specimen](specimens/latin/source/tr10.png)
 
 #### `TR10-AL-AR1` — `TR10`
 
+**Logical selector:** `TIMES-ROMAN/ROMAN/10`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR10-AL-AR1 latin source specimen](specimens/latin/source/tr10-al-ar1.png)
 
 #### `TR10B`
+
+**Logical selector:** `TIMES-ROMAN/BOLD/10`
+
+**Representation:** `Authored source`
 
 ![TR10B latin source specimen](specimens/latin/source/tr10b.png)
 
 #### `TR10B-AL-AR1` — `TR10B`
 
+**Logical selector:** `TIMES-ROMAN/BOLD/10`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR10B-AL-AR1 latin source specimen](specimens/latin/source/tr10b-al-ar1.png)
 
 #### `TR10I`
+
+**Logical selector:** `TIMES-ROMAN/ITALIC/10`
+
+**Representation:** `Authored source`
 
 ![TR10I latin source specimen](specimens/latin/source/tr10i.png)
 
 #### `TR10I-AL-AR1` — `TR10I`
 
+**Logical selector:** `TIMES-ROMAN/ITALIC/10`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR10I-AL-AR1 latin source specimen](specimens/latin/source/tr10i-al-ar1.png)
 
 #### `TR12`
+
+**Logical selector:** `TIMES-ROMAN/ROMAN/12`
+
+**Representation:** `Authored source`
 
 ![TR12 latin source specimen](specimens/latin/source/tr12.png)
 
 #### `TR12-AL-AR1` — `TR12`
 
+**Logical selector:** `TIMES-ROMAN/ROMAN/12`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR12-AL-AR1 latin source specimen](specimens/latin/source/tr12-al-ar1.png)
 
 #### `TR12B`
+
+**Logical selector:** `TIMES-ROMAN/BOLD/12`
+
+**Representation:** `Authored source`
 
 ![TR12B latin source specimen](specimens/latin/source/tr12b.png)
 
 #### `TR12B-AL-AR1` — `TR12B`
 
+**Logical selector:** `TIMES-ROMAN/BOLD/12`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR12B-AL-AR1 latin source specimen](specimens/latin/source/tr12b-al-ar1.png)
 
 #### `TR12I`
+
+**Logical selector:** `TIMES-ROMAN/ITALIC/12`
+
+**Representation:** `Authored source`
 
 ![TR12I latin source specimen](specimens/latin/source/tr12i.png)
 
 #### `TR12I-AL-AR1` — `TR12I`
 
+**Logical selector:** `TIMES-ROMAN/ITALIC/12`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR12I-AL-AR1 latin source specimen](specimens/latin/source/tr12i-al-ar1.png)
 
 #### `TR14`
+
+**Logical selector:** `TIMES-ROMAN/ROMAN/14`
+
+**Representation:** `Authored source`
 
 ![TR14 latin source specimen](specimens/latin/source/tr14.png)
 
 #### `TR14-AL-AR1` — `TR14`
 
+**Logical selector:** `TIMES-ROMAN/ROMAN/14`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR14-AL-AR1 latin source specimen](specimens/latin/source/tr14-al-ar1.png)
 
 #### `TR18`
+
+**Logical selector:** `TIMES-ROMAN/ROMAN/18`
+
+**Representation:** `Authored source`
 
 ![TR18 latin source specimen](specimens/latin/source/tr18.png)
 
 #### `TR18-AL-AR1` — `TR18`
 
+**Logical selector:** `TIMES-ROMAN/ROMAN/18`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR18-AL-AR1 latin source specimen](specimens/latin/source/tr18-al-ar1.png)
 
 #### `TR8`
+
+**Logical selector:** `TIMES-ROMAN/ROMAN/8`
+
+**Representation:** `Authored source`
 
 ![TR8 latin source specimen](specimens/latin/source/tr8.png)
 
 #### `TR8-AL-AR1` — `TR8`
 
+**Logical selector:** `TIMES-ROMAN/ROMAN/8`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR8-AL-AR1 latin source specimen](specimens/latin/source/tr8-al-ar1.png)
 
 #### `TR8B`
+
+**Logical selector:** `TIMES-ROMAN/BOLD/8`
+
+**Representation:** `Authored source`
 
 ![TR8B latin source specimen](specimens/latin/source/tr8b.png)
 
 #### `TR8B-AL-AR1` — `TR8B`
 
+**Logical selector:** `TIMES-ROMAN/BOLD/8`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR8B-AL-AR1 latin source specimen](specimens/latin/source/tr8b-al-ar1.png)
 
 #### `TR8I`
+
+**Logical selector:** `TIMES-ROMAN/ITALIC/8`
+
+**Representation:** `Authored source`
 
 ![TR8I latin source specimen](specimens/latin/source/tr8i.png)
 
 #### `TR8I-AL-AR1` — `TR8I`
 
+**Logical selector:** `TIMES-ROMAN/ITALIC/8`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![TR8I-AL-AR1 latin source specimen](specimens/latin/source/tr8i-al-ar1.png)
 
 #### `TVFONT`
+
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `Authored source`
 
 ![TVFONT latin source specimen](specimens/latin/source/tvfont.png)
 
@@ -497,169 +972,337 @@ closed complement. See [the Unicode mapping](docs/UNICODE.md) and
 
 #### `13FGB`
 
+**Logical selector:** `FIXED-GOTHIC/BOLD/13`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![13FGB latin runtime specimen](specimens/latin/runtime/13fgb.png)
 
 #### `16FG`
+
+**Logical selector:** `FIXED-GOTHIC/ROMAN/16`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![16FG latin runtime specimen](specimens/latin/runtime/16fg.png)
 
 #### `20VR`
 
+**Logical selector:** `VR/ROMAN/20`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![20VR latin runtime specimen](specimens/latin/runtime/20vr.png)
 
 #### `25FR3`
+
+**Logical selector:** `FR3/ROMAN/25`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![25FR3 latin runtime specimen](specimens/latin/runtime/25fr3.png)
 
 #### `31VR`
 
+**Logical selector:** `VR/ROMAN/31`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![31VR latin runtime specimen](specimens/latin/runtime/31vr.png)
 
 #### `40VR`
+
+**Logical selector:** `VR/ROMAN/40`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
 
 ![40VR latin runtime specimen](specimens/latin/runtime/40vr.png)
 
 #### `40VSHD`
 
+**Logical selector:** `VR/SHADOW/40 [STANDARD] · MIT CADR VR Shadow (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![40VSHD latin runtime specimen](specimens/latin/runtime/40vshd.png)
 
 #### `43VXMS`
+
+**Logical selector:** `XMS-43/ROMAN/43 [XMS] · MIT CADR 43VXMS (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![43VXMS latin runtime specimen](specimens/latin/runtime/43vxms.png)
 
 #### `5X5`
 
+**Logical selector:** `FIX/UPPERCASE/5`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![5X5 latin runtime specimen](specimens/latin/runtime/5x5.png)
 
 #### `BIGFNT`
+
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![BIGFNT latin runtime specimen](specimens/latin/runtime/bigfnt.png)
 
 #### `BIGVG`
 
+**Logical selector:** `MIT CADR BIGVG (unmapped)`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![BIGVG latin runtime specimen](specimens/latin/runtime/bigvg.png)
 
 #### `CPT-13FG`
+
+**Logical selector:** `FIXED-GOTHIC/ROMAN/13`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
 
 ![CPT-13FG latin runtime specimen](specimens/latin/runtime/cpt-13fg.png)
 
 #### `CPT-CM10`
 
+**Logical selector:** `COMPUTER-MODERN/ROMAN/10`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![CPT-CM10 latin runtime specimen](specimens/latin/runtime/cpt-cm10.png)
 
 #### `CPT-CM12`
+
+**Logical selector:** `COMPUTER-MODERN/ROMAN/12`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![CPT-CM12 latin runtime specimen](specimens/latin/runtime/cpt-cm12.png)
 
 #### `CPT-HL10`
 
+**Logical selector:** `HELVETICA/ROMAN/10`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![CPT-HL10 latin runtime specimen](specimens/latin/runtime/cpt-hl10.png)
 
 #### `CPT-HL10B`
+
+**Logical selector:** `HELVETICA/BOLD/10`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
 
 ![CPT-HL10B latin runtime specimen](specimens/latin/runtime/cpt-hl10b.png)
 
 #### `CPT-TR10I`
 
+**Logical selector:** `TIMES-ROMAN/ITALIC/10`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![CPT-TR10I latin runtime specimen](specimens/latin/runtime/cpt-tr10i.png)
 
 #### `CPTFONT`
+
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![CPTFONT latin runtime specimen](specimens/latin/runtime/cptfont.png)
 
 #### `GERM35`
 
+**Logical selector:** `GERMAN-BLACKLETTER/ROMAN/35 [GERMAN] · MIT CADR German Blackletter (role-mapped)`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![GERM35 latin runtime specimen](specimens/latin/runtime/germ35.png)
 
 #### `HL10`
+
+**Logical selector:** `HELVETICA/ROMAN/10`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![HL10 latin runtime specimen](specimens/latin/runtime/hl10.png)
 
 #### `HL10B`
 
+**Logical selector:** `HELVETICA/BOLD/10`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![HL10B latin runtime specimen](specimens/latin/runtime/hl10b.png)
 
 #### `HL12`
+
+**Logical selector:** `HELVETICA/ROMAN/12`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![HL12 latin runtime specimen](specimens/latin/runtime/hl12.png)
 
 #### `HL12B`
 
+**Logical selector:** `HELVETICA/BOLD/12`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![HL12B latin runtime specimen](specimens/latin/runtime/hl12b.png)
 
 #### `HL12BI`
+
+**Logical selector:** `HELVETICA/BOLD-ITALIC/12`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
 
 ![HL12BI latin runtime specimen](specimens/latin/runtime/hl12bi.png)
 
 #### `HL12I`
 
+**Logical selector:** `HELVETICA/ITALIC/12`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![HL12I latin runtime specimen](specimens/latin/runtime/hl12i.png)
 
 #### `HL6`
+
+**Logical selector:** `HELVETICA/ROMAN/6`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![HL6 latin runtime specimen](specimens/latin/runtime/hl6.png)
 
 #### `HL7`
 
+**Logical selector:** `HELVETICA/ROMAN/7`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![HL7 latin runtime specimen](specimens/latin/runtime/hl7.png)
 
 #### `MEDFNB`
+
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
 
 ![MEDFNB latin runtime specimen](specimens/latin/runtime/medfnb.png)
 
 #### `MEDFNT`
 
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![MEDFNT latin runtime specimen](specimens/latin/runtime/medfnt.png)
 
 #### `METS`
+
+**Logical selector:** `METS/ROMAN/Default`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![METS latin runtime specimen](specimens/latin/runtime/mets.png)
 
 #### `METSI`
 
+**Logical selector:** `METS/ITALIC/Default`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![METSI latin runtime specimen](specimens/latin/runtime/metsi.png)
 
 #### `N43XMS` — `43VXMS`
+
+**Logical selector:** `XMS-43/ROMAN/43 [XMS] · MIT CADR 43VXMS (role-mapped)`
+
+**Representation:** `System 46 Legacy N43XMS · legacy compiled version`
 
 ![N43XMS latin runtime specimen](specimens/latin/runtime/n43xms.png)
 
 #### `PRT12B`
 
+**Logical selector:** `PRINT/BOLD/12`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![PRT12B latin runtime specimen](specimens/latin/runtime/prt12b.png)
 
 #### `S35GER`
+
+**Logical selector:** `GERMAN-BLACKLETTER/ROMAN/35 [GERMAN] · MIT CADR German Blackletter (role-mapped)`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
 
 ![S35GER latin runtime specimen](specimens/latin/runtime/s35ger.png)
 
 #### `SAIL12`
 
+**Logical selector:** `SAIL/ROMAN/12`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![SAIL12 latin runtime specimen](specimens/latin/runtime/sail12.png)
 
 #### `TR10I`
+
+**Logical selector:** `TIMES-ROMAN/ITALIC/10`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![TR10I latin runtime specimen](specimens/latin/runtime/tr10i.png)
 
 #### `TR12B`
 
+**Logical selector:** `TIMES-ROMAN/BOLD/12`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![TR12B latin runtime specimen](specimens/latin/runtime/tr12b.png)
 
 #### `TR12B1`
+
+**Logical selector:** `TIMES-ROMAN/ALTERNATE-1/12`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
 
 ![TR12B1 latin runtime specimen](specimens/latin/runtime/tr12b1.png)
 
 #### `TR8`
 
+**Logical selector:** `TIMES-ROMAN/ROMAN/8`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![TR8 latin runtime specimen](specimens/latin/runtime/tr8.png)
 
 #### `TR8B`
+
+**Logical selector:** `TIMES-ROMAN/BOLD/8`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![TR8B latin runtime specimen](specimens/latin/runtime/tr8b.png)
 
 #### `TR8I`
 
+**Logical selector:** `TIMES-ROMAN/ITALIC/8`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![TR8I latin runtime specimen](specimens/latin/runtime/tr8i.png)
 
 #### `TVFONT`
+
+**Logical selector:** `MIT CADR Fixed (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![TVFONT latin runtime specimen](specimens/latin/runtime/tvfont.png)
 
@@ -669,133 +1312,265 @@ closed complement. See [the Unicode mapping](docs/UNICODE.md) and
 
 #### `APL14`
 
+**Logical selector:** `APL/ROMAN/14 [APL] · MIT CADR APL (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![APL14 symbols source specimen](specimens/symbols/source/apl14.png)
 
 #### `APL14-AL-AR1` — `APL14`
+
+**Logical selector:** `APL/ROMAN/14 [APL] · MIT CADR APL (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![APL14-AL-AR1 symbols source specimen](specimens/symbols/source/apl14-al-ar1.png)
 
 #### `ARR10`
 
+**Logical selector:** `ARROWS/ROMAN/10 [ARROWS] · MIT CADR Arrows (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![ARR10 symbols source specimen](specimens/symbols/source/arr10.png)
 
 #### `ARR10-AL-AR1` — `ARR10`
+
+**Logical selector:** `ARROWS/ROMAN/10 [ARROWS] · MIT CADR Arrows (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![ARR10-AL-AR1 symbols source specimen](specimens/symbols/source/arr10-al-ar1.png)
 
 #### `ARROW`
 
+**Logical selector:** `ARROWS/ROMAN/Default [ARROWS] · MIT CADR Arrows (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![ARROW symbols source specimen](specimens/symbols/source/arrow.png)
 
 #### `ARROW-KST` — `ARROW`
+
+**Logical selector:** `ARROWS/ROMAN/Default [ARROWS] · MIT CADR Arrows (role-mapped)`
+
+**Representation:** `Authored source · KST`
 
 ![ARROW-KST symbols source specimen](specimens/symbols/source/arrow-kst.png)
 
 #### `BUG`
 
+**Logical selector:** `BUG/ROMAN/Default [BUG] · MIT CADR Bug (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![BUG symbols source specimen](specimens/symbols/source/bug.png)
 
 #### `BUG-KST` — `BUG`
+
+**Logical selector:** `BUG/ROMAN/Default [BUG] · MIT CADR Bug (role-mapped)`
+
+**Representation:** `Authored source · KST`
 
 ![BUG-KST symbols source specimen](specimens/symbols/source/bug-kst.png)
 
 #### `CLARGK`
 
+**Logical selector:** `CLAR/ROMAN/Greek [GREEK] · MIT CADR Clarendon Greek (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![CLARGK symbols source specimen](specimens/symbols/source/clargk.png)
 
 #### `CLARGK-AL-AR1` — `CLARGK`
+
+**Logical selector:** `CLAR/ROMAN/Greek [GREEK] · MIT CADR Clarendon Greek (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![CLARGK-AL-AR1 symbols source specimen](specimens/symbols/source/clargk-al-ar1.png)
 
 #### `CYR12`
 
+**Logical selector:** `CYRILLIC/ROMAN/12 [CYRILLIC] · MIT CADR Cyrillic (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![CYR12 symbols source specimen](specimens/symbols/source/cyr12.png)
 
 #### `CYR12-AL-AR1` — `CYR12`
+
+**Logical selector:** `CYRILLIC/ROMAN/12 [CYRILLIC] · MIT CADR Cyrillic (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![CYR12-AL-AR1 symbols source specimen](specimens/symbols/source/cyr12-al-ar1.png)
 
 #### `GATES3`
 
+**Logical selector:** `GATES/ROMAN/32 [GATES] · MIT CADR Gates (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![GATES3 symbols source specimen](specimens/symbols/source/gates3.png)
 
 #### `GATES3-AL-AR1` — `GATES3`
+
+**Logical selector:** `GATES/ROMAN/32 [GATES] · MIT CADR Gates (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![GATES3-AL-AR1 symbols source specimen](specimens/symbols/source/gates3-al-ar1.png)
 
 #### `GATS3A`
 
+**Logical selector:** `GATES/ALTERNATE-A/32 [GATES] · MIT CADR Gates (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![GATS3A symbols source specimen](specimens/symbols/source/gats3a.png)
 
 #### `GATS3A-AL-AR1` — `GATS3A`
+
+**Logical selector:** `GATES/ALTERNATE-A/32 [GATES] · MIT CADR Gates (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![GATS3A-AL-AR1 symbols source specimen](specimens/symbols/source/gats3a-al-ar1.png)
 
 #### `HIP10A`
 
+**Logical selector:** `HIPPO/ALTERNATE-A/10 [GREEK] · MIT CADR Hippo (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![HIP10A symbols source specimen](specimens/symbols/source/hip10a.png)
 
 #### `HIP10A-AL-AR1` — `HIP10A`
+
+**Logical selector:** `HIPPO/ALTERNATE-A/10 [GREEK] · MIT CADR Hippo (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HIP10A-AL-AR1 symbols source specimen](specimens/symbols/source/hip10a-al-ar1.png)
 
 #### `HIPO10`
 
+**Logical selector:** `HIPPO/ALTERNATE-O/10 [GREEK] · MIT CADR Hippo (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![HIPO10 symbols source specimen](specimens/symbols/source/hipo10.png)
 
 #### `HIPO10-AL-AR1` — `HIPO10`
+
+**Logical selector:** `HIPPO/ALTERNATE-O/10 [GREEK] · MIT CADR Hippo (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![HIPO10-AL-AR1 symbols source specimen](specimens/symbols/source/hipo10-al-ar1.png)
 
 #### `MAT10A`
 
+**Logical selector:** `MATH/ALTERNATE-A/10A Name [MATH] · MIT CADR Math (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![MAT10A symbols source specimen](specimens/symbols/source/mat10a.png)
 
 #### `MAT10A-AL-AR1` — `MAT10A`
+
+**Logical selector:** `MATH/ALTERNATE-A/10A Name [MATH] · MIT CADR Math (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![MAT10A-AL-AR1 symbols source specimen](specimens/symbols/source/mat10a-al-ar1.png)
 
 #### `MATH10`
 
+**Logical selector:** `MATH/ROMAN/10 Name [MATH] · MIT CADR Math (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![MATH10 symbols source specimen](specimens/symbols/source/math10.png)
 
 #### `MATH10-AL-AR1` — `MATH10`
+
+**Logical selector:** `MATH/ROMAN/10 Name [MATH] · MIT CADR Math (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![MATH10-AL-AR1 symbols source specimen](specimens/symbols/source/math10-al-ar1.png)
 
 #### `MATH16`
 
+**Logical selector:** `MATH/ROMAN/16 Name [MATH] · MIT CADR Math (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![MATH16 symbols source specimen](specimens/symbols/source/math16.png)
 
 #### `MATH16-AL-AR1` — `MATH16`
+
+**Logical selector:** `MATH/ROMAN/16 Name [MATH] · MIT CADR Math (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
 
 ![MATH16-AL-AR1 symbols source specimen](specimens/symbols/source/math16-al-ar1.png)
 
 #### `MOUSE`
 
+**Logical selector:** `MOUSE/ROMAN/Default [MOUSE] · MIT CADR Mouse (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![MOUSE symbols source specimen](specimens/symbols/source/mouse.png)
 
 #### `MUSC10`
+
+**Logical selector:** `MUSIC/ROMAN/10 [MUSIC] · MIT CADR Music (role-mapped)`
+
+**Representation:** `Authored source`
 
 ![MUSC10 symbols source specimen](specimens/symbols/source/musc10.png)
 
 #### `MUSC10-AL-AR1` — `MUSC10`
 
+**Logical selector:** `MUSIC/ROMAN/10 [MUSIC] · MIT CADR Music (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![MUSC10-AL-AR1 symbols source specimen](specimens/symbols/source/musc10-al-ar1.png)
 
 #### `PLNK16`
+
+**Logical selector:** `PLANK/ROMAN/16 [PLANK] · MIT CADR Plank (role-mapped)`
+
+**Representation:** `Authored source`
 
 ![PLNK16 symbols source specimen](specimens/symbols/source/plnk16.png)
 
 #### `PLNK16-AL-AR1` — `PLNK16`
 
+**Logical selector:** `PLANK/ROMAN/16 [PLANK] · MIT CADR Plank (role-mapped)`
+
+**Representation:** `Authored source · AL-AR1`
+
 ![PLNK16-AL-AR1 symbols source specimen](specimens/symbols/source/plnk16-al-ar1.png)
 
 #### `SWFONT`
 
+**Logical selector:** `SWFONT/ROMAN/Default [SWFONT] · MIT CADR SWFONT (role-mapped)`
+
+**Representation:** `Authored source`
+
 ![SWFONT symbols source specimen](specimens/symbols/source/swfont.png)
 
 #### `TOG`
+
+**Logical selector:** `TOG/ROMAN/Default [TOG] · MIT CADR TOG (role-mapped)`
+
+**Representation:** `Authored source`
 
 ![TOG symbols source specimen](specimens/symbols/source/tog.png)
 
@@ -803,28 +1578,56 @@ closed complement. See [the Unicode mapping](docs/UNICODE.md) and
 
 #### `ARROW`
 
+**Logical selector:** `ARROWS/ROMAN/Default [ARROWS] · MIT CADR Arrows (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
+
 ![ARROW symbols runtime specimen](specimens/symbols/runtime/arrow.png)
 
 #### `MOUSE`
+
+**Logical selector:** `MOUSE/ROMAN/Default [MOUSE] · MIT CADR Mouse (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![MOUSE symbols runtime specimen](specimens/symbols/runtime/mouse.png)
 
 #### `NTOG` — `TOG`
 
+**Logical selector:** `TOG/ROMAN/Default [TOG] · MIT CADR TOG (role-mapped)`
+
+**Representation:** `System 46 Legacy NTOG · legacy compiled version`
+
 ![NTOG symbols runtime specimen](specimens/symbols/runtime/ntog.png)
 
 #### `S30CHS`
+
+**Logical selector:** `CHESS/ROMAN/30 [CHESS] · MIT CADR Chess (role-mapped)`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
 
 ![S30CHS symbols runtime specimen](specimens/symbols/runtime/s30chs.png)
 
 #### `SEARCH`
 
+**Logical selector:** `SEARCH/ROMAN/Default [SEARCH] · MIT CADR Search (role-mapped)`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![SEARCH symbols runtime specimen](specimens/symbols/runtime/search.png)
 
 #### `SHIP`
 
+**Logical selector:** `SHIP/ROMAN/Default [SHIP] · MIT CADR Ship (role-mapped)`
+
+**Representation:** `System 46 Runtime · compiled-only current object`
+
 ![SHIP symbols runtime specimen](specimens/symbols/runtime/ship.png)
 
 #### `TOG`
+
+**Logical selector:** `TOG/ROMAN/Default [TOG] · MIT CADR TOG (role-mapped)`
+
+**Representation:** `System 46 Runtime · source-backed current object`
 
 ![TOG symbols runtime specimen](specimens/symbols/runtime/tog.png)

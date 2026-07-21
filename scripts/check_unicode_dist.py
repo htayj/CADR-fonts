@@ -1003,6 +1003,8 @@ def _check_profile(
     mapping_copy: Path,
     mappings: dict[str, dict[int, dict[str, object]]],
     assignments: dict[str, str],
+    font_identities: dict[str, object],
+    font_identities_path: Path,
     runtime_catalog: dict[str, object],
 ) -> dict[str, object]:
     profile_root = output / "unicode" / profile_directory
@@ -1011,6 +1013,12 @@ def _check_profile(
     require(catalog["schema_version"] == 1, "unsupported Unicode catalog schema")
     require(catalog["profile"] == profile_name, "Unicode profile identity drift")
     require(catalog["mapping_id"] == mapping_manifest["mapping_id"], "mapping id drift")
+    require(
+        catalog.get("font_identity_mapping_id") == font_identities["mapping_id"]
+        and catalog.get("font_identity_mapping_sha256")
+        == sha256(font_identities_path),
+        "font-identity mapping provenance drift",
+    )
     require(
         catalog["unicode_version"] == mapping_manifest["unicode_version"],
         "Unicode version drift",
@@ -1057,6 +1065,27 @@ def _check_profile(
     pangram_cases: list[str] = []
     for artifact, raw_record in zip(artifacts, raw_records):
         artifact_name = artifact["artifact_name"]
+        logical_identity = artifact.get("logical_identity")
+        representation = artifact.get("representation")
+        require(
+            isinstance(logical_identity, dict)
+            and isinstance(representation, dict),
+            f"{artifact_name}: logical identity or representation missing",
+        )
+        require(
+            "representation" not in logical_identity,
+            f"{artifact_name}: representation is nested in logical identity",
+        )
+        require(
+            logical_identity == raw_record.get("logical_identity")
+            and representation == raw_record.get("representation"),
+            f"{artifact_name}: raw/Unicode logical metadata drift",
+        )
+        require(
+            representation.get("profile") == profile_directory
+            and representation.get("artifact_name") == artifact_name,
+            f"{artifact_name}: physical representation identity drift",
+        )
         if profile_directory == "source":
             assignment_key = raw_record["logical_name"]
             expected_raw_path = output / raw_record["outputs"]["bdf"]
@@ -1064,6 +1093,10 @@ def _check_profile(
             require(
                 artifact["logical_name"] == raw_record["logical_name"],
                 f"{artifact_name}: logical name drift",
+            )
+            require(
+                representation.get("logical_name") == raw_record["logical_name"],
+                f"{artifact_name}: source representation identity drift",
             )
         else:
             assignment_key = artifact_name
@@ -1075,6 +1108,21 @@ def _check_profile(
                 and artifact["classification"] == raw_record["classification"],
                 f"{artifact_name}: runtime identity drift",
             )
+            require(
+                representation.get("runtime_name") == raw_record["runtime_name"]
+                and representation.get("classification")
+                == raw_record["classification"],
+                f"{artifact_name}: runtime representation identity drift",
+            )
+        configured_logical_id = font_identities["assignments"][
+            "source_logical_names"
+            if profile_directory == "source"
+            else "runtime_artifacts"
+        ][assignment_key]
+        require(
+            logical_identity.get("logical_id") == configured_logical_id,
+            f"{artifact_name}: configured logical-font assignment drift",
+        )
         repertoire = assignments[assignment_key]
         resolved, geometry, font_geometry, pangram_case = _check_artifact(
             profile_root=profile_root,
@@ -1274,9 +1322,25 @@ def _check_build_manifest(
     output: Path,
     source: dict[str, object],
     runtime: dict[str, object],
+    font_identities: dict[str, object],
+    font_identities_path: Path,
 ) -> None:
     build = json.loads((output / "BUILD-MANIFEST.json").read_text(encoding="utf-8"))
     require(build["schema_version"] == 2, "BUILD-MANIFEST is not four-profile schema 2")
+    identity_assignments = font_identities["assignments"]
+    expected_identity_provenance = {
+        "id": font_identities["mapping_id"],
+        "sha256": sha256(font_identities_path),
+        "logical_identity_count": len(font_identities["logical_identities"]),
+        "source_logical_name_count": len(
+            identity_assignments["source_logical_names"]
+        ),
+        "runtime_artifact_count": len(identity_assignments["runtime_artifacts"]),
+    }
+    require(
+        build.get("font_identities") == expected_identity_provenance,
+        "BUILD-MANIFEST font-identity provenance is stale",
+    )
     pairs = (
         ("unicode_authoring_source", source, "authoring_source"),
         ("unicode_system_46_runtime", runtime, "system_46_runtime"),
@@ -1327,6 +1391,19 @@ def check_unicode_distribution(
     require(mapping_copy.read_bytes() == mapping_path.read_bytes(), "distributed Unicode mapping is stale")
     source_catalog_path = output / "catalog.json"
     runtime_catalog_path = output / "runtime" / "catalog.json"
+    font_identities_path = output / "FONT-IDENTITIES.json"
+    require(font_identities_path.is_file(), "distributed font identities are missing")
+    require(
+        font_identities_path.read_bytes()
+        == (ROOT / "config" / "font-identities.json").read_bytes(),
+        "distributed font identities differ from the tracked mapping",
+    )
+    font_identities = json.loads(font_identities_path.read_text(encoding="utf-8"))
+    require(
+        font_identities.get("schema_version") == 1
+        and isinstance(font_identities.get("mapping_id"), str),
+        "unsupported font-identity mapping",
+    )
     source_catalog = json.loads(source_catalog_path.read_text(encoding="utf-8"))
     runtime_catalog = json.loads(runtime_catalog_path.read_text(encoding="utf-8"))
     mapping_result = validate_mapping_closure(manifest, source_catalog, runtime_catalog)
@@ -1343,6 +1420,8 @@ def check_unicode_distribution(
         mapping_copy=mapping_copy,
         mappings=mappings,
         assignments=assignments["source_logical_names"],
+        font_identities=font_identities,
+        font_identities_path=font_identities_path,
         runtime_catalog=runtime_catalog,
     )
     runtime_result = _check_profile(
@@ -1356,6 +1435,8 @@ def check_unicode_distribution(
         mapping_copy=mapping_copy,
         mappings=mappings,
         assignments=assignments["runtime_artifacts"],
+        font_identities=font_identities,
+        font_identities_path=font_identities_path,
         runtime_catalog=runtime_catalog,
     )
     require(
@@ -1383,7 +1464,13 @@ def check_unicode_distribution(
     )
     unicode_aliases = set(source_result["aliases"]) | set(runtime_result["aliases"])
     require(not (raw_aliases & unicode_aliases), "raw and Unicode aliases collide")
-    _check_build_manifest(output, source_result, runtime_result)
+    _check_build_manifest(
+        output,
+        source_result,
+        runtime_result,
+        font_identities,
+        font_identities_path,
+    )
     return {
         "source_artifact_count": source_result["catalog"]["artifact_count"],
         "runtime_artifact_count": runtime_result["catalog"]["artifact_count"],

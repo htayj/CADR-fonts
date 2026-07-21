@@ -286,6 +286,21 @@ class XlfdOutputTests(unittest.TestCase):
             self.assertTrue(png.startswith(b"\x89PNG\r\n\x1a\n"))
             self.assertEqual(struct.unpack(">I", png[8:12])[0], 13)
 
+    def test_reviewed_typographic_policy_can_replace_conservative_default(self) -> None:
+        font = synthetic_font("Policy", (4,), ((3, 0, 3),))
+        policy = "reviewed logical-font identity mapping"
+        profile = common.bdf_profile(
+            font,
+            foundry="MIT",
+            family_name="MIT CADR Helvetica",
+            weight_name="Bold",
+            slant="I",
+            setwidth_name="Normal",
+            typographic_classification_policy=policy,
+        )
+        self.assertEqual(profile["typographic_classification_policy"], policy)
+        self.assertIn("-MIT-MIT CADR Helvetica-Bold-I-Normal-", profile["xlfd_name"])
+
 
 class TextSpecimenTests(unittest.TestCase):
     @staticmethod

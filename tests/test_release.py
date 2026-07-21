@@ -8,6 +8,7 @@ import sys
 import tarfile
 import tempfile
 import unittest
+from unittest import mock
 
 
 REPOSITORY = Path(__file__).resolve().parents[1]
@@ -144,18 +145,34 @@ class ReleaseIndexTests(unittest.TestCase):
 
 
 class FonttosfntIdentityTests(unittest.TestCase):
-    def test_hashes_executable_when_version_option_is_unsupported(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            executable = Path(directory) / "fonttosfnt"
-            executable.write_text(
-                "#!/bin/sh\nprintf 'usage: fonttosfnt\\n' >&2\nexit 1\n",
-                encoding="ascii",
-            )
-            executable.chmod(0o755)
+    def test_accepts_reviewed_fonttosfnt_version(self) -> None:
+        process = mock.Mock(stdout="fonttosfnt 1.2.5\n", stderr="")
+        with mock.patch.object(
+            release.shutil, "which", return_value="/tmp/fonttosfnt"
+        ), mock.patch.object(release.subprocess, "run", return_value=process):
             self.assertEqual(
-                release._fonttosfnt_version(str(executable)),
-                f"fonttosfnt executable sha256:{release.sha256(executable)}",
+                release._fonttosfnt_version("fonttosfnt"), "fonttosfnt 1.2.5"
             )
+
+    def test_rejects_unreviewed_fonttosfnt_version(self) -> None:
+        process = mock.Mock(stdout="fonttosfnt 1.0.4\n", stderr="")
+        with mock.patch.object(
+            release.shutil, "which", return_value="/tmp/fonttosfnt"
+        ), mock.patch.object(release.subprocess, "run", return_value=process):
+            with self.assertRaisesRegex(
+                release.ReleaseError, "expected 'fonttosfnt 1.2.5'"
+            ):
+                release._fonttosfnt_version("fonttosfnt")
+
+    def test_rejects_fonttosfnt_without_version_support(self) -> None:
+        error = release.subprocess.CalledProcessError(1, ["fonttosfnt", "--version"])
+        with mock.patch.object(
+            release.shutil, "which", return_value="/tmp/fonttosfnt"
+        ), mock.patch.object(release.subprocess, "run", side_effect=error):
+            with self.assertRaisesRegex(
+                release.ReleaseError, "cannot identify fonttosfnt version"
+            ):
+                release._fonttosfnt_version("fonttosfnt")
 
 
 class DeterministicArchiveTests(unittest.TestCase):

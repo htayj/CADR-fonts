@@ -90,6 +90,51 @@ function used to create GERM35 in 1978. The manifest additionally pins the prese
 date and the later 32-bit TV implementation as chronological cross-checks,
 then commits a GERM35-only normalized display-geometry oracle.
 
+## Logical-font identity evidence and policy boundary
+
+`config/font-identities.json` is a closed, reviewed interpretation layer over
+the physical source and runtime inventories. It assigns all 88 authored logical
+names and all 49 runtime artifacts to 108 logical identities while retaining
+all 200 physical representations. The mapping does not alter filenames,
+resident names, encodings, metrics, or pixels. Generated raw and Unicode
+catalogs store the resolved `logical_identity` separately from the source,
+current-runtime, or legacy `representation` record.
+
+The identity map pins four evidence files from the same exact CADR submodule
+revision and verifies each file's SHA-256 before use:
+
+- `src/lmfont/fcmp.xfile` supplies the surviving logical-name and face/size
+  inventory;
+- `src/lmio1/rfontw.43` supplies the historical family, face, and point-size
+  descriptor model;
+- `src/lmio1/press.46` supplies explicit Helvetica, Times Roman, Gacha, Math,
+  Hippo, and Gates family/face/size descriptors; and
+- `src/lmio1/dplt.63` cross-checks SAIL, Gacha, Helvetica, Math, and Helvetica
+  bold descriptor use.
+
+Those witnesses justify grouping `HL8`, `HL14`, and the other `HL*` strikes as
+one Helvetica family with different nominal sizes, and resolving `B`, `I`, and
+`BI` as bold, italic, and bold-italic faces where the evidence supports it.
+They do not justify deriving every opaque historical suffix mechanically.
+Accordingly, each logical assignment is labelled `mapped`, `role-mapped`, or
+`unmapped`, and each desktop family carries `direct`, `inferred`, or `neutral`
+confidence. The current closed inventory contains 72 mapped, 32 role-mapped,
+and four unmapped logical identities across 41 desktop families. Specialty and
+unmapped repertoires remain isolated from ordinary body-text family matching.
+
+Historical nominal size is not substituted for raster geometry. For example,
+source `HL8` is nominal size 8 with a measured 12-pixel character height, while
+`HL14` is nominal size 14 with a measured 15-pixel height. The logical catalog
+records both values. BDF/XLFD pixel and decipoint fields continue to use the
+measured line height at the documented 72 dpi interchange convention, so the
+mapping cannot scale or otherwise rewrite a recovered strike.
+
+The build copies the reviewed mapping to `dist/FONT-IDENTITIES.json` and pins
+its mapping ID and SHA-256 in `BUILD-MANIFEST.json`; release manifests carry
+the same identity provenance. These generated copies are reproducible
+expressions of the reviewed project mapping, not additional historical
+witnesses.
+
 ## Unicode mapping evidence and policy boundary
 
 The Unicode profile is a derivative view of the raw source and runtime
@@ -132,8 +177,9 @@ name are deliberately insufficient to infer a standardized character.
 records each family's evidence and uncertainty. Generated
 `dist/unicode/UNICODE-MAPPING.json` and the Unicode catalogs are reproducible
 expressions of that policy, not independent historical witnesses. The raw
-`Misc-FontSpecific` BDF encodings and raw catalogs remain unchanged and retain
-authority for archival CADR codes and geometry.
+`Misc-FontSpecific` BDF encodings remain unchanged. Raw catalogs retain
+authority for archival CADR codes and geometry while adding the reviewed
+logical-identity and representation metadata described above.
 
 The per-artifact Latin pangram PNGs are likewise generated presentation aids,
 not historical witnesses or new character-identification evidence. Their
@@ -145,12 +191,15 @@ layout, renderer hash, image hash, and dimensions.
 
 ## Identity and alias contract
 
-Full XLFD names distinguish authored artifacts from current and legacy runtime
-objects; alias prefixes alone are insufficient because an X server resolves an
-alias to an XLFD, not to a particular file. Current runtime XLFDs therefore use
-`System 46 Runtime` as their add-style, while legacy runtime XLFDs carry their
-explicit `System 46 Legacy N43XMS` or `System 46 Legacy NTOG` add-style. Source
-XLFD add-styles retain source-variant identity such as `KST` and `AL AR1`.
+Full XLFD names combine the reviewed logical family and face with enough
+representation detail to distinguish authored artifacts from current and
+legacy runtime objects. Alias prefixes alone are insufficient because an X
+server resolves an alias to an XLFD, not to a particular file. Current runtime
+XLFDs therefore compose `System 46 Runtime` into their add-style, while legacy
+runtime XLFDs carry explicit `System 46 Legacy N43XMS` or
+`System 46 Legacy NTOG` add-styles. Source XLFD add-styles retain source-variant
+identity such as `KST` and the XLFD-safe `AL AR1`; strike qualifiers are added
+where two physical rasters would otherwise have the same desktop tuple.
 
 The raw source and runtime `fonts.alias` files are generated under these
 deterministic rules and installed together on the X font path:

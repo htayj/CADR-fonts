@@ -57,6 +57,7 @@ config_enabled=$(join_path "$prefix" "/etc/fonts/conf.d/$config_name")
 for file in \
     "$data_root/RELEASE-MANIFEST.json" \
     "$data_root/SHA256SUMS" \
+    "$data_root/metadata/FONT-IDENTITIES.json" \
     "$data_root/metadata/SOURCE-MANIFEST.json" \
     "$data_root/metadata/runtime-source-manifest.json" \
     "$data_root/metadata/UNICODE-MAPPING.json"; do
@@ -154,18 +155,136 @@ if find "$font_root/bdf" -mindepth 1 -maxdepth 1 -type d \
     fail "installed BDF tree contains an unexpected profile"
 fi
 
-python3 - "$font_root" "$expected_source" "$expected_runtime" <<'PY'
-from pathlib import Path
+python3 - "$font_root" "$data_root" "$expected_source" "$expected_runtime" <<'PY'
+from pathlib import Path, PurePosixPath
+import hashlib
+import json
 import sys
-root = Path(sys.argv[1])
-for profile, expected in (("source", int(sys.argv[2])), ("runtime", int(sys.argv[3]))):
-    directory = root / "otb" / profile
-    files = sorted(directory.glob("*.otb")) if directory.is_dir() else []
-    if len(files) != expected:
-        raise SystemExit(f"{directory}: expected {expected} OTBs, found {len(files)}")
-    bdf_stems = {p.stem for p in (root / "bdf" / profile).glob("*.bdf")}
-    if {p.stem for p in files} != bdf_stems:
-        raise SystemExit(f"{directory}: OTB/Unicode-BDF filename closure mismatch")
+
+font_root = Path(sys.argv[1])
+data_root = Path(sys.argv[2])
+profile_counts = {"source": int(sys.argv[3]), "runtime": int(sys.argv[4])}
+manifest = json.loads((data_root / "RELEASE-MANIFEST.json").read_text(encoding="utf-8"))
+identity_path = data_root / "metadata" / "FONT-IDENTITIES.json"
+identity_bytes = identity_path.read_bytes()
+identities = json.loads(identity_bytes)
+identity_digest = hashlib.sha256(identity_bytes).hexdigest()
+source_distribution = manifest.get("source_distribution")
+if not isinstance(source_distribution, dict) or source_distribution.get("font_identities") != {
+    "path": "FONT-IDENTITIES.json",
+    "id": identities.get("mapping_id"),
+    "sha256": identity_digest,
+}:
+    raise SystemExit("installed font-identity provenance differs")
+
+metadata = manifest.get("metadata")
+expected_metadata = {
+    "FONT-IDENTITIES.json",
+    "SOURCE-MANIFEST.json",
+    "runtime-source-manifest.json",
+    "UNICODE-MAPPING.json",
+}
+if not isinstance(metadata, dict) or set(metadata) != expected_metadata:
+    raise SystemExit("installed release metadata set differs")
+for name, record in metadata.items():
+    installed = data_root / "metadata" / name
+    expected_record = {
+        "path": f"metadata/{name}",
+        "sha256": hashlib.sha256(installed.read_bytes()).hexdigest(),
+    }
+    if record != expected_record:
+        raise SystemExit(f"{installed}: metadata provenance differs")
+
+assignments = identities.get("assignments")
+if not isinstance(assignments, dict):
+    raise SystemExit("installed font-identity assignments are missing")
+source_assignments = assignments.get("source_logical_names")
+runtime_assignments = assignments.get("runtime_artifacts")
+if not isinstance(source_assignments, dict) or not isinstance(runtime_assignments, dict):
+    raise SystemExit("installed font-identity physical assignments are missing")
+
+expected_bdfs = set()
+expected_otbs = set()
+artifact_counts = {"source": 0, "runtime": 0}
+physical_identities = set()
+for artifact in manifest.get("artifacts", []):
+    if not isinstance(artifact, dict):
+        raise SystemExit("installed release artifact is malformed")
+    profile = artifact.get("profile")
+    artifact_name = artifact.get("artifact_name")
+    if profile not in profile_counts or not isinstance(artifact_name, str):
+        raise SystemExit("installed release artifact identity is malformed")
+    physical = (profile, artifact_name)
+    if physical in physical_identities:
+        raise SystemExit(f"duplicate installed artifact identity: {physical}")
+    physical_identities.add(physical)
+    artifact_counts[profile] += 1
+
+    logical_identity = artifact.get("logical_identity")
+    representation = artifact.get("representation")
+    if not isinstance(logical_identity, dict) or not isinstance(representation, dict):
+        raise SystemExit(f"{physical}: installed logical identity is missing")
+    if "representation" in logical_identity:
+        raise SystemExit(f"{physical}: representation is nested in logical identity")
+    if (
+        representation.get("profile") != profile
+        or representation.get("artifact_name") != artifact_name
+    ):
+        raise SystemExit(f"{physical}: installed representation identity differs")
+    if profile == "source":
+        logical_name = artifact.get("logical_name")
+        if representation.get("logical_name") != logical_name:
+            raise SystemExit(f"{physical}: installed source representation differs")
+        assigned_logical_id = source_assignments.get(logical_name)
+    else:
+        runtime_name = artifact.get("runtime_name")
+        classification = artifact.get("classification")
+        if (
+            representation.get("runtime_name") != runtime_name
+            or representation.get("classification") != classification
+        ):
+            raise SystemExit(f"{physical}: installed runtime representation differs")
+        assigned_logical_id = runtime_assignments.get(artifact_name)
+    if assigned_logical_id != logical_identity.get("logical_id"):
+        raise SystemExit(f"{physical}: installed configured logical assignment differs")
+
+    files = artifact.get("files")
+    if not isinstance(files, dict):
+        raise SystemExit(f"{physical}: installed artifact files are missing")
+    for kind, release_prefix, installed_kind, expected_paths in (
+        ("unicode_bdf", ("fonts", "unicode", profile), "bdf", expected_bdfs),
+        ("otb", ("fonts", "otb", profile), "otb", expected_otbs),
+    ):
+        record = files.get(kind)
+        if not isinstance(record, dict) or not isinstance(record.get("path"), str):
+            raise SystemExit(f"{physical}: installed {kind} record is malformed")
+        relative = PurePosixPath(record["path"])
+        if (
+            relative.parts[:3] != release_prefix
+            or len(relative.parts) != 4
+            or relative.suffix != (".bdf" if kind == "unicode_bdf" else ".otb")
+        ):
+            raise SystemExit(f"{physical}: installed {kind} path escaped its profile")
+        installed = font_root / installed_kind / profile / relative.name
+        if installed in expected_paths or not installed.is_file():
+            raise SystemExit(f"{physical}: installed {kind} file closure differs")
+        expected_paths.add(installed)
+        digest = hashlib.sha256(installed.read_bytes()).hexdigest()
+        if digest != record.get("sha256"):
+            raise SystemExit(f"{installed}: release hash differs")
+
+if artifact_counts != profile_counts:
+    raise SystemExit(
+        f"installed artifact profile counts differ: {artifact_counts!r} != {profile_counts!r}"
+    )
+actual_bdfs = set(font_root.glob("bdf/*/*.bdf"))
+actual_otbs = set(font_root.glob("otb/*/*.otb"))
+if actual_bdfs != expected_bdfs or actual_otbs != expected_otbs:
+    raise SystemExit("installed BDF/OTB manifest path closure differs")
+if {path.relative_to(font_root / "bdf").with_suffix("") for path in actual_bdfs} != {
+    path.relative_to(font_root / "otb").with_suffix("") for path in actual_otbs
+}:
+    raise SystemExit("installed OTB/Unicode-BDF profile and filename closure differs")
 PY
 
 if [[ "$skip_fontconfig" == true ]]; then
@@ -177,6 +296,127 @@ for file in "$config_available" "$config_enabled"; do
     [[ -s "$file" ]] || fail "missing installed fontconfig file: $file"
 done
 for tool in fc-cache fc-query fc-list fc-match mktemp; do need_tool "$tool"; done
+
+python3 - "$font_root" "$data_root/RELEASE-MANIFEST.json" <<'PY'
+from pathlib import Path, PurePosixPath
+import json
+import subprocess
+import sys
+
+font_root = Path(sys.argv[1])
+manifest = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+
+
+def unicode_add_style(typographic):
+    composed = " ".join(
+        part for part in (typographic["add_style_name"], "Unicode") if part
+    )
+    normalized = "".join(
+        " " if character in '-?*,"\\' else character for character in composed
+    )
+    return " ".join(normalized.split())
+
+
+def expected_style(typographic):
+    parts = []
+    parts.append(unicode_add_style(typographic).replace(" ", "-"))
+    if typographic["weight_name"] == "Bold":
+        parts.append("Bold")
+    if typographic["slant"] == "I":
+        parts.append("Italic")
+    if typographic["setwidth_name"] != "Normal":
+        parts.append(typographic["setwidth_name"])
+    return " ".join(parts) or "Regular"
+
+
+expected_weights = {"Medium": 80, "Bold": 200}
+expected_slants = {"R": 0, "I": 100}
+expected_widths = {"Condensed": 75, "Normal": 100, "Expanded": 125}
+expected_identities = {}
+observed_identities = {}
+for artifact in manifest["artifacts"]:
+    profile = artifact["profile"]
+    name = artifact["artifact_name"]
+    label = f"{profile}/{name}"
+    identity = artifact["logical_identity"]
+    typographic = identity["typographic"]
+    otb_relative = PurePosixPath(artifact["files"]["otb"]["path"])
+    bdf_relative = PurePosixPath(artifact["files"]["unicode_bdf"]["path"])
+    otb = font_root / "otb" / Path(
+        *otb_relative.relative_to("fonts/otb").parts
+    )
+    bdf = font_root / "bdf" / Path(
+        *bdf_relative.relative_to("fonts/unicode").parts
+    )
+    pixel_values = [
+        line.split()[1]
+        for line in bdf.read_text(encoding="ascii").splitlines()
+        if line.startswith("PIXEL_SIZE ")
+    ]
+    if len(pixel_values) != 1:
+        raise SystemExit(f"{bdf}: expected one PIXEL_SIZE")
+    expected_add_style = unicode_add_style(typographic)
+    add_style_values = [
+        line.removeprefix('ADD_STYLE_NAME "').removesuffix('"')
+        for line in bdf.read_text(encoding="ascii").splitlines()
+        if line.startswith('ADD_STYLE_NAME "')
+    ]
+    if add_style_values != [expected_add_style]:
+        raise SystemExit(f"{bdf}: Unicode BDF add style differs from logical identity")
+    try:
+        expected = (
+            typographic["family_name"],
+            expected_style(typographic),
+            expected_weights[typographic["weight_name"]],
+            expected_slants[typographic["slant"]],
+            expected_widths[typographic["setwidth_name"]],
+            float(pixel_values[0]),
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise SystemExit(f"{label}: unsupported logical typography: {error}") from error
+    if expected in expected_identities:
+        raise SystemExit(
+            f"desktop identity collision: {expected_identities[expected]} and {label}"
+        )
+    expected_identities[expected] = label
+    process = subprocess.run(
+        [
+            "fc-query",
+            "--format",
+            "%{family[0]}\t%{style[0]}\t%{weight}\t%{slant}\t%{width}\t%{pixelsize}\n",
+            str(otb),
+        ],
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    fields = process.stdout.rstrip("\n").split("\t")
+    if len(fields) != 6:
+        raise SystemExit(f"{otb}: fc-query returned malformed identity")
+    try:
+        observed = (
+            fields[0],
+            fields[1],
+            int(fields[2]),
+            int(fields[3]),
+            int(fields[4]),
+            float(fields[5]),
+        )
+    except ValueError as error:
+        raise SystemExit(f"{otb}: fc-query returned non-numeric identity fields") from error
+    if observed in observed_identities:
+        raise SystemExit(
+            f"observed Fontconfig identity collision: "
+            f"{observed_identities[observed]} and {label}"
+        )
+    observed_identities[observed] = label
+    if observed != expected:
+        raise SystemExit(
+            f"{otb}: Fontconfig identity differs for {label}: "
+            f"expected={expected!r}, observed={observed!r}"
+        )
+PY
 
 first_otb=$(find "$font_root/otb" -type f -name '*.otb' | sort | head -n 1)
 [[ -n "$first_otb" ]] || fail "no OTB font found under $font_root"

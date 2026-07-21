@@ -29,6 +29,12 @@ import shutil
 import sys
 from typing import Iterable
 
+from font_identities import (
+    DEFAULT_FONT_IDENTITIES,
+    bdf_profile_arguments,
+    load_font_identities,
+    resolve_font_identity,
+)
 from lisp_machine_fonts import (
     BitmapFont,
     Glyph,
@@ -1329,6 +1335,7 @@ def _runtime_add_style(spec: RuntimeArtifactSpec) -> str:
 def write_runtime_distribution(
     decoded: Iterable[DecodedRuntimeFont],
     *,
+    font_identities: dict[str, object],
     manifest: dict,
     manifest_path: Path,
     source: Path,
@@ -1355,12 +1362,18 @@ def write_runtime_distribution(
     for item in decoded:
         spec = item.spec
         font = item.font
-        profile = bdf_profile(
-            font,
-            foundry="Misc",
-            family_name=f"MIT CADR {spec.runtime_name}",
-            add_style_name=_runtime_add_style(spec),
+        logical_identity = resolve_font_identity(
+            font_identities,
+            profile="runtime",
+            physical_assignment=spec.artifact_name,
+            artifact_name=spec.artifact_name,
+            measured_pixel_size=font.character_height,
+            representation_style=_runtime_add_style(spec),
+            runtime_name=spec.runtime_name,
+            classification=spec.classification,
         )
+        representation = logical_identity.pop("representation")
+        profile = bdf_profile(font, **bdf_profile_arguments(logical_identity))
         outputs = write_font_outputs(
             font,
             output,
@@ -1409,6 +1422,8 @@ def write_runtime_distribution(
                 "raster_height": font.raster_height,
                 "baseline": font.baseline,
                 "glyph_count": len(font.glyphs),
+                "logical_identity": logical_identity,
+                "representation": representation,
                 "observations": font.metadata,
                 "bdf_profile": profile,
                 "outputs": outputs,
@@ -1455,11 +1470,13 @@ def write_runtime_distribution(
             ),
         },
         "xlfd_profile_policy": {
-            "current_add_style_name": "System 46 Runtime",
-            "legacy_add_style_name_pattern": "System 46 Legacy <artifact>",
+            "representation_add_style_name": "System 46 Runtime",
+            "legacy_representation_add_style_name_pattern": (
+                "System 46 Legacy <artifact>"
+            ),
             "purpose": (
-                "keep runtime QFASLs distinct from authoring-source XLFDs and "
-                "keep legacy versions distinct from current runtime fonts"
+                "compose runtime provenance with reviewed logical family/face "
+                "metadata and keep legacy versions distinct from current fonts"
             ),
         },
         "source_repository": SOURCE_REPOSITORY,
@@ -1535,6 +1552,12 @@ def main() -> int:
         default=DEFAULT_MANIFEST,
         help="closed runtime QFASL source manifest",
     )
+    parser.add_argument(
+        "--font-identities",
+        type=Path,
+        default=DEFAULT_FONT_IDENTITIES,
+        help="closed reviewed logical-font identity mapping",
+    )
     parser.add_argument("--sheet-columns", type=positive_integer, default=16)
     parser.add_argument("--sheet-scale", type=positive_integer, default=2)
     parser.add_argument(
@@ -1548,9 +1571,14 @@ def main() -> int:
     try:
         source = args.source.resolve()
         manifest_path = args.manifest.resolve()
+        font_identities = load_font_identities(
+            args.font_identities.resolve(),
+            source_repository=source.parents[1],
+        )
         manifest, decoded = decode_reviewed_fonts(source, manifest_path)
         catalog = write_runtime_distribution(
             decoded,
+            font_identities=font_identities,
             manifest=manifest,
             manifest_path=manifest_path,
             source=source,

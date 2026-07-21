@@ -14,6 +14,13 @@ import tempfile
 import time
 
 from lisp_machine_fonts import safe_filename
+from check_font_identities import (
+    IdentityCheckError,
+    check_bdf_profile,
+    check_catalog_record,
+    expected_source_record,
+    load_distributed_mapping,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -176,7 +183,10 @@ def expected_spacing(bdf: dict[str, object]) -> str:
 
 
 def check_bdf(
-    path: Path, record: dict[str, object], normalized_root: Path
+    path: Path,
+    record: dict[str, object],
+    normalized_root: Path,
+    font_identities: dict[str, object],
 ) -> dict[str, object]:
     bdf = parse_bdf(path)
     profile = record["bdf"]
@@ -223,27 +233,20 @@ def check_bdf(
     # bdf_profile/catalog regression visible instead of merely self-consistent.
     character_height = record["character_height"]
     baseline = record["baseline"]
-    expected_style = (
-        ""
-        if record["variant_of"] is None
-        else str(record["observations"]["variant_source_format"]).replace("-", " ")
+    logical_identity = check_catalog_record(
+        record,
+        expected_source_record(font_identities, record),
+        context=str(path),
     )
-    expected_family = "MIT CADR " + str(record["runtime_name"]).replace("-", " ")
+    check_bdf_profile(profile, logical_identity, context=str(path))
     require(bdf["size"] == (character_height, 72, 72), f"{path}: wrong SIZE policy")
-    require(properties["FOUNDRY"] == "Misc", f"{path}: wrong foundry policy")
-    require(
-        properties["FAMILY_NAME"] == expected_family,
-        f"{path}: wrong runtime family name",
-    )
-    require(properties["WEIGHT_NAME"] == "Unknown", f"{path}: inferred weight")
-    require(properties["SLANT"] == "OT", f"{path}: inferred slant")
-    require(
-        properties["SETWIDTH_NAME"] == "Unknown", f"{path}: inferred setwidth"
-    )
-    require(
-        properties["ADD_STYLE_NAME"] == expected_style,
-        f"{path}: wrong source-variant style",
-    )
+    require(properties["FOUNDRY"] == "MIT", f"{path}: wrong foundry policy")
+    typography = logical_identity["typographic"]
+    require(properties["FAMILY_NAME"] == typography["family_name"], f"{path}: wrong logical family")
+    require(properties["WEIGHT_NAME"] == typography["weight_name"], f"{path}: wrong logical weight")
+    require(properties["SLANT"] == typography["slant"], f"{path}: wrong logical slant")
+    require(properties["SETWIDTH_NAME"] == typography["setwidth_name"], f"{path}: wrong logical setwidth")
+    require(properties["ADD_STYLE_NAME"] == typography["add_style_name"], f"{path}: wrong representation style")
     require(properties["PIXEL_SIZE"] == character_height, f"{path}: wrong pixel size")
     require(
         properties["POINT_SIZE"] == character_height * 10,
@@ -572,6 +575,7 @@ def main() -> int:
     output = args.output.resolve()
 
     try:
+        font_identities = load_distributed_mapping(output)
         catalog = json.loads((output / "catalog.json").read_text(encoding="utf-8"))
         runtime_catalog = json.loads(
             (output / "runtime" / "catalog.json").read_text(encoding="utf-8")
@@ -610,7 +614,7 @@ def main() -> int:
         placeholder_font_count = 0
         for record in catalog["fonts"]:
             path = output / record["outputs"]["bdf"]
-            bdf = check_bdf(path, record, output)
+            bdf = check_bdf(path, record, output, font_identities)
             semantic_inventory.append(
                 {
                     "artifact": Path(record["outputs"]["bdf"]).name,
@@ -765,7 +769,14 @@ def main() -> int:
             if args.external_tools
             else None
         )
-    except (CheckError, KeyError, OSError, ValueError, subprocess.CalledProcessError) as error:
+    except (
+        CheckError,
+        IdentityCheckError,
+        KeyError,
+        OSError,
+        ValueError,
+        subprocess.CalledProcessError,
+    ) as error:
         parser.error(str(error))
 
     print(

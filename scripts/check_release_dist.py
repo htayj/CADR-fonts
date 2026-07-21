@@ -21,7 +21,7 @@ EXPECTED = {
         "source": (118, 12_237, 209),
         "runtime": (42, 5_084, 86),
         "artifacts": 160,
-        "files": 656,
+        "files": 657,
         "aliases": 590,
         "runtime_classes": {
             "compiled-only": 14,
@@ -33,7 +33,7 @@ EXPECTED = {
         "source": (33, 2_381, 63),
         "runtime": (7, 605, 13),
         "artifacts": 40,
-        "files": 176,
+        "files": 177,
         "aliases": 152,
         "runtime_classes": {
             "compiled-only": 3,
@@ -257,6 +257,7 @@ def check_archive(path: Path, content_class: str) -> dict[str, object]:
     artifacts = manifest["artifacts"]
     require(len(artifacts) == expected["artifacts"], f"{path}: artifact count changed")
     identities: set[tuple[str, str]] = set()
+    desktop_identities: dict[tuple[object, ...], tuple[str, str]] = {}
     glyph_counts = Counter()
     runtime_classes = Counter()
     expected_paths = {
@@ -265,10 +266,75 @@ def check_archive(path: Path, content_class: str) -> dict[str, object]:
         "LICENSE.source",
         "RELEASE-MANIFEST.json",
         "SHA256SUMS",
+        "metadata/FONT-IDENTITIES.json",
         "metadata/SOURCE-MANIFEST.json",
         "metadata/runtime-source-manifest.json",
         "metadata/UNICODE-MAPPING.json",
     }
+    require(
+        expected_paths <= set(relative_files),
+        f"{path}: required release files are missing",
+    )
+    try:
+        font_identities = json.loads(relative_files["metadata/FONT-IDENTITIES.json"])
+    except json.JSONDecodeError as error:
+        raise ReleaseDistError(f"{path}: malformed font-identity mapping") from error
+    require(
+        isinstance(font_identities, dict)
+        and font_identities.get("schema_version") == 1,
+        f"{path}: unsupported font-identity mapping",
+    )
+    identity_mapping_id = font_identities.get("mapping_id")
+    require(
+        isinstance(identity_mapping_id, str) and identity_mapping_id,
+        f"{path}: font-identity mapping ID is missing",
+    )
+    identity_assignments = font_identities.get("assignments")
+    require(
+        isinstance(identity_assignments, dict),
+        f"{path}: font-identity assignments are missing",
+    )
+    source_assignments = identity_assignments.get("source_logical_names")
+    runtime_assignments = identity_assignments.get("runtime_artifacts")
+    require(
+        isinstance(source_assignments, dict) and isinstance(runtime_assignments, dict),
+        f"{path}: font-identity physical assignments are missing",
+    )
+    identity_digest = digest(relative_files["metadata/FONT-IDENTITIES.json"])
+    source_distribution = manifest.get("source_distribution")
+    require(
+        isinstance(source_distribution, dict),
+        f"{path}: source-distribution provenance is missing",
+    )
+    require(
+        source_distribution.get("font_identities")
+        == {
+            "path": "FONT-IDENTITIES.json",
+            "id": identity_mapping_id,
+            "sha256": identity_digest,
+        },
+        f"{path}: source font-identity provenance differs",
+    )
+    metadata_names = {
+        "FONT-IDENTITIES.json",
+        "SOURCE-MANIFEST.json",
+        "runtime-source-manifest.json",
+        "UNICODE-MAPPING.json",
+    }
+    metadata = manifest.get("metadata")
+    require(
+        isinstance(metadata, dict) and set(metadata) == metadata_names,
+        f"{path}: release metadata set changed",
+    )
+    for name in sorted(metadata_names):
+        packaged_path = f"metadata/{name}"
+        record = metadata[name]
+        require(isinstance(record, dict), f"{path}:{packaged_path}: malformed record")
+        require(
+            record.get("path") == packaged_path
+            and record.get("sha256") == digest(relative_files[packaged_path]),
+            f"{path}:{packaged_path}: metadata provenance differs",
+        )
     license_sources = {
         "project": ("LICENSE.project", ROOT / "LICENSE"),
         "source": ("LICENSE.source", ROOT / "LICENSE.source"),
@@ -315,6 +381,70 @@ def check_archive(path: Path, content_class: str) -> dict[str, object]:
             identity = (profile, str(record["artifact_name"]))
             require(identity not in identities, f"{path}: duplicate artifact identity")
             identities.add(identity)
+            logical_identity = record.get("logical_identity")
+            representation = record.get("representation")
+            require(
+                isinstance(logical_identity, dict),
+                f"{path}:{identity}: logical identity is missing",
+            )
+            require(
+                isinstance(representation, dict),
+                f"{path}:{identity}: representation is missing",
+            )
+            require(
+                "representation" not in logical_identity,
+                f"{path}:{identity}: representation is nested in logical identity",
+            )
+            typographic = logical_identity.get("typographic")
+            require(
+                isinstance(typographic, dict)
+                and isinstance(typographic.get("family_name"), str)
+                and bool(typographic["family_name"]),
+                f"{path}:{identity}: logical typography is malformed",
+            )
+            require(
+                representation.get("profile") == profile
+                and representation.get("artifact_name") == identity[1],
+                f"{path}:{identity}: representation physical identity differs",
+            )
+            if profile == "source":
+                logical_name = str(record["logical_name"])
+                require(
+                    representation.get("logical_name") == logical_name,
+                    f"{path}:{identity}: representation logical name differs",
+                )
+                assigned_logical_id = source_assignments.get(logical_name)
+            else:
+                runtime_name = str(record["runtime_name"])
+                classification = str(record["classification"])
+                require(
+                    representation.get("runtime_name") == runtime_name
+                    and representation.get("classification") == classification,
+                    f"{path}:{identity}: representation runtime identity differs",
+                )
+                assigned_logical_id = runtime_assignments.get(identity[1])
+            require(
+                assigned_logical_id == logical_identity.get("logical_id"),
+                f"{path}:{identity}: configured logical assignment differs",
+            )
+            desktop_identity = (
+                typographic.get("family_name"),
+                typographic.get("weight_name"),
+                typographic.get("slant"),
+                typographic.get("setwidth_name"),
+                typographic.get("add_style_name"),
+                logical_identity.get("measured_pixel_size"),
+            )
+            require(
+                all(value is not None for value in desktop_identity),
+                f"{path}:{identity}: desktop identity is incomplete",
+            )
+            require(
+                desktop_identity not in desktop_identities,
+                f"{path}: desktop identity collision between "
+                f"{desktop_identities.get(desktop_identity)} and {identity}",
+            )
+            desktop_identities[desktop_identity] = identity
             if profile == "runtime":
                 runtime_classes[str(record["classification"])] += 1
             files = record["files"]
@@ -336,6 +466,12 @@ def check_archive(path: Path, content_class: str) -> dict[str, object]:
                 and unicode_path.startswith(f"fonts/unicode/{profile}/")
                 and otb_path.startswith(f"fonts/otb/{profile}/"),
                 f"{path}:{identity}: profile path escaped",
+            )
+            require(
+                PurePosixPath(raw_path).stem
+                == PurePosixPath(unicode_path).stem
+                == PurePosixPath(otb_path).stem,
+                f"{path}:{identity}: font-format basenames differ",
             )
             raw_names.add(PurePosixPath(raw_path).name)
             unicode_names.add(PurePosixPath(unicode_path).name)
@@ -424,14 +560,42 @@ def check_release_directory(directory: Path) -> list[dict[str, object]]:
         "release archives have different versions",
     )
     identities = []
+    desktop_identities: dict[tuple[object, ...], tuple[str, str, str]] = {}
     for content_class, archive_path in archives.items():
         _members, files = _read_archive(archive_path)
         root = next(iter({PurePosixPath(name).parts[0] for name in files}))
         manifest = json.loads(files[f"{root}/RELEASE-MANIFEST.json"])
-        identities.extend(
-            (content_class, record["profile"], record["artifact_name"])
-            for record in manifest["artifacts"]
-        )
+        for record in manifest["artifacts"]:
+            release_identity = (
+                content_class,
+                str(record["profile"]),
+                str(record["artifact_name"]),
+            )
+            identities.append(release_identity)
+            logical_identity = record.get("logical_identity")
+            require(
+                isinstance(logical_identity, dict),
+                f"{archive_path}:{release_identity}: logical identity is missing",
+            )
+            typographic = logical_identity.get("typographic")
+            require(
+                isinstance(typographic, dict),
+                f"{archive_path}:{release_identity}: logical typography is missing",
+            )
+            desktop_identity = (
+                typographic.get("family_name"),
+                typographic.get("weight_name"),
+                typographic.get("slant"),
+                typographic.get("setwidth_name"),
+                typographic.get("add_style_name"),
+                logical_identity.get("measured_pixel_size"),
+            )
+            require(
+                desktop_identity not in desktop_identities,
+                "combined release desktop identity collision between "
+                f"{desktop_identities.get(desktop_identity)} and {release_identity}",
+            )
+            desktop_identities[desktop_identity] = release_identity
     require(len(identities) == 200, "combined release does not contain 200 artifacts")
     unclassified = [(profile, name) for _class, profile, name in identities]
     require(len(set(unclassified)) == 200, "release archives overlap artifact identities")

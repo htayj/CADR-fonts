@@ -5,12 +5,13 @@ Unicode-encoded derivative of the recovered MIT CADR System 46 bitmap fonts.
 It is a project mapping for interoperable use of this distribution, not a
 claim that the historical CADR files contained Unicode data.
 
-The Unicode profile changes only character encodings and the corresponding
-XLFD registry/encoding identity. It preserves each selected artifact's bitmap
-rows, advance, signed bearing, line metrics, spacing classification, source or
-runtime identity, and the no-op-slot omission policy. It does not trace bitmaps
-into outlines, synthesize characters, or merge source and runtime
-representations.
+The Unicode profile changes character encodings and the corresponding XLFD
+registry/encoding identity, and adds `Unicode` to the representation
+add-style. It preserves each selected artifact's reviewed logical family,
+face, nominal design size, measured pixel height, bitmap rows, advance, signed
+bearing, line metrics, spacing classification, source or runtime identity, and
+the no-op-slot omission policy. It does not trace bitmaps into outlines,
+synthesize characters, or merge source and runtime representations.
 
 The raw preservation profiles remain authoritative and unchanged:
 
@@ -19,6 +20,29 @@ The raw preservation profiles remain authoritative and unchanged:
 - the source and runtime JSON catalogs continue to record raw CADR slots;
 - Unicode BDFs are a derived, separately named view and never replace a raw
   BDF or raw alias.
+
+## Relationship to logical-font identity
+
+Character encoding and font identity are two independent reviewed mappings.
+`config/font-identities.json` groups physical strikes into desktop families and
+faces and records historical nominal sizes separately from measured line
+heights. `config/unicode-mapping.json` maps historical character positions to
+Unicode scalars. Applying the second mapping never changes the result of the
+first.
+
+For example, source `HL8` and `HL14` remain distinct physical strikes in one
+`MIT CADR Helvetica` family at nominal sizes 8 and 14; their measured character
+heights remain 12 and 15 pixels. `HL12B`, `HL12I`, and runtime `HL12BI` expose
+bold, italic, and bold-italic faces of that family. Their Unicode derivatives
+retain those identities and exact raster sizes while changing BDF `ENCODING`
+values from historical CADR codes to reviewed Unicode scalars.
+
+Every raw and Unicode catalog therefore carries the same `logical_identity`
+and a separate physical `representation` record. The distribution copies the
+reviewed identity map as `dist/FONT-IDENTITIES.json`; the encoding map remains
+`dist/unicode/UNICODE-MAPPING.json`. A PUA repertoire “family” below describes
+shared historical character positions and must not be confused with a desktop
+typographic family.
 
 ## Mapping selection
 
@@ -277,7 +301,8 @@ dist/unicode/
 
 `UNICODE-MAPPING.json` is the machine-readable release form of this mapping.
 The two catalogs retain the source/runtime and current/legacy boundaries while
-recording the derivative encodings. The profile-specific alias rules are:
+recording the unchanged logical/representation identities and derivative
+encodings. The profile-specific alias rules are:
 
 1. `cadr-unicode-source-<artifact>` selects that exact authored source
    representation.
@@ -368,7 +393,11 @@ metrics and provenance.
 Unicode derivative BDFs store the scalar value directly as decimal BDF
 `ENCODING`. Their XLFD `CHARSET_REGISTRY` and `CHARSET_ENCODING` fields are
 `ISO10646` and `1`, so the final XLFD fields are `ISO10646-1`, as required for
-Unicode-encoded X core fonts. Raw BDFs continue to use `Misc-FontSpecific`.
+Unicode-encoded X core fonts. Raw BDFs continue to store the original CADR code
+as `ENCODING` and use `Misc-FontSpecific`. Family, face, measured pixel size,
+advance, bearing, and bitmap geometry are identical across that encoding
+boundary; only the Unicode add-style qualifier and character-set identity
+differ.
 
 All assigned values are in the Basic Multilingual Plane: the highest reserved
 project PUA value is U+EDFF, and the highest standard value is U+25CA. They
