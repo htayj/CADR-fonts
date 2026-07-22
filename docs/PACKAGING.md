@@ -87,7 +87,7 @@ collection's filename/package name installs only the other collection.
 
 ## Arch User Repository
 
-The AUR package base [`cadr-fonts`](https://aur.archlinux.org/packages/cadr-fonts)
+The AUR package base [`cadr-fonts`](https://aur.archlinux.org/pkgbase/cadr-fonts)
 builds the tagged release from the checksummed project and historical CADR Git
 sources. It produces the independently installable `cadr-fonts-latin` and
 `cadr-fonts-symbols` packages; it neither downloads nor republishes the binary

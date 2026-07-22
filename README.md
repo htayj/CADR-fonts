@@ -305,7 +305,7 @@ The same release also publishes separate `cadr-fonts-latin` and
 adjacent SHA-256 file. The repository flake provides
 `cadr-fonts-latin` and `cadr-fonts-symbols` for x86_64 and AArch64 Linux. See
 [Packaging](docs/PACKAGING.md) for paths, local commands, the source-built
-[`cadr-fonts` AUR package](https://aur.archlinux.org/packages/cadr-fonts), and
+[`cadr-fonts` AUR package](https://aur.archlinux.org/pkgbase/cadr-fonts), and
 the additional manual package recipes.
 
 ## License
