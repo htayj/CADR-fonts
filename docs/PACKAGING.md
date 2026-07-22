@@ -85,13 +85,35 @@ sudo xbps-install --repository="$PWD" cadr-fonts-latin cadr-fonts-symbols
 Check the adjacent `.sha256` files before installation. Omitting either
 collection's filename/package name installs only the other collection.
 
+## Arch User Repository
+
+The AUR package base [`cadr-fonts`](https://aur.archlinux.org/packages/cadr-fonts)
+builds the tagged release from the checksummed project and historical CADR Git
+sources. It produces the independently installable `cadr-fonts-latin` and
+`cadr-fonts-symbols` packages; it neither downloads nor republishes the binary
+Arch package attached to the GitHub release.
+
+Build and install both split packages using the standard AUR workflow:
+
+```sh
+git clone https://aur.archlinux.org/cadr-fonts.git
+cd cadr-fonts
+makepkg --syncdeps --install
+```
+
+The AUR packages have no runtime dependencies or cache-update install script.
+Arch's existing Fontconfig configuration recursively discovers the BDF and OTB
+files beneath `/usr/share/fonts`, and Pacman hooks refresh the cache. The AUR
+repository's `LICENSE`/`REUSE.toml` cover the package recipe under 0BSD; both
+BSD-3-Clause font provenance notices remain installed in each binary package.
+
 ## Local generic and binary builds
 
 Build and independently verify both generic archives with a version string and
 the source commit timestamp:
 
 ```sh
-version=v0.1.1
+version=v0.1.2
 epoch=$(git show -s --format=%ct HEAD)
 make check-release VERSION="$version" SOURCE_DATE_EPOCH="$epoch"
 make release-reproducible VERSION="$version" SOURCE_DATE_EPOCH="$epoch"
@@ -123,8 +145,8 @@ can be repeated with:
 ```sh
 scripts/test-linux-package-container.sh \
   --runtime docker --format deb \
-  --package dist/packages/deb/cadr-fonts-latin_0.1.1-1_all.deb \
-  --package dist/packages/deb/cadr-fonts-symbols_0.1.1-1_all.deb
+  --package dist/packages/deb/cadr-fonts-latin_0.1.2-1_all.deb \
+  --package dist/packages/deb/cadr-fonts-symbols_0.1.2-1_all.deb
 ```
 
 Use the matching format and files for the other package systems. Passing both
@@ -168,9 +190,10 @@ BDFs nor unrelated CADR source files.
 The following recipes mirror the additional platforms maintained by the
 sibling DEC Fonts project:
 
-- `packaging/aur/cadr-fonts-git/` is an AUR-style VCS split `PKGBUILD` for
-  `cadr-fonts-latin-git` and `cadr-fonts-symbols-git`; its separately declared
-  CADR Git source is redirected into the pinned submodule checkout.
+- `packaging/aur/cadr-fonts/` is the stable AUR split `PKGBUILD` for
+  `cadr-fonts-latin` and `cadr-fonts-symbols`; its tagged project source and
+  separately declared CADR Git source are pinned before the latter is
+  redirected into the historical submodule checkout.
 - `packaging/gentoo/` is a local live overlay containing independent
   `media-fonts/cadr-fonts-latin` and `media-fonts/cadr-fonts-symbols` ebuilds.
 - `packaging/guix/` is a local channel module exporting `cadr-fonts-latin` and

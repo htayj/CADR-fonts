@@ -132,6 +132,26 @@ payload assets—two generic archives and eight native packages—and ten adjace
 SHA-256 files. Repository metadata, temporary build products, signatures, and
 package-manager repository indexes are not uploaded implicitly.
 
+## Updating the AUR package
+
+The AUR package base `cadr-fonts` is a separate, source-only Git repository.
+Update it after the corresponding GitHub tag and release are immutable:
+
+1. bump `pkgver` and reset `pkgrel` in `packaging/aur/cadr-fonts/PKGBUILD`;
+2. replace the project tag object, project commit, release timestamp, and any
+   changed CADR revision with the exact reviewed identities;
+3. regenerate both source hashes with `makepkg --geninteg`, then regenerate
+   `.SRCINFO` with `makepkg --printsrcinfo`;
+4. run `pkgctl license check`, `namcap` on the recipe and both packages, a
+   clean Arch build, co-installation, and Fontconfig discovery; and
+5. copy only `PKGBUILD`, `.SRCINFO`, `.gitignore`, `LICENSE`,
+   `LICENSES/0BSD.txt`, and `REUSE.toml` to the AUR `master` branch, commit a
+   meaningful release update, and push.
+
+Do not upload built packages, file lists, generated font trees, or GitHub
+release assets to the AUR repository. AUR commit authorship is effectively
+permanent, so confirm the public Git name and email before every push.
+
 ## Required gates
 
 The tag workflow invokes the same generators and checkers used locally. Its
@@ -175,7 +195,7 @@ archive epoch:
 
 ```sh
 git submodule update --init --recursive
-version=v0.1.1
+version=v0.1.2
 epoch=$(git show -s --format=%ct HEAD)
 make ci VERSION="$version" SOURCE_DATE_EPOCH="$epoch"
 export SOURCE_DATE_EPOCH="$epoch"

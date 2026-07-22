@@ -44,8 +44,8 @@ make check-external
 make reproducible
 make compare-genera
 make audit-runtime-names
-make release VERSION=v0.1.1
-make check-release VERSION=v0.1.1
+make release VERSION=v0.1.2
+make check-release VERSION=v0.1.2
 make check-specimens
 ```
 
@@ -304,8 +304,9 @@ The same release also publishes separate `cadr-fonts-latin` and
 `cadr-fonts-symbols` packages in DEB, RPM, Arch, and Void formats, each with an
 adjacent SHA-256 file. The repository flake provides
 `cadr-fonts-latin` and `cadr-fonts-symbols` for x86_64 and AArch64 Linux. See
-[Packaging](docs/PACKAGING.md) for paths, local commands, and the additional
-manual package recipes.
+[Packaging](docs/PACKAGING.md) for paths, local commands, the source-built
+[`cadr-fonts` AUR package](https://aur.archlinux.org/packages/cadr-fonts), and
+the additional manual package recipes.
 
 ## License
 
